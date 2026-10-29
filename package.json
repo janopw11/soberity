@@ -1,0 +1,28 @@
+{
+  "name": "soberity",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.4.1",
+  "engines": {
+    "node": ">=24.14.0 <25",
+    "pnpm": "10.4.1"
+  },
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:secrets": "node scripts/check-secret-ignores.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm check:secrets"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.13.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

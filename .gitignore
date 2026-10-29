@@ -1,0 +1,45 @@
+/docs
+
+# Dependencies and generated outputs
+node_modules/
+.pnpm-store/
+dist/
+build/
+target/
+coverage/
+*.tsbuildinfo
+.expo/
+web-build/
+/apps/consumer/android/
+/apps/consumer/ios/
+
+# Local environment and credentials; examples are intentionally versioned
+.env
+.env.*
+!.env.example
+!.env.*.example
+.secrets/
+secrets/
+*service-account*.json
+*serviceAccount*.json
+*firebase-adminsdk*.json
+application_default_credentials.json
+credentials.json
+google-services.json
+GoogleService-Info.plist
+*.pem
+*.key
+*.p12
+*.p8
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+
+# Local tools and OS files
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.log
+.maven-user-home/

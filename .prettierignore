@@ -1,0 +1,16 @@
+# User-authored requirements: do not rewrite them during source formatting.
+AGENTS.md
+PHASES.md
+Soberity_raport_produktowo_techniczny.md
+
+# Local documentation is excluded from Git by owner decision.
+docs/
+
+# Generated files and upstream wrapper scripts
+pnpm-lock.yaml
+backend/mvnw
+backend/mvnw.cmd
+node_modules/
+dist/
+target/
+coverage/
