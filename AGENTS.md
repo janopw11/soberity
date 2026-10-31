@@ -4,12 +4,13 @@
 
 Soberity to międzynarodowa aplikacja web/iOS/Android promująca życie bez alkoholu na podstawie rzetelnych badań naukowych. **Edukacja (Science) oraz wydarzenia i społeczność (Community/Events) są równorzędnymi filarami produktu**. Szczególne znaczenie mają sober parties i sober raves, uzupełniane o inne bezalkoholowe aktywności.
 
-Przed planowaniem lub implementacją zapoznaj się z poniższymi plikami w katalogu głównym repozytorium:
+Przed planowaniem lub implementacją zapoznaj się z poniższymi dokumentami repozytorium:
 
 1. [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md) — **główne źródło wymagań**: misja, funkcje, architektura, dane, API, bezpieczeństwo i kierunek rozwoju. Czytaj odpowiednie rozdziały w całości przed pracą nad danym modułem.
 2. [`PHASES.md`](./PHASES.md) — **plan wykonania i tracker postępu**: fazy 0–9 rozbite na iteracje `P0-I00` itd., zależności, checklisty, testy, kryteria akceptacji i dziennik implementacji. To z niego wybierasz kolejne zadania i do niego wpisujesz wyniki.
 3. [`CHANGELOG.md`](./CHANGELOG.md) — **historia ukończonych zmian z datami**: zwięzłe podsumowanie większych funkcjonalności, napraw i kamieni milowych; nie jest miejscem na codzienną listę commitów ani zadania planowane.
-4. `AGENTS.md` (ten plik) — **stałe zasady pracy agenta**. Nie kopiuj tu szczegółowych zadań z `PHASES.md`.
+4. [`docs/BRANDING.md`](./docs/BRANDING.md) — **obowiązujący kierunek brandingu i specyfikacja UI**: paleta, typografia, spacing, komponenty, dostępność, wzorce ekranów oraz status zatwierdzenia logo. **Przeczytaj przed każdą pracą nad frontendem, UI, ilustracjami, layoutem lub assetami.**
+5. `AGENTS.md` (ten plik) — **stałe zasady pracy agenta**. Nie kopiuj tu szczegółowych zadań z `PHASES.md`.
 
 W razie rozbieżności między dokumentami, kodem i bieżącym poleceniem użytkownika: sprawdź stan repozytorium, opisz konflikt i poproś o decyzję zamiast po cichu zmieniać założenia. Nie traktuj samej checklisty jako dowodu istnienia funkcji.
 
@@ -29,10 +30,19 @@ W razie rozbieżności między dokumentami, kodem i bieżącym poleceniem użytk
 - **Lokalny development:** Docker Compose dla usług backendowych, testy jednostkowe i integracyjne; nie dodawaj mikroserwisów, Kafki ani Kubernetes bez potwierdzonej potrzeby i zgody.
 - Zgodność wersji bibliotek, konkretne komendy i architekturę katalogów weryfikuj w aktualnym repozytorium, nie zakładaj, że przykłady z planu są już zaimplementowane.
 
-## 4. Zasady realizacji faz i iteracji
+## 4. Branding, frontend i jakość wizualna
+
+- **Jedynym repozytoryjnym źródłem wytycznych UI jest [`docs/BRANDING.md`](./docs/BRANDING.md).** Zawsze czytaj go przed implementacją lub refaktoryzacją ekranów, komponentów, kolorów, nawigacji wizualnej, ilustracji i assetów. Raport produktowy nadal określa funkcje i cele; `BRANDING.md` określa ich oprawę wizualną.
+- Soberity ma **jasny, czysty styl z fioletem jako akcentem**. Używaj wspólnych semantycznych design tokens, responsywnych układów i dostępnych komponentów na web/iOS/Android. Nie wprowadzaj dowolnych HEX ani przypadkowej typografii w kolejnych ekranach.
+- **Logo/sygnet nie są jeszcze finalnie zatwierdzone.** Nie utrwalaj wcześniejszych, niezaakceptowanych symboli (np. motywu liścia/kropli) jako oficjalnego logo lub ikony sklepowej. Do czasu akceptacji użyj tymczasowego tekstowego `Soberity` i zachowaj możliwość podmiany assetu.
+- Osobisty avatar administratora GitHub (ciemny kaptur, ukryta twarz i włosy) **nie jest** elementem oficjalnego logotypu ani domyślnym avatarem użytkowników.
+- W **P0-I03** implementuj podstawowy design system według `docs/BRANDING.md`; w **P0-I02** korzystaj jedynie z niezbędnych podstaw wizualnych. Zmiany głównej palety, logo i fontu marki wymagają akceptacji właściciela.
+- Przed oznaczeniem zadania UI jako `DONE` zweryfikuj kontrast, stany komponentów, EN/PL, responsywność, accessibility oraz rzeczywiście przetestowane platformy. Niewykonanych testów nie deklaruj jako zakończonych.
+
+## 5. Zasady realizacji faz i iteracji
 
 1. **Zacznij od Phase 0** w `PHASES.md`, chyba że użytkownik wyraźnie wskaże inne zadanie. Phase 0 obejmuje projekt, Expo web/iOS/Android, backend, Firebase Auth, potwierdzenie e-maila, reset/zmianę hasła i profil.
-2. Na początku sesji: przeczytaj `AGENTS.md`, istotne części raportu i aktualną fazę w `PHASES.md`; sprawdź stan kodu i `git status`. Przed większą zmianą przedstaw krótki plan, zależności i sposób weryfikacji.
+2. Na początku sesji: przeczytaj `AGENTS.md`, istotne części raportu i aktualną fazę w `PHASES.md`; przy zadaniach frontendowych/UI przeczytaj również `docs/BRANDING.md`; sprawdź stan kodu i `git status`. Przed większą zmianą przedstaw krótki plan, zależności i sposób weryfikacji.
 3. Realizuj **dokładnie jedną iterację agentową na polecenie** (`P{phase}-I{iteration}`, np. `P0-I06`). Przed jej startem przedstaw plan i zależności. **Nie rozpoczynaj następnej iteracji ani fazy bez mojego polecenia/akceptacji**, nawet gdy ukończysz pracę wcześniej. Nie oznaczaj zależności jako ukończonych na podstawie samej checklisty.
 4. Po **faktycznym zakończeniu i weryfikacji** zadania zmień `- [ ]` na `- [x]` w `PHASES.md`. Zadanie nieprzetestowane, częściowe albo zablokowane nie może być oznaczone jako zakończone.
 5. Po sesji aktualizuj w `PHASES.md`: **status bieżącej iteracji**, ID wykonanych checkboxów, datę rozpoczęcia/ukończenia (tylko rzeczywistą), dowody testów, bieżący wskaźnik pracy, dziennik sesji i ewentualnie status fazy. Iteracja ma status `DONE` dopiero po spełnieniu własnego Definition of Done; bramka fazy wymaga osobnej weryfikacji. Nie zmieniaj historii wykonania na fikcyjną.
@@ -41,11 +51,11 @@ W razie rozbieżności między dokumentami, kodem i bieżącym poleceniem użytk
 8. Istotne zmiany architektoniczne zapisz w `docs/adr/` po uzgodnieniu. Nie nadpisuj głównego raportu produktowego bez prośby albo zatwierdzonej aktualizacji wymagań.
 9. Nie wykonuj deploymentu, operacji na produkcyjnych danych, płatności ani publikacji w sklepach i nie wprowadzaj destrukcyjnych zmian bez jednoznacznej zgody. Commit/push wykonuj zgodnie z poleceniem użytkownika.
 
-## 5. Standard jakości i format odpowiedzi
+## 6. Standard jakości i format odpowiedzi
 
 - W kodzie stosuj spójne nazewnictwo, walidację danych, obsługę błędów, testy i czytelne logowanie bez wycieku danych wrażliwych.
 - Przy zmianach klienta sprawdź web oraz, jeśli środowisko pozwala, iOS Simulator i Android Emulator; zapisz, **co rzeczywiście uruchomiono**, a czego nie.
 - Przy zmianach API sprawdź autoryzację, uprawnienia i niezgodności kontraktów. Nie wstawiaj atrap sugerujących działającą funkcję.
 - Na koniec każdej sesji krótko podsumuj: **wykonane zadania**, **zmienione pliki**, **wyniki testów**, **blokery**, **aktualizacja `CHANGELOG.md` (lub powód braku wpisu)** i **następny krok / identyfikator iteracji `P#-I##` z `PHASES.md`**.
 
-**Zasada nadrzędna:** raport definiuje *co i dlaczego* budujemy; `PHASES.md` definiuje *kiedy, jak i z jakim dowodem ukończenia*; `CHANGELOG.md` podsumowuje *co faktycznie ukończono i kiedy*; `AGENTS.md` definiuje *jak Codex ma pracować*.
+**Zasada nadrzędna:** raport definiuje *co i dlaczego* budujemy; `docs/BRANDING.md` definiuje *jak wizualnie komunikujemy produkt*; `PHASES.md` definiuje *kiedy, jak i z jakim dowodem ukończenia*; `CHANGELOG.md` podsumowuje *co faktycznie ukończono i kiedy*; `AGENTS.md` definiuje *jak Codex ma pracować*.

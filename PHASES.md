@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.0 — 2026-10-29  
-**Status globalny:** IN_PROGRESS — P0-I00 i P0-I01 DONE; P0-I02 oczekuje osobnego polecenia  
+**Status globalny:** IN_PROGRESS — P0-I00–P0-I02 DONE; P0-I03 oczekuje osobnego polecenia  
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 14 | 2/14 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 14 | 3/14 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 78 iteracji agentowych; wykonane: **2/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 zweryfikowane; P0-I02 nie rozpoczęto).
+**Łącznie:** 78 iteracji agentowych; wykonane: **3/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -170,24 +170,29 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I02 — Expo web/iOS/Android bootstrap
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE
+
+**Started:** 2026-10-29
+
+**Finished:** 2026-10-29
+
 **Zależności iteracji:** P0-I01  
-**Dowód:** —  
-**Blokery:** —
+
+**Dowód:** [klient i instrukcje](apps/consumer/README.md), [testy web](apps/consumer/tests/web/navigation.spec.ts), [lokalny raport](docs/testing/P0-I02-results.md). 2026-10-29: frozen install, pnpm check/build, eksport Hermes iOS/Android — exit 0; Expo Doctor 20/20 i expo install --check PASS; Playwright Chromium desktop + mobile viewport 4/4 PASS (3 trasy, powroty, reload, nieznana trasa, granice kart). iOS: Xcode 26.6, iPhone 17e / iOS 26.5, development build com.soberity.app.dev zbudowany i uruchomiony przez agenta; właściciel ręcznie potwierdził wszystkie 3 trasy i powroty w rozmowie. Android: Emulator 36.6.11, Medium_Phone API 37 arm64, Expo Go SDK 58; ADB/UIAutomator potwierdziły Science, Events, konto i każdy powrót na welcome, zapisano XML i screenshoty. Przejrzano screenshoty web oraz ekrany natywne.
+
+**Blokery:** brak dla zakresu P0-I02. Android development APK NOT VERIFIED — brak platformy SDK 37/pełnego toolchainu; test wykonano w Expo Go, nie własnym binary. Android Studio → SDK Manager: doinstaluj platformę/Build Tools, następnie `pnpm --filter @soberity/consumer android`. Historyczny błąd neon znika poza sandboxem; renderer software/ANR System UI utrudniały pierwszy start AVD, końcowy test z GPU host przeszedł po zamknięciu komunikatu. iOS automatyzacja kliknięć zablokowana przez macOS Accessibility; zastąpiona jawnym testem właściciela. Fizyczne urządzenia, release, API/Firebase i Safari NOT VERIFIED (poza zakresem).
 
 **Zakres zadań:**
 
-- [ ] `P0-I02-T01` Skonfiguruj Expo Router i TypeScript dla jednego klienta.
-- [ ] `P0-I02-T02` Dodaj ekran powitalny i podstawowe routing placeholders jawnie oznaczone jako nieaktywne.
-- [ ] `P0-I02-T03` Zweryfikuj web, iOS Simulator i Android Emulator tam, gdzie narzędzia są dostępne.
-- [ ] `P0-I02-T04` Udokumentuj różnice hostów API i Expo Go vs development build.
+- [x] `P0-I02-T01` Skonfiguruj Expo Router i TypeScript dla jednego klienta.
+- [x] `P0-I02-T02` Dodaj ekran powitalny i podstawowe routing placeholders jawnie oznaczone jako nieaktywne.
+- [x] `P0-I02-T03` Zweryfikuj web, iOS Simulator i Android Emulator tam, gdzie narzędzia są dostępne.
+- [x] `P0-I02-T04` Udokumentuj różnice hostów API i Expo Go vs development build.
 
 **Weryfikacja:**
 
-- [ ] `P0-I02-V01` Uruchom web.
-- [ ] `P0-I02-V02` Zweryfikuj start i nawigację na dostępnych symulatorach, nie deklaruj nieuruchomionych.
+- [x] `P0-I02-V01` Uruchom web.
+- [x] `P0-I02-V02` Zweryfikuj start i nawigację na dostępnych symulatorach, nie deklaruj nieuruchomionych.
 
 **Definition of Done:** Jedna baza aplikacji uruchamia się na 3 platformach lub brakujący test ma status BLOCKED. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2065,7 +2070,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 | Scenariusz Phase 0 | Web | iOS Simulator | Android Emulator | Dowód / data |
 |---|---|---|---|---|
-| Start i nawigacja Expo | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
+| Start i nawigacja Expo | PASS | PASS | PASS | 2026-10-29: Chromium desktop/mobile 4/4; iPhone 17e iOS 26.5 development build + manualne potwierdzenie właściciela; Medium_Phone API 37 Expo Go, ADB/UIAutomator 3 trasy i powroty. Własny APK Android NOT VERIFIED. |
 | Sign up i logowanie | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
 | Weryfikacja e-mail / refresh | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
 | Przywracanie sesji / logout | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
@@ -2080,12 +2085,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I01 — Monorepo, tools & local bootstrap`
-- **Status:** DONE — narzędzia i bootstrap zweryfikowane na macOS 2026-10-29
-- **Następna iteracja po akceptacji:** `P0-I02`
-- **Otwarte blokery:** brak dla P0-I01. Przed P0-I02: historyczny błąd Android Emulator (`neon`, exit 134) i brak platformy SDK 37 wymagają ponownej weryfikacji/naprawy. Firebase/EAS/hosting: NOT VERIFIED, zgodnie z odroczeniami D4.
-- **Wymagana akceptacja:** osobne polecenie rozpoczęcia P0-I02. D1–D4 zatwierdzono; `/docs` zachowano w .gitignore na polecenie właściciela.
-- **Ostatni potwierdzony wynik testów:** 2026-10-29 — frozen install/bootstrap na czystej kopii, lint/typecheck/format/ignore, build 4 szkieletów TS, Maven verify: PASS. Testy błędów narzędzi, niezapisania env przy błędzie, zachowania istniejących env i rozbieżności lockfile: PASS. Web/iOS/Android NOT VERIFIED; buildy aplikacji i testy Java poza zakresem P0-I01. [Lokalne szczegóły](docs/testing/P0-I01-results.md).
+- **Aktualna iteracja:** `P0-I02 — Expo web/iOS/Android bootstrap`
+- **Status:** DONE — T01–T04 i V01–V02 zweryfikowane 2026-10-29; bramka Phase 0 pozostaje niezamknięta.
+- **Następna iteracja po akceptacji:** `P0-I03 — Design system, navigation & i18n`
+- **Otwarte blokery:** brak dla P0-I02; Android development APK NOT VERIFIED (brak platformy SDK 37; instrukcja instalacji w README klienta). Expo Go nie potwierdza przyszłych modułów natywnych. Firebase/EAS/hosting poza zakresem, NOT VERIFIED.
+- **Wymagana akceptacja:** osobne polecenie rozpoczęcia P0-I03. `/docs` zachowano w .gitignore na polecenie właściciela.
+- **Ostatni potwierdzony wynik testów:** frozen install, pnpm check/build, eksport JS iOS/Android, Expo Doctor 20/20, zgodność zależności, Playwright 4/4 PASS. iOS development build/start PASS; wszystkie trasy i powroty potwierdził właściciel. Android Expo Go: start i 3 trasy/powroty PASS przez ADB/UIAutomator. [Lokalne szczegóły](docs/testing/P0-I02-results.md).
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2122,3 +2127,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 - **Observability:** użyteczne metryki, logi bez PII/tokenów, kontrola błędów i kosztów. Dane o abstynencji/zdrowiu nie są domyślnym warunkiem korzystania z aplikacji.
 - **Środowiska:** żadnego udawania gotowych funkcji, zatwierdzonych publikacji, przetestowanych platform, prawdziwych eventów, zakupionych biletów ani działań produkcyjnych.
 - **Regresje:** testy przy każdej iteracji, wymogi gate przed zamknięciem fazy i konkretne zapisy w `CHANGELOG.md` dla rzeczywiście ukończonych większych zmian.
+
+| 2026-10-29 | P0-I02 | DONE; T01–T04 i V01–V02 zweryfikowane | apps/consumer: Expo Router/TS, start, jawne placeholdery, Playwright; lockfile, README, ignore, PHASES, CHANGELOG. Frozen install/check/build/export PASS, Doctor 20/20, web 4/4; iOS development build/start i manualna nawigacja właściciela; Android Expo Go/ADB wszystkie trasy i powroty. Lokalne XML/screenshoty i raport w docs/testing/P0-I02. | Brak blokera iteracji; własny APK Android NOT VERIFIED, brak platformy SDK 37. Nie uruchomiono P0-I03. /docs nadal ignorowane. |

@@ -14,3 +14,7 @@ node_modules/
 dist/
 target/
 coverage/
+
+# Local agent instructions are not application sources.
+.agents/
+.codex/

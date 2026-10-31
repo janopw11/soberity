@@ -14,3 +14,11 @@
   Instalację, lint/typecheck, build szkieletów i walidację Maven sprawdzono
   również w czystej kopii bez lokalnych plików. Kontrola ignore chroni typowe
   ścieżki sekretów. Nie wdrożono jeszcze aplikacji Expo ani serwera Spring Boot.
+
+- W P0-I02 uruchomiono wspólnego klienta Expo Router/TypeScript na web,
+  iOS i Androidzie: ekran powitalny, jawne placeholdery Science,
+  Events/Community i konta oraz obsługę nieznanej trasy. Dodano instrukcje
+  hostów API i Expo Go/development build oraz testy nawigacji web (4/4 PASS).
+  Zweryfikowano eksport web i bundle natywne, build development iOS oraz
+  nawigację iOS (ręcznie przez właściciela) i Android Expo Go (ADB/UIAutomator).
+  Własny APK Android pozostaje NOT VERIFIED — brakuje platformy SDK 37.

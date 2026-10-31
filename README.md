@@ -6,10 +6,10 @@ wymagają weryfikowalnych źródeł; produkt nie zastępuje pomocy medycznej.
 
 ## Stan repozytorium
 
-P0-I01: monorepo i lokalne narzędzia. Pakiety TypeScript zawierają jawnie puste
-moduły do sprawdzenia kompilatora. Backend ma wyłącznie POM i Maven Wrapper.
-Nie ma jeszcze działającej aplikacji, API, bazy danych ani Firebase Auth.
-Expo i ekrany powstaną w P0-I02, backend Spring Boot w P0-I04.
+P0-I02: wspólny klient Expo Router / TypeScript z ekranem powitalnym oraz
+jawnymi placeholderami Science, Events/Community i konta. API, dane oraz
+Firebase Auth nie są jeszcze podłączone. Pakiety współdzielone pozostają
+szkieletami; backend ma POM i Maven Wrapper (Spring Boot w P0-I04).
 
 Wymagania i postęp: [AGENTS.md](AGENTS.md), [PHASES.md](PHASES.md),
 [raport produktu](Soberity_raport_produktowo_techniczny.md),
@@ -32,7 +32,8 @@ w świeżym klonie. Ten README zawiera samodzielną instrukcję przygotowania re
 - Dostęp sieciowy do npm i Maven Central przy pierwszym bootstrapie.
 
 Systemowy Maven nie jest potrzebny: wrapper pobiera wersję **3.9.16**.
-Docker, Xcode i Android SDK nie są wymagane w P0-I01. Skrypty bootstrapu
+Docker nie jest wymagany do uruchomienia klienta. iOS wymaga macOS/Xcode
+i CocoaPods, Android wymaga Android SDK i działającego AVD. Skrypty bootstrapu
 są przeznaczone dla macOS/Linux; zweryfikowano macOS. Na Windows użyj WSL
 z narzędziami wewnątrz WSL.
 `backend/mvnw.cmd` jest dostarczony przez Apache, lecz Windows nie był testowany.
@@ -70,21 +71,22 @@ Brak sieci lub niewłaściwa wersja narzędzia kończy bootstrap błędem.
 | `pnpm lint`                                | ESLint dla skryptów i źródeł TS                                                      |
 | `pnpm -r lint`                             | lint każdego z czterech pakietów workspace                                           |
 | `pnpm typecheck`                           | TypeScript strict we wszystkich pakietach                                            |
-| `pnpm build`                               | kompilacja szkieletów TS do lokalnych `dist/`, nie build Expo                        |
+| `pnpm build`                               | statyczny eksport Expo web oraz kompilacja pakietów TS                               |
 | `pnpm format:check`                        | kontrola formatowania źródeł, konfiguracji i README                                  |
 | `pnpm format`                              | formatowanie tych plików; pomija dokumenty wymagań i wrapper Apache                  |
 | `pnpm check:secrets`                       | reguły ignorowania na syntetycznych ścieżkach, bez odczytu sekretów                  |
 | `pnpm check`                               | lint + typecheck + format + kontrola ignore                                          |
 | `cd backend && ./mvnw --batch-mode verify` | poprawność POM i wymaganych wersji JDK/Maven; jeszcze bez kompilacji Java/testów/JAR |
 
-Brak testów funkcjonalnych produktu w P0-I01. Pozytywny wynik powyższych
-komend oznacza sprawne narzędzia, nie działający web/iOS/Android ani API.
-Wyniki P0-I01 i ograniczenia są zapisane w PHASES.md.
+Testy nawigacji web: `pnpm --filter @soberity/consumer test:web`
+(po `pnpm --filter @soberity/consumer exec playwright install chromium`).
+Instrukcje platform: [apps/consumer/README.md](apps/consumer/README.md).
+Wyniki i ograniczenia testów są zapisane w PHASES.md.
 
 ## Struktura
 
 ```text
-apps/consumer/          prywatny pakiet przyszłego klienta Expo
+apps/consumer/          wspólny klient Expo web/iOS/Android
 packages/api-client/   przyszłe kontrakty generowane z OpenAPI
 packages/design-tokens/ przyszłe tokeny UI
 packages/shared-utils/ przyszłe czyste funkcje współdzielone
@@ -100,9 +102,8 @@ ani usług chmurowych. Konfiguracja Spring/DB/Auth nie jest częścią bootstrap
 
 ## Środowisko i sekrety
 
-Pliki `.env.example` są publicznymi szablonami bez poświadczeń; bieżące
-szkielety ich nie odczytują. Konfiguracja zostanie podłączona w kolejnych
-iteracjach. `EXPO_PUBLIC_*` trafia do aplikacji klienta — nigdy nie umieszczaj
+Pliki `.env.example` są publicznymi szablonami bez poświadczeń; Expo ładuje env, ale klient jeszcze nie wykonuje żądań do API.
+Konfiguracja API zostanie podłączona w kolejnych iteracjach. `EXPO_PUBLIC_*` trafia do aplikacji klienta — nigdy nie umieszczaj
 tam klucza serwisowego, hasła ani tokena. Backend otrzyma poświadczenia
 Firebase przez ADC/secret manager, poza repozytorium.
 
@@ -112,18 +113,19 @@ sprawdza reguły, **nie skanuje zawartości plików**. Git nie przestaje śledzi
 już dodanego pliku po dodaniu reguły ignore: przed commitem sprawdź zawartość
 zmian. Nigdy nie używaj `git add -f` dla sekretów.
 
-## Kolejne uruchomienia platform
+## Uruchomienie klienta
 
-W P0-I02 powstaną rzeczywiste komendy Expo. Docelowo API lokalne będzie
-osiągalne przez `localhost:8080` z web/iOS Simulator, `10.0.2.2:8080` z Android
-Emulator oraz adres LAN hosta z telefonu. Obecnie nic nie nasłuchuje tam
-z ramienia tego projektu. Staging/production będą używać HTTPS.
+```sh
+pnpm --filter @soberity/consumer web
+pnpm --filter @soberity/consumer ios
+pnpm --filter @soberity/consumer android
+```
 
-Audyt P0-I00 wykazał Xcode 26.6 i listę symulatorów iOS 26.5; nie uruchomiono
-aplikacji. Android Emulator 36.6.11 zgłaszał błąd procesora `neon`, a SDK
-Platforms zawierało tylko 36.1. Przed P0-I02 napraw emulator w Android Studio
-→ SDK Manager → SDK Tools, doinstaluj platformę 37 i potwierdź start AVD
-`Medium_Phone`. To historyczny wynik audytu, nie test ponowiony w P0-I01.
+Komendy natywne budują lokalny development build. Pierwszy build pobiera
+zależności. Alternatywą do podstawowego smoke testu jest Expo Go:
+`pnpm --filter @soberity/consumer exec expo start --go`.
+Hosty API, ograniczenia Expo Go i konfigurację urządzeń opisuje
+[README klienta](apps/consumer/README.md).
 
 Jeżeli bootstrap zgłasza błędną Javę, sprawdź `JAVA_HOME` oraz `java -version`.
 Jeżeli frozen install odrzuca manifest, nie usuwaj lockfile: po świadomej

@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Soberity Dev",
+    "slug": "soberity",
+    "version": "0.0.1",
+    "scheme": "soberity-dev",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "com.soberity.app.dev",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.soberity.app.dev"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "name": "Soberity"
+    },
+    "plugins": ["expo-router", "expo-dev-client"]
+  }
+}
