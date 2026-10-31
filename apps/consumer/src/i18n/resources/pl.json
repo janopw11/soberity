@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Soberity",
+    "backToWelcome": "Powrót na stronę główną",
+    "notAvailableYetBadge": "Jeszcze niedostępne",
+    "previewNotice": "To jest podgląd planowanego obszaru. Treści i usługi nie są tu jeszcze dostępne."
+  },
+  "welcome": {
+    "eyebrow": "Nauka. Społeczność. Bez alkoholu.",
+    "title": "Więcej z życia.\nRazem.",
+    "intro": "Miejsce dla ciekawych świata osób i doświadczeń bez alkoholu. Odkryj, co buduje Soberity.",
+    "previewTitle": "Wczesny podgląd",
+    "previewBody": "Nauka, wydarzenia i konta nie są jeszcze dostępne. Możesz poznać planowane obszary poniżej.",
+    "scienceCardLabel": "01 / POZNAJ",
+    "scienceCardTitle": "Nauka",
+    "scienceCardBody": "Planowane: badania, jasne wyjaśnienia i źródła, które możesz sprawdzić.",
+    "scienceCardLink": "Poznaj naukę",
+    "eventsCardLabel": "02 / POŁĄCZ SIĘ",
+    "eventsCardTitle": "Wydarzenia i społeczność",
+    "eventsCardBody": "Planowane: sober parties, sober rave'y i inne aktywności bez alkoholu.",
+    "eventsCardLink": "Odkryj wydarzenia",
+    "accountLink": "Twoje konto — wkrótce",
+    "footer": "Najpierw nauka. Zawsze dowody. Bez oceniania."
+  },
+  "science": {
+    "title": "Nauka",
+    "description": "Planowane: artykuły oparte na źródłach, fiszki i quizy z jasnymi wyjaśnieniami i ograniczeniami."
+  },
+  "events": {
+    "title": "Wydarzenia i społeczność",
+    "description": "Planowane: sober parties, sober rave'y, inne aktywności bez alkoholu oraz sposoby na kontakt."
+  },
+  "account": {
+    "title": "Twoje konto",
+    "description": "Rejestracja, logowanie i ustawienia profilu zostaną dodane później. W tym podglądzie nie tworzy się konta."
+  },
+  "verificationPending": {
+    "title": "Potwierdź swój e-mail",
+    "badge": "Wymagana weryfikacja",
+    "description": "Gdy rejestracja zacznie działać, przed dostępem do konta trzeba będzie potwierdzić adres e-mail. Weryfikacja e-maila nie jest jeszcze wdrożona.",
+    "alertTitle": "Ekran zastępczy",
+    "alertMessage": "Ten ekran rezerwuje stan oczekiwania na weryfikację pod przyszły proces rejestracji i potwierdzenia e-maila w Firebase.",
+    "resendButton": "Wyślij e-mail weryfikacyjny ponownie",
+    "resendHelper": "Jeszcze niedostępne — rejestracja i weryfikacja e-maila są planowane w kolejnej iteracji."
+  },
+  "notFound": {
+    "title": "Nie znaleziono strony",
+    "link": "Powrót na stronę główną"
+  },
+  "errors": {
+    "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+    "network": "Nie udało się połączyć z Soberity. Sprawdź połączenie i spróbuj ponownie.",
+    "validation": {
+      "required": "To pole jest wymagane."
+    }
+  }
+}

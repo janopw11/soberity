@@ -1,9 +1,15 @@
-# Consumer — P0-I02
+# Consumer — P0-I03
 
-Jeden klient Expo SDK 58, React Native 0.88, React 19.3 i Expo Router.
-Ekran powitalny prowadzi do `/science`, `/events`, `/account`; wszystkie
-obszary jasno informują o niedostępności. Nie ma API ani logowania.
-Nieznana trasa pozwala wrócić na start. Pełny design system i en/pl to P0-I03.
+Jeden klient Expo SDK 58, React Native 0.88, React 19.3 i Expo Router, z
+podstawowym design systemem (`@soberity/design-tokens` + `src/ui`), routingiem
+na kontraktach `public` / `verification-pending` / `authenticated` (Expo
+Router `Stack.Protected`) i i18n en/pl (i18next + react-i18next, domyślny en).
+Nie ma jeszcze prawdziwego logowania — `AuthStatusContext` to stub zawsze
+zwracający `guest`, gotowy pod Firebase z P0-I05/P0-I06/P0-I07. Dla gościa
+`/account` i `/verification-pending` przekierowują na stronę główną bez
+ujawniania prywatnej treści. Ekran powitalny prowadzi do `/science`, `/events`;
+wszystkie obszary jasno informują o niedostępności. Nieznana trasa pozwala
+wrócić na start.
 
 ## Komendy z katalogu głównego
 
@@ -16,6 +22,7 @@ Nieznana trasa pozwala wrócić na start. Pełny design system i en/pl to P0-I03
 | `build`                                       | statyczny eksport web do `apps/consumer/dist`                                  |
 | `export:native`                               | bundlowanie JS/assets iOS i Android do `dist/native`; nie tworzy IPA/APK       |
 | `test:web`                                    | Playwright Chromium desktop i mobilny viewport; własny serwer na 8091          |
+| `test:unit`                                   | Jest (`jest-expo` + Testing Library) dla komponentów UI i `AuthStatusContext`  |
 
 Najpierw `pnpm install --frozen-lockfile`. Testy web wymagają pobrania przeglądarki:
 `pnpm --filter @soberity/consumer exec playwright install chromium`.

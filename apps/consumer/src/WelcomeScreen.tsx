@@ -1,114 +1,138 @@
 import { Link } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { colors, radii, spacing, typography } from '@soberity/design-tokens';
+
+import { Screen } from './ui';
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation();
+
   return (
-    <ScrollView contentContainerStyle={styles.page}>
-      <View style={styles.content}>
-        <Text style={styles.eyebrow}>SCIENCE. CONNECTION. ALCOHOL-FREE.</Text>
-        <Text accessibilityRole="header" style={styles.title}>
-          More to life.{'\n'}Together.
-        </Text>
-        <Text style={styles.intro}>
-          A place for curious minds and alcohol-free experiences. Discover what
-          Soberity is building.
-        </Text>
-        <View style={styles.notice}>
-          <Text style={styles.noticeTitle}>An early preview</Text>
-          <Text style={styles.body}>
-            Learning, events and accounts are not available yet. You can explore
-            the planned areas below.
-          </Text>
-        </View>
-        <View style={styles.cards}>
-          <Link href="/science" asChild>
-            <Pressable style={styles.card}>
-              <Text style={styles.number}>01 / LEARN</Text>
-              <Text accessibilityRole="header" style={styles.cardTitle}>
-                Science
-              </Text>
-              <Text style={styles.body}>
-                Planned: research, clear explanations and sources you can check.
-              </Text>
-              <Text style={styles.cardLink}>Explore Science →</Text>
-            </Pressable>
-          </Link>
-          <Link href="/events" asChild>
-            <Pressable style={styles.card}>
-              <Text style={styles.number}>02 / CONNECT</Text>
-              <Text accessibilityRole="header" style={styles.cardTitle}>
-                Events & Community
-              </Text>
-              <Text style={styles.body}>
-                Planned: sober parties, sober raves and other alcohol-free
-                activities.
-              </Text>
-              <Text style={styles.cardLink}>Explore Events →</Text>
-            </Pressable>
-          </Link>
-        </View>
-        <Link href="/account" style={styles.account}>
-          Your account — coming later →
-        </Link>
-        <Text style={styles.footer}>
-          Science first. Evidence always. No judgment.
-        </Text>
+    <Screen>
+      <Text style={styles.eyebrow}>{t('welcome.eyebrow')}</Text>
+      <Text accessibilityRole="header" style={styles.title}>
+        {t('welcome.title')}
+      </Text>
+      <Text style={styles.intro}>{t('welcome.intro')}</Text>
+
+      <View style={styles.notice}>
+        <Text style={styles.noticeTitle}>{t('welcome.previewTitle')}</Text>
+        <Text style={styles.body}>{t('welcome.previewBody')}</Text>
       </View>
-    </ScrollView>
+
+      <View style={styles.cards}>
+        <Link href="/science" asChild>
+          <Pressable style={styles.card} accessibilityRole="link">
+            <Text style={styles.cardLabel}>
+              {t('welcome.scienceCardLabel')}
+            </Text>
+            <Text accessibilityRole="header" style={styles.cardTitle}>
+              {t('welcome.scienceCardTitle')}
+            </Text>
+            <Text style={styles.body}>{t('welcome.scienceCardBody')}</Text>
+            <Text style={styles.cardLink}>
+              {t('welcome.scienceCardLink')} →
+            </Text>
+          </Pressable>
+        </Link>
+        <Link href="/events" asChild>
+          <Pressable style={styles.card} accessibilityRole="link">
+            <Text style={styles.cardLabel}>{t('welcome.eventsCardLabel')}</Text>
+            <Text accessibilityRole="header" style={styles.cardTitle}>
+              {t('welcome.eventsCardTitle')}
+            </Text>
+            <Text style={styles.body}>{t('welcome.eventsCardBody')}</Text>
+            <Text style={styles.cardLink}>{t('welcome.eventsCardLink')} →</Text>
+          </Pressable>
+        </Link>
+      </View>
+
+      <Link href="/account" style={styles.account}>
+        {t('welcome.accountLink')} →
+      </Link>
+      <Text style={styles.footer}>{t('welcome.footer')}</Text>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, padding: 24, backgroundColor: '#f7f5ef' },
-  content: {
-    width: '100%',
-    maxWidth: 880,
-    alignSelf: 'center',
-    paddingVertical: 24,
-    gap: 24,
-  },
   eyebrow: {
-    color: '#416455',
-    fontSize: 12,
-    fontWeight: '700',
+    color: colors.textSecondary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
     letterSpacing: 1.5,
   },
-  title: { color: '#183e32', fontSize: 48, fontWeight: '700', lineHeight: 54 },
-  intro: { color: '#42564c', fontSize: 19, lineHeight: 29, maxWidth: 640 },
-  notice: { backgroundColor: '#e8eee3', borderRadius: 16, padding: 20, gap: 8 },
-  noticeTitle: { color: '#183e32', fontSize: 16, fontWeight: '700' },
-  body: { color: '#42564c', fontSize: 16, lineHeight: 25 },
-  cards: { flexDirection: 'row', flexWrap: 'wrap', gap: 20 },
+  title: {
+    color: colors.textPrimary,
+    fontSize: typography.display.fontSize,
+    lineHeight: typography.display.lineHeight,
+    fontWeight: typography.display.fontWeight,
+  },
+  intro: {
+    color: colors.textSecondary,
+    fontSize: typography.h3.fontSize,
+    lineHeight: typography.h3.lineHeight + 4,
+    maxWidth: 640,
+  },
+  notice: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radii.lg,
+    padding: spacing.space16,
+    gap: spacing.space8,
+  },
+  noticeTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.bodyStrong.fontSize,
+    fontWeight: typography.bodyStrong.fontWeight,
+  },
+  body: {
+    color: colors.textSecondary,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
+  },
+  cards: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space16 },
   card: {
     flexGrow: 1,
     flexBasis: 300,
     flexShrink: 1,
     minWidth: 0,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: '#d5dfd3',
-    padding: 24,
-    gap: 16,
+    borderColor: colors.border,
+    padding: spacing.space24,
+    gap: spacing.space16,
   },
-  number: {
-    color: '#416455',
-    fontSize: 12,
-    fontWeight: '700',
+  cardLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
     letterSpacing: 1,
   },
-  cardTitle: { color: '#183e32', fontSize: 26, fontWeight: '700' },
+  cardTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.h2.fontSize,
+    lineHeight: typography.h2.lineHeight,
+    fontWeight: typography.h2.fontWeight,
+  },
   cardLink: {
-    color: '#183e32',
-    fontSize: 16,
-    fontWeight: '700',
-    paddingVertical: 8,
+    color: colors.primary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
+    paddingVertical: spacing.space8,
   },
   account: {
-    color: '#183e32',
-    fontSize: 16,
-    paddingVertical: 12,
+    color: colors.primary,
+    fontSize: typography.body.fontSize,
+    paddingVertical: spacing.space12,
+    minHeight: 48,
     textDecorationLine: 'underline',
   },
-  footer: { color: '#52645a', fontSize: 13, lineHeight: 20 },
+  footer: {
+    color: colors.textSecondary,
+    fontSize: typography.small.fontSize,
+    lineHeight: typography.small.lineHeight,
+  },
 });

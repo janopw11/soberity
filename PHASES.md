@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.0 — 2026-10-29  
-**Status globalny:** IN_PROGRESS — P0-I00–P0-I02 DONE; P0-I03 oczekuje osobnego polecenia  
+**Status globalny:** IN_PROGRESS — P0-I00–P0-I03 DONE; P0-I04 oczekuje osobnego polecenia  
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 14 | 3/14 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 14 | 4/14 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 78 iteracji agentowych; wykonane: **3/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane).
+**Łącznie:** 78 iteracji agentowych; wykonane: **4/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -198,26 +198,32 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I03 — Design system, navigation & i18n
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-10-31  
+**Finished:** 2026-10-31  
 **Zależności iteracji:** P0-I02  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** `packages/design-tokens/src/index.ts`; `apps/consumer/src/ui/*`; `apps/consumer/src/auth/AuthStatusContext.tsx`; `apps/consumer/app/_layout.tsx` (`Stack.Protected`); `apps/consumer/src/i18n/*`; `apps/consumer/tests/web/navigation.spec.ts`; `apps/consumer/src/**/*.test.tsx`. Komendy: `pnpm run check` (lint+typecheck+format+secrets) exit 0; `pnpm --filter @soberity/consumer exec jest` 6/6 suites, 15/15 testów PASS; `pnpm --filter @soberity/consumer run test:web` 6/6 PASS (desktop+mobile-web); `pnpm run build` (tsc pakietów + `expo export --platform web`) i `export:native` (iOS+Android) exit 0 bez błędów. Manualna weryfikacja na iOS Simulator (iPhone 17 Pro, Expo Go 58.0.7) i Android Emulator (Medium_Phone, Expo Go 58.0.5): render ekranu powitalnego z automatycznym wykryciem lokalizacji urządzenia (PL/EN), nawigacja Science↔welcome, oraz deep-linki do `/account` i `/verification-pending` potwierdzające przekierowanie gościa na `/` bez ujawnienia prywatnej treści na obu platformach.  
+**Blokery:** brak.
 
 **Zakres zadań:**
 
-- [ ] `P0-I03-T01` Utwórz tokeny designu, podstawowe Button/Input/Screen/Alert/Loading/Empty.
-- [ ] `P0-I03-T02` Zaimplementuj routing public/authenticated/verification-pending na kontraktach.
-- [ ] `P0-I03-T03` Dodaj i18n en/pl, domyślny en i lokalizowane błędy.
-- [ ] `P0-I03-T04` Dodaj podstawy a11y, ekranowe klawiatury i responsywność.
+- [x] `P0-I03-T01` Utwórz tokeny designu, podstawowe Button/Input/Screen/Alert/Loading/Empty.
+- [x] `P0-I03-T02` Zaimplementuj routing public/authenticated/verification-pending na kontraktach.
+- [x] `P0-I03-T03` Dodaj i18n en/pl, domyślny en i lokalizowane błędy.
+- [x] `P0-I03-T04` Dodaj podstawy a11y, ekranowe klawiatury i responsywność.
 
 **Weryfikacja:**
 
-- [ ] `P0-I03-V01` Sprawdź routing bez danych prywatnych.
-- [ ] `P0-I03-V02` Uruchom lint/typecheck oraz podstawowe testy komponentów.
+- [x] `P0-I03-V01` Sprawdź routing bez danych prywatnych.
+- [x] `P0-I03-V02` Uruchom lint/typecheck oraz podstawowe testy komponentów.
 
 **Definition of Done:** Komponenty i nawigacja są wieloplatformowe, dostępne i gotowe pod Auth. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+
+**Uwagi i ograniczenia:**
+- `AuthStatusContext` to świadomy stub (zawsze `guest`, bez sieci/trwałości) — rzeczywiste logowanie, sesja i Firebase ID token to zakres P0-I05/P0-I06; weryfikacja e-maila to P0-I07. Nie fabrykowano żadnych ekranów spoza tej iteracji.
+- Pełne przejście po trasach dotykiem (tap-through) na iOS Simulator nie zostało zautomatyzowane przez agenta (brak narzędzia do syntetycznych gestów dotyku w tym środowisku) — zweryfikowano render i i18n wizualnie oraz guard przez deep-linki `exp://...`; pełna manualna nawigacja dotykiem pozostaje do potwierdzenia przez właściciela, analogicznie do P0-I02.
+- `npx expo-doctor` raportuje 1/20 (patch-level rozjazd `expo`/`expo-router`/`expo-dev-client` o jedną wersję) — rozjazd nie dotyczy żadnej zależności dodanej w tej iteracji i powstał wskutek nowych wydań na rejestrze od czasu P0-I02; nie naprawiano w ramach tego zadania (poza zakresem P0-I03).
+
 
 ## P0-I04 — Spring Boot, PostgreSQL & API skeleton
 
@@ -2085,12 +2091,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I02 — Expo web/iOS/Android bootstrap`
-- **Status:** DONE — T01–T04 i V01–V02 zweryfikowane 2026-10-29; bramka Phase 0 pozostaje niezamknięta.
-- **Następna iteracja po akceptacji:** `P0-I03 — Design system, navigation & i18n`
-- **Otwarte blokery:** brak dla P0-I02; Android development APK NOT VERIFIED (brak platformy SDK 37; instrukcja instalacji w README klienta). Expo Go nie potwierdza przyszłych modułów natywnych. Firebase/EAS/hosting poza zakresem, NOT VERIFIED.
-- **Wymagana akceptacja:** osobne polecenie rozpoczęcia P0-I03. `/docs` zachowano w .gitignore na polecenie właściciela.
-- **Ostatni potwierdzony wynik testów:** frozen install, pnpm check/build, eksport JS iOS/Android, Expo Doctor 20/20, zgodność zależności, Playwright 4/4 PASS. iOS development build/start PASS; wszystkie trasy i powroty potwierdził właściciel. Android Expo Go: start i 3 trasy/powroty PASS przez ADB/UIAutomator. [Lokalne szczegóły](docs/testing/P0-I02-results.md).
+- **Aktualna iteracja:** `P0-I03 — Design system, navigation & i18n`
+- **Status:** DONE — T01–T04 i V01–V02 zweryfikowane 2026-10-31; bramka Phase 0 pozostaje niezamknięta.
+- **Następna iteracja po akceptacji:** `P0-I04 — Spring Boot, PostgreSQL & API skeleton`
+- **Otwarte blokery:** brak dla P0-I03. Pełna manualna nawigacja dotykiem na iOS Simulator/Android Emulator NOT VERIFIED przez agenta (brak narzędzia do syntetycznych gestów); render, i18n i guard tras zweryfikowano zrzutami ekranu i deep-linkami. Android development APK nadal NOT VERIFIED (brak platformy SDK 37, z P0-I02). Firebase/EAS/hosting poza zakresem, NOT VERIFIED.
+- **Wymagana akceptacja:** osobne polecenie rozpoczęcia P0-I04. `/docs` zachowano w .gitignore na polecenie właściciela.
+- **Ostatni potwierdzony wynik testów:** `pnpm run check` (lint+typecheck+format+secrets) exit 0; Jest 6/6 suites, 15/15 PASS; Playwright web 6/6 PASS (desktop+mobile-web, nowy test guardu tras); `pnpm run build` i `export:native` exit 0. iOS Simulator (Expo Go 58.0.7) i Android Emulator (Expo Go 58.0.5): render + i18n + deep-linki `/account`, `/verification-pending` PASS; pełna nawigacja dotykiem NOT VERIFIED (brak narzędzia do gestów w środowisku agenta).
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2129,3 +2135,4 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 - **Regresje:** testy przy każdej iteracji, wymogi gate przed zamknięciem fazy i konkretne zapisy w `CHANGELOG.md` dla rzeczywiście ukończonych większych zmian.
 
 | 2026-10-29 | P0-I02 | DONE; T01–T04 i V01–V02 zweryfikowane | apps/consumer: Expo Router/TS, start, jawne placeholdery, Playwright; lockfile, README, ignore, PHASES, CHANGELOG. Frozen install/check/build/export PASS, Doctor 20/20, web 4/4; iOS development build/start i manualna nawigacja właściciela; Android Expo Go/ADB wszystkie trasy i powroty. Lokalne XML/screenshoty i raport w docs/testing/P0-I02. | Brak blokera iteracji; własny APK Android NOT VERIFIED, brak platformy SDK 37. Nie uruchomiono P0-I03. /docs nadal ignorowane. |
+| 2026-10-31 | P0-I03 | DONE; T01–T04 i V01–V02 zweryfikowane | `packages/design-tokens` (tokeny), `apps/consumer/src/ui/*` (Screen/Button/TextField/Alert/LoadingState/EmptyState + testy Jest), `apps/consumer/src/auth/AuthStatusContext.tsx` (stub, zawsze `guest`) + test, `apps/consumer/app/_layout.tsx` i nowe grupy tras `(public)`/`(authenticated)`/`verification-pending` (Expo Router `Stack.Protected`), `apps/consumer/src/i18n/*` (i18next/react-i18next/expo-localization, en/pl) + test parzystości kluczy, przepisane `WelcomeScreen`/`UnavailableScreen`/nowy `VerificationPendingScreen`/`+not-found`, zaktualizowany `tests/web/navigation.spec.ts`, `babel.config.cjs`, `jest.config.cjs`, `eslint.config.mjs` (globale dla `.cjs`), README konsumenta, PHASES, CHANGELOG. `pnpm run check` exit 0; Jest 6/6 suites (15/15) PASS; Playwright web 6/6 PASS; `pnpm run build` + `export:native` exit 0; manualnie na iOS Simulator i Android Emulator (Expo Go dopasowane do SDK 58): render, i18n wg lokalizacji urządzenia i guard `/account`+`/verification-pending` (deep-linki) PASS na obu platformach. | Brak blokera iteracji. Nawigacja dotykiem na symulatorach NOT VERIFIED przez agenta (brak narzędzia do gestów) — do potwierdzenia manualnie przez właściciela. `expo-doctor` 19/20 z powodu niezwiązanego z tą iteracją patch-rozjazdu `expo`/`expo-router`/`expo-dev-client`. Nie uruchomiono P0-I04. |

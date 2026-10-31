@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Soberity",
+    "backToWelcome": "Back to welcome",
+    "notAvailableYetBadge": "Not available yet",
+    "previewNotice": "This is a preview of a planned area. No content or services are available here yet."
+  },
+  "welcome": {
+    "eyebrow": "Science. Connection. Alcohol-free.",
+    "title": "More to life.\nTogether.",
+    "intro": "A place for curious minds and alcohol-free experiences. Discover what Soberity is building.",
+    "previewTitle": "An early preview",
+    "previewBody": "Learning, events and accounts are not available yet. You can explore the planned areas below.",
+    "scienceCardLabel": "01 / Learn",
+    "scienceCardTitle": "Science",
+    "scienceCardBody": "Planned: research, clear explanations and sources you can check.",
+    "scienceCardLink": "Explore Science",
+    "eventsCardLabel": "02 / Connect",
+    "eventsCardTitle": "Events & Community",
+    "eventsCardBody": "Planned: sober parties, sober raves and other alcohol-free activities.",
+    "eventsCardLink": "Explore Events",
+    "accountLink": "Your account — coming later",
+    "footer": "Science first. Evidence always. No judgment."
+  },
+  "science": {
+    "title": "Science",
+    "description": "Planned: source-based articles, flashcards and quizzes with clear explanations and limitations."
+  },
+  "events": {
+    "title": "Events & Community",
+    "description": "Planned: sober parties, sober raves, other alcohol-free activities and ways to connect."
+  },
+  "account": {
+    "title": "Your account",
+    "description": "Registration, sign-in and profile settings will be added later. No account is created in this preview."
+  },
+  "verificationPending": {
+    "title": "Confirm your email",
+    "badge": "Verification needed",
+    "description": "Once sign-up exists, you will need to confirm your email address before reaching your account. Email verification is not implemented yet.",
+    "alertTitle": "Placeholder screen",
+    "alertMessage": "This screen reserves the verification-pending state for the upcoming Firebase sign-up and email verification flow.",
+    "resendButton": "Resend verification email",
+    "resendHelper": "Not available yet — sign-up and email verification are planned for a later iteration."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "link": "Back to welcome"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "We couldn't reach Soberity. Check your connection and try again.",
+    "validation": {
+      "required": "This field is required."
+    }
+  }
+}

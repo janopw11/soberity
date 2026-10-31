@@ -1,51 +1,45 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text } from 'react-native';
+
+import { colors, typography } from '@soberity/design-tokens';
+
+import { EmptyState, Screen } from './ui';
 
 type Props = { title: string; description: string };
 
+/** Generic placeholder for planned areas that are not implemented yet. */
 export default function UnavailableScreen({ title, description }: Props) {
+  const { t } = useTranslation();
+
   return (
-    <ScrollView contentContainerStyle={styles.page}>
-      <View style={styles.content}>
-        <Text style={styles.status}>NOT AVAILABLE YET</Text>
-        <Text accessibilityRole="header" style={styles.title}>
-          {title}
-        </Text>
-        <Text style={styles.description}>{description}</Text>
-        <Text style={styles.description}>
-          This is a preview of a planned area. No content or services are
-          available here yet.
-        </Text>
+    <Screen>
+      <EmptyState
+        eyebrow={t('common.notAvailableYetBadge')}
+        title={title}
+        description={description}
+      >
+        <Text style={styles.body}>{t('common.previewNotice')}</Text>
         <Link href="/" dismissTo style={styles.link}>
-          Back to welcome
+          {t('common.backToWelcome')} →
         </Link>
-      </View>
-    </ScrollView>
+      </EmptyState>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, padding: 24, backgroundColor: '#f7f5ef' },
-  content: {
-    width: '100%',
-    maxWidth: 720,
-    alignSelf: 'center',
-    paddingVertical: 40,
-    gap: 24,
+  body: {
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
+    color: colors.textSecondary,
   },
-  status: {
-    color: '#416455',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-  },
-  title: { color: '#183e32', fontSize: 36, fontWeight: '700' },
-  description: { color: '#42564c', fontSize: 18, lineHeight: 28 },
   link: {
-    color: '#183e32',
-    fontSize: 18,
-    fontWeight: '700',
+    color: colors.primary,
+    fontSize: typography.bodyStrong.fontSize,
+    fontWeight: typography.bodyStrong.fontWeight,
     textDecorationLine: 'underline',
     paddingVertical: 16,
+    minHeight: 48,
   },
 });
