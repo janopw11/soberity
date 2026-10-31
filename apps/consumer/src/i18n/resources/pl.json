@@ -10,16 +10,7 @@
     "title": "Więcej z życia.\nRazem.",
     "intro": "Miejsce dla ciekawych świata osób i doświadczeń bez alkoholu. Odkryj, co buduje Soberity.",
     "previewTitle": "Wczesny podgląd",
-    "previewBody": "Nauka, wydarzenia i konta nie są jeszcze dostępne. Możesz poznać planowane obszary poniżej.",
-    "scienceCardLabel": "01 / POZNAJ",
-    "scienceCardTitle": "Nauka",
-    "scienceCardBody": "Planowane: badania, jasne wyjaśnienia i źródła, które możesz sprawdzić.",
-    "scienceCardLink": "Poznaj naukę",
-    "eventsCardLabel": "02 / POŁĄCZ SIĘ",
-    "eventsCardTitle": "Wydarzenia i społeczność",
-    "eventsCardBody": "Planowane: sober parties, sober rave'y i inne aktywności bez alkoholu.",
-    "eventsCardLink": "Odkryj wydarzenia",
-    "accountLink": "Twoje konto — wkrótce",
+    "previewBody": "Nauka, wydarzenia i konta nie są jeszcze dostępne. Wybierz sekcję z menu bocznego.",
     "footer": "Najpierw nauka. Zawsze dowody. Bez oceniania."
   },
   "science": {
@@ -27,7 +18,7 @@
     "description": "Planowane: artykuły oparte na źródłach, fiszki i quizy z jasnymi wyjaśnieniami i ograniczeniami."
   },
   "events": {
-    "title": "Wydarzenia i społeczność",
+    "title": "Sober Events",
     "description": "Planowane: sober parties, sober rave'y, inne aktywności bez alkoholu oraz sposoby na kontakt."
   },
   "account": {
@@ -53,5 +44,20 @@
     "validation": {
       "required": "To pole jest wymagane."
     }
+  },
+  "navigation": {
+    "title": "Nawigacja",
+    "features": {
+      "home": "Strona główna",
+      "science": "Science & Discover",
+      "events": "Sober Events",
+      "games": "Sober Games",
+      "community": "Soberity (społeczność)",
+      "map": "World Map",
+      "brain": "Brain Lab",
+      "myths": "Myth Buster"
+    },
+    "open": "Otwórz menu",
+    "close": "Zamknij menu"
   }
 }

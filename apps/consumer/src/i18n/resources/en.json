@@ -10,16 +10,7 @@
     "title": "More to life.\nTogether.",
     "intro": "A place for curious minds and alcohol-free experiences. Discover what Soberity is building.",
     "previewTitle": "An early preview",
-    "previewBody": "Learning, events and accounts are not available yet. You can explore the planned areas below.",
-    "scienceCardLabel": "01 / Learn",
-    "scienceCardTitle": "Science",
-    "scienceCardBody": "Planned: research, clear explanations and sources you can check.",
-    "scienceCardLink": "Explore Science",
-    "eventsCardLabel": "02 / Connect",
-    "eventsCardTitle": "Events & Community",
-    "eventsCardBody": "Planned: sober parties, sober raves and other alcohol-free activities.",
-    "eventsCardLink": "Explore Events",
-    "accountLink": "Your account — coming later",
+    "previewBody": "Learning, events and accounts are not available yet. Choose a section from the side menu.",
     "footer": "Science first. Evidence always. No judgment."
   },
   "science": {
@@ -27,7 +18,7 @@
     "description": "Planned: source-based articles, flashcards and quizzes with clear explanations and limitations."
   },
   "events": {
-    "title": "Events & Community",
+    "title": "Sober Events",
     "description": "Planned: sober parties, sober raves, other alcohol-free activities and ways to connect."
   },
   "account": {
@@ -53,5 +44,20 @@
     "validation": {
       "required": "This field is required."
     }
+  },
+  "navigation": {
+    "title": "Navigation",
+    "features": {
+      "home": "Main page",
+      "science": "Science & Discover",
+      "events": "Sober Events",
+      "games": "Sober Games",
+      "community": "Soberity (community)",
+      "map": "World Map",
+      "brain": "Brain Lab",
+      "myths": "Myth Buster"
+    },
+    "open": "Open menu",
+    "close": "Close menu"
   }
 }

@@ -43,3 +43,14 @@
   testy Playwright pod nową strukturę tras (6/6 PASS, w tym nowy test
   guardu tras chronionych). `pnpm run check`, `pnpm run build` i
   `export:native` przechodzą bez błędów na web, iOS i Android.
+
+- Zmieniono nawigację P0-I03 na menu otwierane przyciskiem trzech kresek ☰
+  w lewym górnym rogu nagłówka. Panel zamyka się po wyborze dostępnej sekcji,
+  przyciskiem ☰, tłem lub Back/Escape. Usunięto kafelki wyboru funkcji.
+  Menu uproszczono do ośmiu głównych pozycji: Main page, Science & Discover,
+  Sober Events, Sober Games, Soberity (community), World Map, Brain Lab
+  i Myth Buster. Bez grup i podsekcji; każda pozycja ma pasujące emoji,
+  bez podpisów „Planowane”. Niewdrożone pozycje pozostają nieaktywne.
+  Uproszczenie zweryfikowano przez check i Playwright 10/10 PASS. Check, Jest 15/15, bazowe testy web 6/6
+  i ponowione testy menu 4/4 oraz eksporty web/iOS/Android PASS.
+  Runtime menu iOS/Android pozostaje NOT VERIFIED.

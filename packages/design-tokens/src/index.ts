@@ -19,6 +19,7 @@ export const brand = {
 /** Semantic color tokens — light theme (default and, for now, only theme). */
 export const colors = {
   background: '#FAF9FD',
+  backdrop: 'rgba(36, 33, 54, 0.4)',
   surface: '#FFFFFF',
   surfaceAlt: '#EDE7F6',
   textPrimary: '#242136',

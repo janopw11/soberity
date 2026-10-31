@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { colors } from '@soberity/design-tokens';
 
+import SideMenu from '../../src/SideMenu';
+
 export default function PublicLayout() {
   const { t } = useTranslation();
 
@@ -13,6 +15,8 @@ export default function PublicLayout() {
         headerTintColor: colors.textPrimary,
         contentStyle: { backgroundColor: colors.background },
         headerShadowVisible: false,
+        headerBackVisible: false,
+        headerLeft: () => <SideMenu />,
       }}
     >
       <Stack.Screen name="index" options={{ title: t('common.appName') }} />

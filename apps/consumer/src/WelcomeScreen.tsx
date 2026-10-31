@@ -1,6 +1,5 @@
-import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { colors, radii, spacing, typography } from '@soberity/design-tokens';
 
@@ -22,36 +21,6 @@ export default function WelcomeScreen() {
         <Text style={styles.body}>{t('welcome.previewBody')}</Text>
       </View>
 
-      <View style={styles.cards}>
-        <Link href="/science" asChild>
-          <Pressable style={styles.card} accessibilityRole="link">
-            <Text style={styles.cardLabel}>
-              {t('welcome.scienceCardLabel')}
-            </Text>
-            <Text accessibilityRole="header" style={styles.cardTitle}>
-              {t('welcome.scienceCardTitle')}
-            </Text>
-            <Text style={styles.body}>{t('welcome.scienceCardBody')}</Text>
-            <Text style={styles.cardLink}>
-              {t('welcome.scienceCardLink')} →
-            </Text>
-          </Pressable>
-        </Link>
-        <Link href="/events" asChild>
-          <Pressable style={styles.card} accessibilityRole="link">
-            <Text style={styles.cardLabel}>{t('welcome.eventsCardLabel')}</Text>
-            <Text accessibilityRole="header" style={styles.cardTitle}>
-              {t('welcome.eventsCardTitle')}
-            </Text>
-            <Text style={styles.body}>{t('welcome.eventsCardBody')}</Text>
-            <Text style={styles.cardLink}>{t('welcome.eventsCardLink')} →</Text>
-          </Pressable>
-        </Link>
-      </View>
-
-      <Link href="/account" style={styles.account}>
-        {t('welcome.accountLink')} →
-      </Link>
       <Text style={styles.footer}>{t('welcome.footer')}</Text>
     </Screen>
   );
@@ -91,44 +60,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: typography.body.fontSize,
     lineHeight: typography.body.lineHeight,
-  },
-  cards: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space16 },
-  card: {
-    flexGrow: 1,
-    flexBasis: 300,
-    flexShrink: 1,
-    minWidth: 0,
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.space24,
-    gap: spacing.space16,
-  },
-  cardLabel: {
-    color: colors.textSecondary,
-    fontSize: typography.label.fontSize,
-    fontWeight: typography.label.fontWeight,
-    letterSpacing: 1,
-  },
-  cardTitle: {
-    color: colors.textPrimary,
-    fontSize: typography.h2.fontSize,
-    lineHeight: typography.h2.lineHeight,
-    fontWeight: typography.h2.fontWeight,
-  },
-  cardLink: {
-    color: colors.primary,
-    fontSize: typography.label.fontSize,
-    fontWeight: typography.label.fontWeight,
-    paddingVertical: spacing.space8,
-  },
-  account: {
-    color: colors.primary,
-    fontSize: typography.body.fontSize,
-    paddingVertical: spacing.space12,
-    minHeight: 48,
-    textDecorationLine: 'underline',
   },
   footer: {
     color: colors.textSecondary,
