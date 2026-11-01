@@ -14,7 +14,7 @@ import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
   helperText?: string;
-  errorText?: string;
+  errorText?: string | undefined;
   /** Adds a show/hide toggle for password-style fields. */
   secureToggle?: boolean;
   showPasswordLabel?: string;

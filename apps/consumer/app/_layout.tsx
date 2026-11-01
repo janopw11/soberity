@@ -7,21 +7,35 @@ import {
   AuthStatusProvider,
   useAuthStatus,
 } from '../src/auth/AuthStatusContext';
+import OfflineScreen from '../src/OfflineScreen';
 import {
   ThemePreferencesProvider,
   useThemePreferences,
 } from '../src/preferences/ThemePreferencesContext';
+import { LoadingState } from '../src/ui';
 
 /**
- * Guards the three top-level route groups against the current auth status.
- * `guest` is the only reachable status until real sign-in/session handling
- * lands in P0-I05/P0-I06; `verification-pending` and `(authenticated)` are
- * reserved here so later iterations can flip the guard without a reroute.
+ * Guards the top-level route groups against the current auth status. Routes
+ * are not rendered while the initial session check is running. The offline
+ * screen replaces the stack when the backend cannot confirm a session.
  */
 function RootNavigator() {
   const { status } = useAuthStatus();
   const { t } = useTranslation();
   const { colors, theme } = useThemePreferences();
+
+  if (status === 'loading') {
+    return <LoadingState label={t('auth.checkingSession')} />;
+  }
+
+  if (status === 'offline') {
+    return (
+      <>
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+        <OfflineScreen />
+      </>
+    );
+  }
 
   return (
     <>

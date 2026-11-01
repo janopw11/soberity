@@ -9,8 +9,10 @@
     "eyebrow": "Nauka. Społeczność. Bez alkoholu.",
     "title": "Więcej z życia.\nRazem.",
     "intro": "Miejsce dla ciekawych świata osób i doświadczeń bez alkoholu. Odkryj, co buduje Soberity.",
+    "signInButton": "Zaloguj się",
+    "signUpButton": "Utwórz konto",
     "previewTitle": "Wczesny podgląd",
-    "previewBody": "Nauka, wydarzenia i konta nie są jeszcze dostępne. Wybierz sekcję z menu bocznego.",
+    "previewBody": "Nauka i wydarzenia są jeszcze w podglądzie. Konta są już dostępne: utwórz je albo zaloguj się, aby kontynuować.",
     "footer": "Najpierw nauka. Zawsze dowody. Bez oceniania."
   },
   "science": {
@@ -23,16 +25,62 @@
   },
   "account": {
     "title": "Twoje konto",
-    "description": "Rejestracja, logowanie i ustawienia profilu zostaną dodane później. W tym podglądzie nie tworzy się konta."
+    "badge": "Zalogowano",
+    "description": "Ustawienia profilu zostaną dodane później.",
+    "signedInAs": "Zalogowano jako {{email}}",
+    "signOutButton": "Wyloguj się"
+  },
+  "auth": {
+    "checkingSession": "Sprawdzamy Twoją sesję…",
+    "signInTitle": "Zaloguj się",
+    "signInIntro": "Użyj adresu e-mail i hasła, z którymi się zarejestrowałeś.",
+    "signUpTitle": "Utwórz konto",
+    "signUpIntro": "Utwórz konto, podając adres e-mail i hasło.",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Hasło",
+    "confirmPasswordLabel": "Powtórz hasło",
+    "passwordHelper": "Co najmniej {{min}} znaków.",
+    "showPassword": "Pokaż hasło",
+    "hidePassword": "Ukryj hasło",
+    "signInSubmit": "Zaloguj się",
+    "signUpSubmit": "Utwórz konto",
+    "noAccountLink": "Nie masz konta? Utwórz je",
+    "haveAccountLink": "Masz już konto? Zaloguj się",
+    "errorTitle": "Wymaga Twojej uwagi",
+    "fieldErrors": {
+      "required": "To pole jest wymagane.",
+      "invalidEmail": "Podaj poprawny adres e-mail.",
+      "passwordTooShort": "Użyj co najmniej {{min}} znaków.",
+      "passwordMismatch": "Hasła nie są takie same."
+    },
+    "errors": {
+      "emailInUse": "Konto z tym adresem e-mail już istnieje. Spróbuj się zalogować.",
+      "invalidEmail": "Podaj poprawny adres e-mail.",
+      "weakPassword": "To hasło jest zbyt słabe. Wybierz dłuższe lub mniej przewidywalne.",
+      "invalidCredentials": "Adres e-mail lub hasło są nieprawidłowe.",
+      "tooManyRequests": "Zbyt wiele prób. Odczekaj kilka minut i spróbuj ponownie.",
+      "userDisabled": "To konto zostało wyłączone. Skontaktuj się z pomocą.",
+      "network": "Nie udało się połączyć z Soberity. Sprawdź połączenie i spróbuj ponownie.",
+      "notConfigured": "Konta nie są dostępne w tej wersji aplikacji.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie."
+    }
+  },
+  "offline": {
+    "badge": "Wymagane połączenie",
+    "title": "Nie możemy potwierdzić Twojej sesji",
+    "description": "Nie udało się sprawdzić Twojego konta w Soberity. Nie jesteś zalogowany, dopóki nie uda się tego potwierdzić.",
+    "hint": "Sprawdź połączenie i spróbuj ponownie albo się wyloguj.",
+    "retryButton": "Spróbuj ponownie",
+    "signOutButton": "Wyloguj się"
   },
   "verificationPending": {
     "title": "Potwierdź swój e-mail",
     "badge": "Wymagana weryfikacja",
-    "description": "Gdy rejestracja zacznie działać, przed dostępem do konta trzeba będzie potwierdzić adres e-mail. Weryfikacja e-maila nie jest jeszcze wdrożona.",
-    "alertTitle": "Ekran zastępczy",
-    "alertMessage": "Ten ekran rezerwuje stan oczekiwania na weryfikację pod przyszły proces rejestracji i potwierdzenia e-maila w Firebase.",
+    "description": "Konto zostało utworzone, ale przed dostępem do niego musisz potwierdzić adres e-mail.",
+    "alertTitle": "Konto utworzone",
+    "alertMessage": "Wysyłanie e-maila potwierdzającego i ponowne wysyłanie są częścią kolejnej iteracji.",
     "resendButton": "Wyślij e-mail weryfikacyjny ponownie",
-    "resendHelper": "Jeszcze niedostępne — rejestracja i weryfikacja e-maila są planowane w kolejnej iteracji."
+    "resendHelper": "Jeszcze niedostępne — weryfikacja e-maila jest planowana w kolejnej iteracji."
   },
   "notFound": {
     "title": "Nie znaleziono strony",

@@ -22,6 +22,8 @@ export default function PublicLayout() {
       <Stack.Screen name="index" options={{ title: t('common.appName') }} />
       <Stack.Screen name="science" options={{ title: t('science.title') }} />
       <Stack.Screen name="events" options={{ title: t('events.title') }} />
+      <Stack.Screen name="sign-in" options={{ title: t('auth.signInTitle') }} />
+      <Stack.Screen name="sign-up" options={{ title: t('auth.signUpTitle') }} />
     </Stack>
   );
 }

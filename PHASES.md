@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 5/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 6/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **5/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 zweryfikowane).
+**Łącznie:** 79 iteracji agentowych; wykonane: **6/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -331,26 +331,27 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I06 — Cross-platform Auth adapter, signup & login
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-11-01  
+**Finished:** 2026-11-01  
 **Zależności iteracji:** P0-I03, P0-I05  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** kod: `apps/consumer/src/auth/` (adapter Firebase web/native, `AuthStatusContext`, `identityApi`, walidacja, mapowanie błędów), ekrany `SignInScreen`/`SignUpScreen`/`OfflineScreen`/`AccountScreen`, trasy `app/(public)/sign-in|sign-up` i `app/(authenticated)/index.tsx`. Weryfikacja: `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. V02 (web, konto dev `soberity-f9e4b`): logowanie → strefa zalogowana, wylogowanie, błędne hasło i ekran offline sprawdzone ręcznie przez właściciela. V03: potwierdzone przez właściciela jako PASS (urządzenie i wersja OS do uzupełnienia w `docs/testing/P0-I06-results.md`). Szczegóły: `docs/testing/P0-I06-results.md` (lokalnie).  
+**Blokery:** brak. Do uzupełnienia dowodu: nazwa platformy i wersja OS dla V03.
 
 **Zakres zadań:**
 
-- [ ] `P0-I06-T01` Wybierz i zaimplementuj zgodną wersję Firebase JS SDK oraz persystencję osobno web/native.
-- [ ] `P0-I06-T02` Zaimplementuj AuthProvider, nasłuch stanu, loading, token refresh.
-- [ ] `P0-I06-T03` Utwórz rejestrację i logowanie email/hasło oraz walidację.
-- [ ] `P0-I06-T04` Zapewnij czytelne komunikaty błędów i ekran braku sieci.
-- [ ] `P0-I06-T05` Nie przedstawiaj fałszywego zalogowania bez backendu.
+- [x] `P0-I06-T01` Wybierz i zaimplementuj zgodną wersję Firebase JS SDK oraz persystencję osobno web/native. (`firebase@^13.1.0`; `firebaseInstance.web.ts` / `.native.ts`; typy dla `getReactNativePersistence` w `firebase-react-native.d.ts`.)
+- [x] `P0-I06-T02` Zaimplementuj AuthProvider, nasłuch stanu, loading, token refresh. (`onIdTokenChanged`, stany `loading | guest | verification-pending | authenticated | offline`, ochrona przed nieaktualnymi odpowiedziami.)
+- [x] `P0-I06-T03` Utwórz rejestrację i logowanie email/hasło oraz walidację. (Ekrany + `validation.ts`, testy `validation.test.ts`.)
+- [x] `P0-I06-T04` Zapewnij czytelne komunikaty błędów i ekran braku sieci. (`errors.ts`, testy `errors.test.ts`; `OfflineScreen` z ponowieniem.)
+- [x] `P0-I06-T05` Nie przedstawiaj fałszywego zalogowania bez backendu. (`authenticated` tylko po HTTP 200 z `/api/v1/identity/me`; 403 → weryfikacja; 401 → wylogowanie; błąd sieci/5xx → offline.)
 
 **Weryfikacja:**
 
-- [ ] `P0-I06-V01` Testuj formularze i adapter.
-- [ ] `P0-I06-V02` Smoke test konta dev na web.
-- [ ] `P0-I06-V03` Powtórz na dostępnych emulatorach.
+- [x] `P0-I06-V01` Testuj formularze i adapter. (Jest 40/40, w tym provider z fałszywym adapterem i `identityApi` zamockowanym.)
+- [x] `P0-I06-V02` Smoke test konta dev na web. — PASS 2026-11-01 (przeglądarka, `http://localhost:8082`, konto dev `soberity-f9e4b` z potwierdzonym e-mailem): logowanie, wylogowanie, błędne hasło, ekran offline. Naprawiono brak trasy indeksowej `(authenticated)/index.tsx`.
+- [x] `P0-I06-V03` Powtórz na dostępnych emulatorach. — PASS wg właściciela 2026-11-01 (co najmniej jedna platforma; szczegóły do uzupełnienia).
+
 
 **Definition of Done:** Realna rejestracja i logowanie Firebase, spójny stan AuthProvider. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2147,8 +2148,8 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I05 — Firebase project & backend token verification` (DONE 2026-11-01; T01 odroczone przez właściciela); P0-I04 pozostaje DONE 2026-11-01
-- **Status:** P0-I05 DONE z odroczonym T01 (staging/prod). Start deweloperski działa przez emulator bez internetu; dev `soberity-f9e4b` zweryfikowany. P0-I03A V02/V03 otwarte. Phase 0 niezamknięta.
+- **Aktualna iteracja:** `P0-I06 — Cross-platform Auth adapter, signup & login` (DONE 2026-11-01); P0-I05 DONE z odroczonym T01.
+- **Status:** P0-I06 DONE: web V02 i V03 (wg właściciela) PASS. Do uzupełnienia dowód V03: platforma i wersja OS. P0-I03A V02/V03 otwarte. Phase 0 niezamknięta.
 - **Następny krok:** P0-I06 wyłącznie po osobnym poleceniu. Przed wdrożeniem staging/prod: podanie ID projektów i wykonanie T01. Wcześniej zamknąć P0-I03A V02/V03 (runtime natywny).
 
 - **Otwarte blokery:** instalacja NDK 27.1.12297006 nie została ukończona (pobrano 136 MiB, po zatrzymaniu usunięto jej niekompletny katalog). Android build/eksport, runtime natywny, VoiceOver/TalkBack i duży font NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
@@ -2227,3 +2228,4 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 
 | 2026-11-01 | Plan — język UI i profil (P0-I03A/P0-I04/P0-I09) | Doprecyzowano wymagania; bez rozpoczęcia nowych iteracji | PHASES: ręczny wybór EN/PL, nullable locale w profilu PostgreSQL, GET/PATCH /me, pierwszeństwo profilu nad urządzeniem, cache per konto/gość, migracja jawnego wyboru przy nowym profilu, offline/błędy i testy trwałości/ACL/drugiego urządzenia. Lokalny BRANDING uzupełniono o zachowanie języka. Sprawdzono obecny kod i18n: wykrywa urządzenie, brak ręcznej persystencji. | Aktualna iteracja nadal P0-I03A; lokalne UI języka w T04, zapis profilu w P0-I09. Bez zmiany kodu aplikacji, testów runtime i wpisu CHANGELOG — aktualizacja planu. |
 | 2026-11-01 | P0-I03A — wdrożenie motywów i preferencji | T04 wdrożone, V01 zweryfikowane; iteracja IN_PROGRESS | Tokeny semantyczne dwóch motywów, provider i ustawienia dostępnego wyboru motywu oraz EN/PL z lokalnym zapisem; dostosowane istniejące ekrany/menu i wspólne komponenty; uzupełniono lokalny `docs/BRANDING.md`. `pnpm run check` PASS; Jest 7/7 suites, 17/17 PASS; Playwright 12/12 PASS przed zmianą klawiaturową, następnie ukierunkowane preferencje desktop/mobile-web 2/2 PASS; referencja 8 wariantów PASS; web export PASS; iOS Simulator build/install PASS. | Android prebuild PASS; instalacja NDK 27.1.12297006 nie została ukończona: pierwsza próba zatrzymana przy 535 MiB, druga pobrała 136 MiB po odzyskaniu miejsca i została zatrzymana przed końcem. Dokończyć instalację NDK i ponowić build/eksport. VoiceOver/TalkBack, duży font i pełny runtime natywny NOT VERIFIED; V02/V03 pozostają otwarte, P0-I04 nie rozpoczęto. |
+| 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |

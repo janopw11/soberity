@@ -2,6 +2,14 @@
 
 ## 2026-11-01
 
+- P0-I06 (DONE 2026-11-01): logowanie i rejestracja e-mail/hasło przez Firebase
+  Auth w aplikacji. Stan sesji pochodzi z backendu (`/api/v1/identity/me`):
+  zweryfikowane konto trafia do strefy zalogowanej, niezweryfikowane dostaje
+  ekran potwierdzenia e-maila, a brak połączenia pokazuje ekran offline. Smoke
+  test web na koncie dev obejmuje logowanie, wylogowanie, błędne hasło i offline;
+  wykryty brak trasy indeksowej `/(authenticated)` naprawiono. Testy: lint,
+  typecheck, format, 40 testów Jest, eksport web. Test na emulatorze mobilnym
+  zaliczony przez właściciela (szczegóły platformy do uzupełnienia).
 - Rozpoczęto P0-I05: backend weryfikuje Firebase ID tokeny przez Firebase Admin
   SDK (sprawdzenie issuera, audience, wygaśnięcia i projektu). Endpointy
   `/api/v1/**` wymagają zweryfikowanego e-maila; niezweryfikowane konto

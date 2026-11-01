@@ -9,8 +9,10 @@
     "eyebrow": "Science. Connection. Alcohol-free.",
     "title": "More to life.\nTogether.",
     "intro": "A place for curious minds and alcohol-free experiences. Discover what Soberity is building.",
+    "signInButton": "Sign in",
+    "signUpButton": "Create account",
     "previewTitle": "An early preview",
-    "previewBody": "Learning, events and accounts are not available yet. Choose a section from the side menu.",
+    "previewBody": "Learning and events are still in preview. Accounts are now available: create one or sign in to continue.",
     "footer": "Science first. Evidence always. No judgment."
   },
   "science": {
@@ -23,16 +25,62 @@
   },
   "account": {
     "title": "Your account",
-    "description": "Registration, sign-in and profile settings will be added later. No account is created in this preview."
+    "badge": "Signed in",
+    "description": "Profile settings will be added later.",
+    "signedInAs": "Signed in as {{email}}",
+    "signOutButton": "Sign out"
+  },
+  "auth": {
+    "checkingSession": "Checking your session…",
+    "signInTitle": "Sign in",
+    "signInIntro": "Use the e-mail address and password you registered with.",
+    "signUpTitle": "Create account",
+    "signUpIntro": "Create your account with an e-mail address and a password.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm password",
+    "passwordHelper": "At least {{min}} characters.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "signInSubmit": "Sign in",
+    "signUpSubmit": "Create account",
+    "noAccountLink": "No account yet? Create one",
+    "haveAccountLink": "Already have an account? Sign in",
+    "errorTitle": "Something needs your attention",
+    "fieldErrors": {
+      "required": "This field is required.",
+      "invalidEmail": "Enter a valid email address.",
+      "passwordTooShort": "Use at least {{min}} characters.",
+      "passwordMismatch": "The passwords do not match."
+    },
+    "errors": {
+      "emailInUse": "An account with this email already exists. Try signing in instead.",
+      "invalidEmail": "Enter a valid email address.",
+      "weakPassword": "This password is too weak. Choose a longer or less predictable one.",
+      "invalidCredentials": "The email or password is incorrect.",
+      "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+      "userDisabled": "This account has been disabled. Contact support.",
+      "network": "We couldn't reach Soberity. Check your connection and try again.",
+      "notConfigured": "Accounts are not available in this build.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "offline": {
+    "badge": "Connection needed",
+    "title": "We can't confirm your session",
+    "description": "Your account could not be checked with Soberity. You are not signed in until we can confirm it.",
+    "hint": "Check your connection and try again, or sign out.",
+    "retryButton": "Try again",
+    "signOutButton": "Sign out"
   },
   "verificationPending": {
     "title": "Confirm your email",
     "badge": "Verification needed",
-    "description": "Once sign-up exists, you will need to confirm your email address before reaching your account. Email verification is not implemented yet.",
-    "alertTitle": "Placeholder screen",
-    "alertMessage": "This screen reserves the verification-pending state for the upcoming Firebase sign-up and email verification flow.",
+    "description": "Your account was created, but you need to confirm your email address before reaching your account.",
+    "alertTitle": "Account created",
+    "alertMessage": "Sending the confirmation e-mail and resending it are part of the next iteration.",
     "resendButton": "Resend verification email",
-    "resendHelper": "Not available yet — sign-up and email verification are planned for a later iteration."
+    "resendHelper": "Not available yet — email verification is planned for a later iteration."
   },
   "notFound": {
     "title": "Page not found",

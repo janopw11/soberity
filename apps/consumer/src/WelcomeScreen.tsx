@@ -1,13 +1,15 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
 
-import { Screen } from './ui';
+import { Button, Screen } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 export default function WelcomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { colors } = useThemePreferences();
   const styles = createStyles(colors);
 
@@ -18,6 +20,20 @@ export default function WelcomeScreen() {
         {t('welcome.title')}
       </Text>
       <Text style={styles.intro}>{t('welcome.intro')}</Text>
+
+      <View style={styles.actions}>
+        <Button
+          label={t('welcome.signInButton')}
+          onPress={() => router.push('/sign-in')}
+          testID="welcome-sign-in"
+        />
+        <Button
+          label={t('welcome.signUpButton')}
+          variant="secondary"
+          onPress={() => router.push('/sign-up')}
+          testID="welcome-sign-up"
+        />
+      </View>
 
       <View style={styles.notice}>
         <Text style={styles.noticeTitle}>{t('welcome.previewTitle')}</Text>
@@ -50,6 +66,10 @@ function createStyles(
       fontSize: typography.h3.fontSize,
       lineHeight: typography.h3.lineHeight + 4,
       maxWidth: 640,
+    },
+    actions: {
+      gap: spacing.space12,
+      maxWidth: 420,
     },
     notice: {
       backgroundColor: colors.surfaceAlt,
