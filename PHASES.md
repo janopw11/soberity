@@ -245,7 +245,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - [x] `P0-I03A-T01` Przejrzyj istniejące ekrany, komponenty i tokeny oraz `docs/BRANDING.md`; określ elementy wymagające dopracowania, zachowując fiolet i uzgodnione menu ośmiu sekcji. Historyczny przegląd jasnej bazy wykonano przed wyborem domyślnej Śliwki.
 - [x] `P0-I03A-T02` Przygotuj do oceny makiety lub odizolowany podgląd trzech reprezentatywnych ekranów: strony głównej, Science & Discover i Sober Events; każdy w układzie mobilnym i desktopowym. Zachowaj równorzędność Science i Events w produkcie i menu; zgodnie z decyzją właściciela 2026-11-01 Home zawiera tylko powitanie i najnowsze artykuły/badania. Pokaż hierarchię treści, typografię, karty, zdjęcia/ilustracje, odstępy oraz nawigację.
 - [x] `P0-I03A-T03` Przedstaw konkretny projekt właścicielowi, zbierz uwagi, dopracuj go i zapisz jego jawną akceptację wraz z datą oraz wskazaniem zaakceptowanej wersji. Akceptacja 2026-11-01: układ v4, `plum-soft` jako default i `violet` jako motyw jasny; referencja `design/reference/P0-I03A/`. Zgoda na palety nie jest dowodem wdrożenia ani testów aplikacji.
-- [ ] `P0-I03A-T04` Po akceptacji zaktualizuj `docs/BRANDING.md` jako jedyne repozytoryjne źródło zasad UI, tokeny i wspólne komponenty oraz dostosuj istniejące ekrany w granicach wdrożonych funkcji. Zapisz lokalizację zaakceptowanych materiałów referencyjnych. Zaimplementuj osobne zestawy tokenów dark/light, dostępny przełącznik oraz lokalne zapamiętywanie wyboru na web/iOS/Android. Bez zapisanego wyboru domyślna jest Śliwka, niezależnie od ustawień systemu. Dobierz i sprawdź stany success/warning/danger/info w obu motywach; logo i font pozostają tymczasowe.
+- [ ] `P0-I03A-T04` Po akceptacji zaktualizuj `docs/BRANDING.md` jako jedyne repozytoryjne źródło zasad UI, tokeny i wspólne komponenty oraz dostosuj istniejące ekrany w granicach wdrożonych funkcji. Zapisz lokalizację zaakceptowanych materiałów referencyjnych. Zaimplementuj osobne zestawy tokenów dark/light, dostępny przełącznik oraz lokalne zapamiętywanie wyboru na web/iOS/Android. Bez zapisanego wyboru domyślna jest Śliwka, niezależnie od ustawień systemu. Dobierz i sprawdź stany success/warning/danger/info w obu motywach; logo i font pozostają tymczasowe. Dodaj dostępny ręczny wybór języka EN/PL i lokalny zapis dla gościa jako podstawę UI; pokaż nazwy języków, nie same flagi. Integracja z profilem PostgreSQL należy do P0-I09; do jej wdrożenia nie sugeruj synchronizacji z kontem.
 - [x] `P0-I03A-T05` Zapisz zasady rozszerzania wzorca na kolejne moduły i stan decyzji dotyczących logo/fontu. Tymczasowy tekstowy wordmark i font systemowy mogą pozostać; finalne logo nie blokuje tej iteracji. Zasady zapisano w BRANDING 2026-11-01; dwa motywy dziedziczą kolejne moduły. Logo i font nadal wymagają odrębnej decyzji.
 
 **Granice zakresu:** Makiety Science i Events służą zatwierdzeniu wyglądu, nie wdrożeniu funkcji Phase 1/2. Przykładowe dane oznacz jako demonstracyjne i trzymaj poza produkcyjnymi trasami; nie sugeruj działającego katalogu, quizów ani backendu. Nie publikuj niezweryfikowanych twierdzeń zdrowotnych. Nie projektuj z góry wszystkich przyszłych modułów.
@@ -273,7 +273,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 - [ ] `P0-I04-T01` Skonfiguruj Spring Boot Java 21: Web, Security, Validation, JPA, Flyway, Actuator i OpenAPI.
 - [ ] `P0-I04-T02` Dodaj moduły identity/profile/common oraz PostgreSQL w Docker Compose.
-- [ ] `P0-I04-T03` Utwórz migrację profilu z firebaseUid i indeksami, bez haseł/tokenów.
+- [ ] `P0-I04-T03` Utwórz migrację profilu z firebaseUid i indeksami, bez haseł/tokenów. Przewidź nullable `locale` jako preferencję języka użytkownika (`en`/`pl` na start), zgodnie z raportem §7; brak wartości oznacza brak zapisanego wyboru. Obsługa GET/PATCH i synchronizacja klienta w P0-I09.
 - [ ] `P0-I04-T04` Dodaj Problem Details, correlation ID i bezpieczne logowanie.
 - [ ] `P0-I04-T05` Dodaj profile local/test/staging i CORS.
 - [ ] `P0-I04-T06` Przygotuj Kubernetes-ready architecture
@@ -416,13 +416,29 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - [ ] `P0-I09-T02` Zaimplementuj GET/PATCH /api/v1/me (allowed fields only).
 - [ ] `P0-I09-T03` Utwórz ekrany profilu i edycji preferencji, miasta, displayName, języka i zainteresowań.
 - [ ] `P0-I09-T04` Rozdziel pola własne Firebase i dane PostgreSQL.
+- [ ] `P0-I09-T05` Udostępnij preferencję `locale` z PostgreSQL w GET/PATCH `/api/v1/me`. Ręczny wybór EN/PL zapisuj wyłącznie we własnym profilu, po weryfikacji Firebase ID tokenu; nie w Firebase jako źródle prawdy. Backend waliduje wspieraną listę (`en`/`pl` na start), odrzuca niepoprawny kod jako 400 i nie pozwala podmieniać UID/roli.
+- [ ] `P0-I09-T06` Po ręcznej zmianie przełącz UI bez restartu i zapisz wybór w profilu oraz lokalnym cache przypisanym do konta. Po logowaniu/odczycie profilu stosuj zapisany język ponad językiem urządzenia i ustawieniem gościa; odczytuj go ponownie przy kolejnym uruchomieniu/logowaniu, aby wybór działał między urządzeniami. Zmiana języka urządzenia nie nadpisuje istniejącego `locale`.
+- [ ] `P0-I09-T07` Obsłuż gościa, brak `locale`, offline i błędy zapisu zgodnie z zasadami poniżej. Przy tworzeniu profilu można przenieść jawny wybór gościa tylko do nowego profilu bez preferencji; istniejąca preferencja konta ma pierwszeństwo. Nie zapisuj automatycznie wykrytego języka jako ręcznego wyboru.
+
 
 **Weryfikacja:**
 
 - [ ] `P0-I09-V01` Testy ACL: dwaj użytkownicy nie widzą ani nie edytują cudzych danych.
 - [ ] `P0-I09-V02` Testuj po ponownym zalogowaniu trwałość profilu.
+- [ ] `P0-I09-V03` Testuj ręczną zmianę EN↔PL: natychmiastowy UI, PATCH, odczyt z PostgreSQL po reload/restart/ponownym logowaniu oraz na drugim urządzeniu z innym językiem systemu. Zweryfikuj na web/iOS/Android; niewykonane kontrole pozostają NOT VERIFIED.
+- [ ] `P0-I09-V04` Testuj brak preferencji, gościa i przeniesienie jego jawnego wyboru do nowego profilu, pierwszeństwo istniejącego profilu nad ustawieniem gościa, brakujące tłumaczenia, niepoprawne `locale` (400), brak autoryzacji i odmowę edycji cudzego języka.
+- [ ] `P0-I09-V05` Testuj offline/błąd PATCH: lokalna zmiana nie jest fałszywie potwierdzona jako zapisana na koncie, retry nie dotyka innego użytkownika, a logout/zmiana konta nie przenosi cache ani oczekującego zapisu między kontami.
 
-**Definition of Done:** GET/PATCH /me działa dla własnego konta na trzech platformach. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+
+**Uzgodnione zasady języka (2026-11-01):**
+
+- UI korzysta ze wspólnych słowników i18n (minimum EN/PL); zmiana obejmuje nawigację, formularze, stany i komunikaty błędów. Wybór jest dostępny dla gościa i w ustawieniach zalogowanego użytkownika, z nazwami „English” / „Polski”.
+- **Po zalogowaniu:** zapisane `locale` w profilu jest źródłem prawdy. Lokalny cache tego samego konta służy do startu/offline, ale ustępuje udanemu odczytowi aktualnego profilu. Brak zapisanej preferencji: jawny lokalny wybór dla bieżącego kontekstu → wspierany język urządzenia → `en`. Dla gościa obowiązuje ten sam fallback bez odczytu profilu.
+- **Zmiana ręczna:** UI może przełączyć język od razu, lecz potwierdzenie „zapisano w profilu” wymaga sukcesu PATCH. Offline/błąd zapisu oznacza lokalną zmianę i widoczny stan niezsynchronizowany z opcją ponowienia; bez cichego nadpisywania profilu. Pending zmiana dotyczy wyłącznie tego UID i nie może wykonać się po przełączeniu na inne konto.
+- Preferencję konta synchronizuje się przez backend i PostgreSQL, nie przez sam język systemu, local storage ani token Firebase. Cache kont rozdzielaj od ustawienia gościa; cache poprzedniego użytkownika nie jest fallbackiem następnego.
+- `locale` wybiera język interfejsu, nie strefę czasową, kraj, walutę ani język treści organizatora. Artykuły/omówienia badań są lokalizowane redakcyjnie; brak tłumaczenia wymaga jawnego oznaczenia języka oryginału i fallbacku, bez automatycznego przekłamywania nauki. Języki poza EN/PL rozszerza P9-I01.
+
+**Definition of Done:** GET/PATCH /me działa dla własnego konta na trzech platformach. Ręczny wybór języka zapisuje się w PostgreSQL i jest stosowany po ponownym logowaniu/uruchomieniu oraz odczycie na drugim urządzeniu; błędy i offline nie udają udanej synchronizacji. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
 ## P0-I10 — Sensitive account settings & deletion
 
@@ -2205,3 +2221,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-01 | P0-I03A — jaśniejsza Śliwka | IN_PROGRESS; korekta preferowanego motywu do oceny | Właściciel preferuje Śliwkę i poprosił o lekkie rozjaśnienie. design/previews/P0-I03A-plum i PHASES: tło #211B2A, panele #2A2235/#342A43, lawenda #C1A4F6 bez zmiany; oryginał zachowany w przełączniku. Chromium 8 kombinacji EN/PL PASS, 20 par kontrastu PASS (nowa wersja: tekst min. 6.07:1); 4 screenshoty PL. ESLint/Prettier/składnia/diff PASS. | T03: ocena plum-soft i odbiór projektu. Bez zmiany BRANDING/tokenów/Expo i wpisu CHANGELOG; natywne runtime/pełne a11y NOT VERIFIED. |
 
 | 2026-11-01 | P0-I03A — akceptacja motywów i porządkowanie | IN_PROGRESS; T03/T05 zakończone, T04/V01–V03 otwarte | Właściciel zaakceptował default plum-soft i jasny violet. PHASES, lokalny BRANDING i AGENTS zsynchronizowane. Zatwierdzone referencje oraz raporty przeniesiono do design/reference/P0-I03A; usunięto 7 katalogów previews na wyraźne polecenie. Referencja: Chromium 8 wariantów i 20 par kontrastu PASS; lint/format/składnia/diff PASS. CHANGELOG: wpis o zatwierdzonym projekcie, bez deklaracji wdrożenia. | Następny krok P0-I03A-T04: implementacja obu motywów/przełącznika/zapisu wyboru i testy. Bez twierdzenia, że aplikacja już używa Śliwki. |
+
+| 2026-11-01 | Plan — język UI i profil (P0-I03A/P0-I04/P0-I09) | Doprecyzowano wymagania; bez rozpoczęcia nowych iteracji | PHASES: ręczny wybór EN/PL, nullable locale w profilu PostgreSQL, GET/PATCH /me, pierwszeństwo profilu nad urządzeniem, cache per konto/gość, migracja jawnego wyboru przy nowym profilu, offline/błędy i testy trwałości/ACL/drugiego urządzenia. Lokalny BRANDING uzupełniono o zachowanie języka. Sprawdzono obecny kod i18n: wykrywa urządzenie, brak ręcznej persystencji. | Aktualna iteracja nadal P0-I03A; lokalne UI języka w T04, zapis profilu w P0-I09. Bez zmiany kodu aplikacji, testów runtime i wpisu CHANGELOG — aktualizacja planu. |
