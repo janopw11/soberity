@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — P0-I00–P0-I03 DONE; P0-I03A IN_PROGRESS (T04 wdrożone, V01 zweryfikowane; V02/V03 otwarte) przed P0-I04; rozpoczęcie wymaga osobnego polecenia
+**Status globalny:** IN_PROGRESS — P0-I00–P0-I04 DONE; P0-I03A IN_PROGRESS (T04 wdrożone, V01 zweryfikowane; V02/V03 otwarte); P0-I04 wykonano na wyraźne polecenie właściciela, mimo otwartych V02/V03 P0-I03A (backend nie zależy od natywnego UI)
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 4/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 5/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **4/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane).
+**Łącznie:** 79 iteracji agentowych; wykonane: **5/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 zweryfikowane).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -262,21 +262,21 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I04 — Spring Boot, PostgreSQL & API skeleton
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-11-01  
+**Finished:** 2026-11-01  
 **Zależności iteracji:** P0-I01, P0-I03A (uzgodniona kolejność prac)
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** `docs/testing/P0-I04-results.md` (lokalnie): `./mvnw --batch-mode verify` exit 0 (3 unit + 15 IT Testcontainers); `docker compose up` z healthy Postgres i backendem; probes 200; anonimowe 401 problem+json z correlationId; OpenAPI 200; dwie repliki; `docker stop` z graceful shutdown; brak `.env`/hasła w obrazie; `pnpm check` exit 0.  
+**Blokery:** brak blokerów dla backendu. Port 5432 na hoście był zajęty: compose używa `SOBERITY_POSTGRES_PORT`. P0-I03A V02/V03 nadal otwarte. Flaga `SPRING_FLYWAY_ENABLED=false` nie była uruchamiana osobno.
 
 **Zakres zadań:**
 
-- [ ] `P0-I04-T01` Skonfiguruj Spring Boot Java 21: Web, Security, Validation, JPA, Flyway, Actuator i OpenAPI.
-- [ ] `P0-I04-T02` Dodaj moduły identity/profile/common oraz PostgreSQL w Docker Compose.
-- [ ] `P0-I04-T03` Utwórz migrację profilu z firebaseUid i indeksami, bez haseł/tokenów. Przewidź nullable `locale` jako preferencję języka użytkownika (`en`/`pl` na start), zgodnie z raportem §7; brak wartości oznacza brak zapisanego wyboru. Obsługa GET/PATCH i synchronizacja klienta w P0-I09.
-- [ ] `P0-I04-T04` Dodaj Problem Details, correlation ID i bezpieczne logowanie.
-- [ ] `P0-I04-T05` Dodaj profile local/test/staging i CORS.
-- [ ] `P0-I04-T06` Przygotuj Kubernetes-ready architecture
+- [x] `P0-I04-T01` Skonfiguruj Spring Boot Java 21: Web, Security, Validation, JPA, Flyway, Actuator i OpenAPI.
+- [x] `P0-I04-T02` Dodaj moduły identity/profile/common oraz PostgreSQL w Docker Compose.
+- [x] `P0-I04-T03` Utwórz migrację profilu z firebaseUid i indeksami, bez haseł/tokenów. Przewidź nullable `locale` jako preferencję języka użytkownika (`en`/`pl` na start), zgodnie z raportem §7; brak wartości oznacza brak zapisanego wyboru. Obsługa GET/PATCH i synchronizacja klienta w P0-I09.
+- [x] `P0-I04-T04` Dodaj Problem Details, correlation ID i bezpieczne logowanie.
+- [x] `P0-I04-T05` Dodaj profile local/test/staging i CORS.
+- [x] `P0-I04-T06` Przygotuj Kubernetes-ready architecture
       bez wdrażania Kubernetes:
   - Stateless backend (bez przechowywania sesji lokalnie).
   - Konfiguracja przez environment variables.
@@ -292,10 +292,10 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Weryfikacja:**
 
-- [ ] `P0-I04-V01` Uruchom compose i healthcheck.
-- [ ] `P0-I04-V02` Testcontainers: migracja, unikalność UID, podstawowe 400/401.
-- [ ] `P0-I04-V03` Sprawdź OpenAPI.
-- [ ] `P0-I04-V04` Zweryfikuj Kubernetes-ready architecture:
+- [x] `P0-I04-V01` Uruchom compose i healthcheck.
+- [x] `P0-I04-V02` Testcontainers: migracja, unikalność UID, podstawowe 400/401.
+- [x] `P0-I04-V03` Sprawdź OpenAPI.
+- [x] `P0-I04-V04` Zweryfikuj Kubernetes-ready architecture:
   - Backend uruchamia się z konfiguracją ENV.
   - Health/readiness endpoints działają.
   - Graceful shutdown kończy aktywne żądania.
@@ -2147,9 +2147,9 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I03A — Docelowy kierunek UI i akceptacja wizualna`
+- **Aktualna iteracja:** `P0-I04 — Spring Boot, PostgreSQL & API skeleton` (DONE 2026-11-01); poprzednia `P0-I03A` pozostaje IN_PROGRESS
 - **Status:** IN_PROGRESS — T01–T05 i V01 zweryfikowane; T04 wdrożone. V02/V03 otwarte. 2026-11-01 zaakceptowano v4 i oba motywy. Phase 0 niezamknięta.
-- **Następny krok:** dokończyć instalację NDK 27.1.12297006 przez Android SDK Manager lub przy stabilnym łączu, ponowić Android build/eksport; wykonać kontrole runtime i a11y na iOS/Android (w tym VoiceOver/TalkBack i duży font). Następnie zamknąć V02/V03, jeśli testy przejdą; P0-I04 nie rozpoczęto.
+- **Następny krok:** dokończyć instalację NDK 27.1.12297006 przez Android SDK Manager lub przy stabilnym łączu, ponowić Android build/eksport; wykonać kontrole runtime i a11y na iOS/Android (w tym VoiceOver/TalkBack i duży font). Następnie zamknąć V02/V03, jeśli testy przejdą; P0-I04 ukończono 2026-11-01 (DONE). P0-I05 wyłącznie po osobnym poleceniu.
 - **Otwarte blokery:** instalacja NDK 27.1.12297006 nie została ukończona (pobrano 136 MiB, po zatrzymaniu usunięto jej niekompletny katalog). Android build/eksport, runtime natywny, VoiceOver/TalkBack i duży font NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
 - **Wymagana akceptacja:** motywy i układ v4 zaakceptowano 2026-11-01. Logo/font i przyszłe istotne zmiany poza tym zakresem wymagają odrębnej decyzji. `/docs` pozostaje lokalne i ignorowane przez Git na polecenie właściciela.
 - **Korekta P0-I03 (2026-10-31, aktualna):** menu ☰ ma osiem głównych pozycji według listy właściciela, emoji, bez grup i podpisów Planowane. Check PASS, Playwright 10/10 PASS. Natywne runtime NOT VERIFIED; następny krok P0-I03: sprawdzić osiem pozycji, otwieranie/zamykanie i a11y na iOS/Android. P0-I04 nie rozpoczęto.
@@ -2165,6 +2165,7 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 
 | 2026-10-29 | P0-I00 | Właściciel zatwierdził D1–D4; DoD spełnione, DONE | ADR-001–003 ACCEPTED, audyt i raport uzupełnione o zapis akceptacji; historyczne wyniki pozostawiono jawne | Zlecono P0-I01; katalog docs lokalny na wyraźne polecenie właściciela |
 | 2026-10-29 | P0-I01 | DONE; T01–T04 i V01–V02 zweryfikowane | apps/consumer, packages, backend/pom.xml i wrapper, infra/compose, konfiguracje root, lockfile, scripts, README, PHASES, CHANGELOG; lokalnie docs/testing/P0-I01-results.md. Bootstrap czystej kopii i powtórzenie, pnpm check/build/-r lint, Maven verify — exit 0; negatywne scenariusze narzędzi i konfiguracji PASS | Brak blokera P0-I01; brak testów platform (brak aplikacji). P0-I02 wyłącznie po kolejnym poleceniu; Android do sprawdzenia. |
+| 2026-11-01 | P0-I04 | DONE; T01–T06 i V01–V04 zweryfikowane | backend (pom Spring Boot 4.1.2, kod common/identity/profile, Flyway V1, profile, Dockerfile), infra/compose (compose.yml, .env.example, README), docs/testing/P0-I04-results.md (lokalnie), CHANGELOG, PHASES. `./mvnw verify` exit 0 (3 unit, 15 IT); compose: healthy, probes 200, 401 problem+json, OpenAPI 200, 2 repliki, graceful stop; brak sekretów w obrazie; `pnpm check` exit 0 | Brak blokera backendu. P0-I03A V02/V03 otwarte. Następna P0-I05 wyłącznie po poleceniu. |
 
 # 7. Wzór raportu kończącego sesję Codex
 

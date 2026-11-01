@@ -1,0 +1,4 @@
+# Datasource is supplied by Testcontainers (@ServiceConnection) in integration tests.
+soberity:
+  cors:
+    allowed-origins: http://localhost:8081

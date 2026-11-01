@@ -1,12 +1,30 @@
 # Backend
 
-P0-I01 przygotowuje Maven Wrapper 3.9.16 oraz POM sprawdzający Java 21
-i wersję Maven. `./mvnw --batch-mode verify` waliduje szkielet narzędziowy;
-`packaging=pom` oznacza, że nie powstaje JAR i nie ma jeszcze testów Java.
+Backend to Spring Boot 4.1.2 na Java 21 (jar `soberity-backend`) z modułami
+`common`, `identity` i `profile`, PostgreSQL 17, migracjami Flyway i OpenAPI
+(springdoc 3.2.0). Zaimplementowano P0-I04: szkielet API bez logiki domenowej.
 
-P0-I04 doda Spring Boot 4.1.2, kod, moduły, PostgreSQL, Flyway i testy.
-Zaakceptowany zestaw to Java 21, springdoc 3.2.0 i JUnit 6 zarządzany przez
-BOM Boot. Nie ma endpointów, usługi ani polecenia uruchamiającego serwer.
+Endpointy (P0-I04):
+
+- `GET /actuator/health/liveness` i `/actuator/health/readiness` — publiczne.
+- `GET /v3/api-docs` oraz Swagger UI — publiczne poza profilem `production`.
+- `/api/v1/**` — wymaga uwierzytelnienia; bez tokena zwraca 401 w formacie
+  `application/problem+json`. Weryfikacja Firebase ID tokenów to P0-I05.
+
+Uruchomienie testów (wymaga Dockera dla Testcontainers):
+
+```bash
+./mvnw --batch-mode verify
+```
+
+Uruchomienie lokalnego stosu (PostgreSQL + backend) — patrz
+[`infra/compose/README.md`](../infra/compose/README.md).
+
+Profile: `local` (wymaga `SOBERITY_DB_PASSWORD`), `test` (datasource z
+Testcontainers), `staging` i `production` (wszystkie wartości ze zmiennych
+środowiskowych; w `production` wyłączone OpenAPI). Zmienne opisuje
+[`.env.example`](./.env.example). Obraz budowany jest z
+[`Dockerfile`](./Dockerfile) i nie zawiera plików `.env` ani sekretów.
 
 `./mvnw` wymaga JDK 21 oraz curl lub wget i unzip przy pierwszym pobraniu.
 Maven pobierany jest z Maven Central, z weryfikacją SHA-256 dystrybucji.

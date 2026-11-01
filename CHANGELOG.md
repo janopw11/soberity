@@ -1,6 +1,18 @@
 # Changelog
 
-## 2026-10-29
+## 2026-11-01
+
+- Ukończono P0-I04: backend Spring Boot 4.1.2 na Java 21 z modułami
+  `common`, `identity` i `profile`, migracją Flyway tabeli profilu
+  (`firebase_uid` unikalny, nullable `locale` en/pl), PostgreSQL 17 w Docker
+  Compose oraz OpenAPI. Dodano Problem Details, correlation ID, profile
+  local/test/staging/production i CORS. Obraz Docker jest bezstanowy i nie
+  zawiera sekretów.
+- Zweryfikowano: `./mvnw verify` (3 testy jednostkowe, 15 testów integracyjnych
+  z Testcontainers), stos compose z healthcheckiem, probes, 401 w formacie
+  problem+json, OpenAPI, dwie repliki backendu oraz graceful shutdown. Nie
+  uruchomiono aplikacji mobilnej ani natywnych testów; P0-I03A V02/V03 pozostają
+  otwarte.
 
 - Przeprowadzono audyt początkowego repozytorium i narzędzi dla P0-I00.
   Udokumentowano zgodność wersji na podstawie oficjalnych źródeł, plan
