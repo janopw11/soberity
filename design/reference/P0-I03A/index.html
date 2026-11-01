@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Soberity · Zatwierdzony wzorzec UI</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="review">
+      <span id="notice"></span><button id="language">Polski</button>
+    </div>
+    <header>
+      <div class="brand-group">
+        <button
+          id="menu"
+          aria-label="Open menu"
+          aria-controls="navigation"
+          aria-expanded="false"
+        >
+          ☰</button
+        ><a class="brand" href="?screen=home">Soberity<span>®</span></a>
+      </div>
+      <span class="header-note">SCIENCE FIRST. CONNECTION ALWAYS.</span
+      ><span class="edition">EXPLORE / 04</span>
+    </header>
+    <dialog id="navigation">
+      <div class="menu-head">
+        <strong>Soberity</strong
+        ><button id="close" aria-label="Close menu">✕</button>
+      </div>
+      <nav></nav>
+    </dialog>
+    <section id="palette-picker" aria-label="Color palette"></section>
+    <main id="main" tabindex="-1"></main>
+    <dialog id="detail">
+      <button id="close-detail" aria-label="Close">✕</button>
+      <div id="detail-body"></div>
+    </dialog>
+    <footer>
+      <strong>Soberity</strong><span id="footer"></span
+      ><span>APPROVED DESIGN / V4</span>
+    </footer>
+    <script src="preview.js"></script>
+    <script src="palettes.js"></script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
-**Wersja:** 2.0 — 2026-10-29  
-**Status globalny:** IN_PROGRESS — P0-I00–P0-I03 DONE; P0-I04 oczekuje osobnego polecenia  
+**Wersja:** 2.1 — 2026-11-01
+**Status globalny:** IN_PROGRESS — P0-I00–P0-I03 DONE; P0-I03A IN_PROGRESS (v4 i dwa motywy zaakceptowane; wdrożenie/testy otwarte) przed P0-I04; rozpoczęcie wymaga osobnego polecenia
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 14 | 4/14 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 4/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 78 iteracji agentowych; wykonane: **4/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane).
+**Łącznie:** 79 iteracji agentowych; wykonane: **4/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -98,7 +98,7 @@ Blockers: opis lub —
 | Poprzedni podział | Nowe iteracje | Znaczenie |
 |---|---|---|
 | P0.0 | P0-I00–P0-I01 | Decyzje architektoniczne i monorepo |
-| P0.1 | P0-I01–P0-I03 | Expo na 3 platformach, UI, routing, i18n |
+| P0.1 | P0-I01–P0-I03 + P0-I03A | Expo na 3 platformach, UI, routing, i18n i akceptacja docelowego kierunku UI |
 | P0.2 | P0-I04 | Backend, PostgreSQL, migracje |
 | P0.3 | P0-I05–P0-I06 | Konfiguracja Firebase i integracja auth |
 | P0.4 | P0-I06–P0-I10 | Rejestracja, logowanie, weryfikacja, reset, settings |
@@ -116,7 +116,7 @@ Nie przenoś starych checkboxów automatycznie: **nowy status wynika wyłącznie
 **Cel:** Architektura i działające konto na web, iOS, Android; priorytet startowy.  
 **Zależności:** Phase 0 implementacyjna; niezależna od discovery z raportu.  
 **Raport główny:** §3.1, §5–§13, §19  
-**Iteracje:** 14
+**Iteracje:** 15
 
 ## P0-I00 — Architecture & repository audit
 
@@ -229,12 +229,43 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - `npx expo-doctor` raportuje 1/20 (patch-level rozjazd `expo`/`expo-router`/`expo-dev-client` o jedną wersję) — rozjazd nie dotyczy żadnej zależności dodanej w tej iteracji i powstał wskutek nowych wydań na rejestrze od czasu P0-I02; nie naprawiano w ramach tego zadania (poza zakresem P0-I03).
 
 
+## P0-I03A — Docelowy kierunek UI i akceptacja wizualna
+
+**Status:** IN_PROGRESS
+**Started:** 2026-11-01
+**Finished:** —
+**Zależności iteracji:** P0-I03; przed implementacją sprawdź również otwartą weryfikację natywnego menu z korekty P0-I03
+**Dowód:** Właściciel zaakceptował 2026-11-01 układ v4 i dwa motywy: domyślna jaśniejsza Śliwka (`plum-soft`), jasny fioletowo-biały (`violet`). Jedyna zachowana referencja: `design/reference/P0-I03A/` — źródła, `palettes.json`, screenshoty, raport testów; audyt T01 w `audit.md`, historyczne wyniki w `history/`. Specyfikacja obu motywów i zasady rozszerzania: `docs/BRANDING.md`. Bez wdrożenia w aplikacji Expo.
+**Blokery i otwarte prace:** Brak otwartej decyzji o palecie. T04 oraz V01–V03 pozostają otwarte: aplikacja, komponenty, przełącznik i zapis preferencji nie są jeszcze dostosowane; pełne a11y i runtime iOS/Android nadal NOT VERIFIED. Historyczna weryfikacja natywnego menu P0-I03 pozostaje do wykonania.
+
+**Cel i kolejność:** Zatwierdzić reprezentatywny wzorzec wizualny przed rozbudową kolejnych ekranów. Iteracja dodana decyzją właściciela 2026-11-01, wykonywana przed P0-I04, bez zmiany historycznych ID i wyników P0-I03. Dodanie do planu nie oznacza rozpoczęcia ani zatwierdzenia projektu UI.
+
+**Zakres zadań:**
+
+- [x] `P0-I03A-T01` Przejrzyj istniejące ekrany, komponenty i tokeny oraz `docs/BRANDING.md`; określ elementy wymagające dopracowania, zachowując fiolet i uzgodnione menu ośmiu sekcji. Historyczny przegląd jasnej bazy wykonano przed wyborem domyślnej Śliwki.
+- [x] `P0-I03A-T02` Przygotuj do oceny makiety lub odizolowany podgląd trzech reprezentatywnych ekranów: strony głównej, Science & Discover i Sober Events; każdy w układzie mobilnym i desktopowym. Zachowaj równorzędność Science i Events w produkcie i menu; zgodnie z decyzją właściciela 2026-11-01 Home zawiera tylko powitanie i najnowsze artykuły/badania. Pokaż hierarchię treści, typografię, karty, zdjęcia/ilustracje, odstępy oraz nawigację.
+- [x] `P0-I03A-T03` Przedstaw konkretny projekt właścicielowi, zbierz uwagi, dopracuj go i zapisz jego jawną akceptację wraz z datą oraz wskazaniem zaakceptowanej wersji. Akceptacja 2026-11-01: układ v4, `plum-soft` jako default i `violet` jako motyw jasny; referencja `design/reference/P0-I03A/`. Zgoda na palety nie jest dowodem wdrożenia ani testów aplikacji.
+- [ ] `P0-I03A-T04` Po akceptacji zaktualizuj `docs/BRANDING.md` jako jedyne repozytoryjne źródło zasad UI, tokeny i wspólne komponenty oraz dostosuj istniejące ekrany w granicach wdrożonych funkcji. Zapisz lokalizację zaakceptowanych materiałów referencyjnych. Zaimplementuj osobne zestawy tokenów dark/light, dostępny przełącznik oraz lokalne zapamiętywanie wyboru na web/iOS/Android. Bez zapisanego wyboru domyślna jest Śliwka, niezależnie od ustawień systemu. Dobierz i sprawdź stany success/warning/danger/info w obu motywach; logo i font pozostają tymczasowe.
+- [x] `P0-I03A-T05` Zapisz zasady rozszerzania wzorca na kolejne moduły i stan decyzji dotyczących logo/fontu. Tymczasowy tekstowy wordmark i font systemowy mogą pozostać; finalne logo nie blokuje tej iteracji. Zasady zapisano w BRANDING 2026-11-01; dwa motywy dziedziczą kolejne moduły. Logo i font nadal wymagają odrębnej decyzji.
+
+**Granice zakresu:** Makiety Science i Events służą zatwierdzeniu wyglądu, nie wdrożeniu funkcji Phase 1/2. Przykładowe dane oznacz jako demonstracyjne i trzymaj poza produkcyjnymi trasami; nie sugeruj działającego katalogu, quizów ani backendu. Nie publikuj niezweryfikowanych twierdzeń zdrowotnych. Nie projektuj z góry wszystkich przyszłych modułów.
+
+**Weryfikacja:**
+
+- [ ] `P0-I03A-V01` Zapisz wizualny odbiór wszystkich sześciu widoków (trzy ekrany × mobile/desktop), uwagi i akceptację właściciela; sprawdź EN/PL, długie teksty, hierarchię i responsywność.
+- [ ] `P0-I03A-V02` Po wdrożeniu wzorca sprawdź kontrast, focus, klawiaturę, czytniki ekranu, duży font i stany loading/error/empty/disabled stosownie do komponentów. Zweryfikuj menu oraz istniejące ekrany na web/iOS/Android; zapisz urządzenia, wyniki i braki jako NOT VERIFIED wraz z czynnościami do wykonania. Nie deklaruj pełnego odbioru przy niewykonanych obowiązkowych kontrolach.
+- [ ] `P0-I03A-V03` Uruchom wymagane dla zmian lint/typecheck, testy komponentów i nawigacji oraz build/eksporty; sprawdź default Śliwka, oba motywy, zmianę motywu, zachowanie wyboru po restarcie/reload i brak regresji przy EN/PL; zapisz wyniki i sprawdź brak regresji routingu oraz guardów.
+
+**Definition of Done:** Właściciel zaakceptował wskazaną wersję projektu; BRANDING, tokeny, komponenty i istniejące ekrany odzwierciedlają ten wzorzec. Makiety przyszłych funkcji pozostają oddzielone od działającego produktu. Wszystkie obowiązkowe zadania i kontrole mają dowody; braki weryfikacji uniemożliwiają DONE. Kolejne moduły rozwijają zatwierdzony wzorzec, a wspólny przegląd przed publicznym MVP odbywa się w P2-I06.
+
+**Porządkowanie materiałów (2026-11-01):** na polecenie właściciela usunięto zbędne `design/previews/P0-I03A-*`. Historia decyzji i wyników w dzienniku jest zachowana; dawne ścieżki w wpisach historycznych opisują pliki istniejące w tamtym momencie. Aktualne źródła, audyt, dowody i zatwierdzone dwa motywy znajdują się wyłącznie w `design/reference/P0-I03A/`.
+
 ## P0-I04 — Spring Boot, PostgreSQL & API skeleton
 
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P0-I01  
+**Zależności iteracji:** P0-I01, P0-I03A (uzgodniona kolejność prac)
 **Dowód:** —  
 **Blokery:** —
 
@@ -816,7 +847,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P2-I01–P2-I05  
+**Zależności iteracji:** P2-I01–P2-I05, P1-I06, P0-I03A
 **Dowód:** —  
 **Blokery:** —
 
@@ -827,14 +858,19 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - [ ] `P2-I06-T03` Przeprowadź smoke na web/iOS/Android i kontrolę stref czasowych.
 - [ ] `P2-I06-T04` Zweryfikuj konwersję event→external checkout oraz jakość katalogu.
 
+- [ ] `P2-I06-T05` Przeprowadź wspólny przegląd spójności wizualnej całego zakresu publicznego MVP: Home, Auth/profil, Science i Events, na podstawie wzorca zaakceptowanego w P0-I03A i aktualnego `docs/BRANDING.md`. Usuń rozbieżności komponentów, typografii, spacingu, nawigacji i stanów; większe zmiany kierunku przedstaw do akceptacji właściciela.
+
 **Weryfikacja:**
 
 - [ ] `P2-I06-V01` E2E wyszukanie→kontakt→zapisanie→zewnętrzny link.
 - [ ] `P2-I06-V02` Audit brak fikcyjnych eventów.
+- [ ] `P2-I06-V03` Zapisz końcowy odbiór wizualny MVP przez właściciela oraz regresję EN/PL, responsywności i a11y na web/iOS/Android. Udokumentuj wyniki i nierozwiązane braki; bez odbioru i obowiązkowych testów nie uznawaj UI MVP za gotowe do publikacji.
 
 **Definition of Done:** Działa katalog wiarygodnych wydarzeń i kontakt bez własnych płatności. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
 ### Gate — Phase 2
+
+- [ ] Przed publicznym MVP ukończono wspólny przegląd UI z P2-I06-T05/V03 i zapisano akceptację właściciela; ten odbiór nie stanowi zgody na deployment ani publikację sklepową.
 
 - [ ] Wszystkie obowiązkowe iteracje Phase 2 mają status `DONE` oraz dowody wykonania i testów.
 - [ ] Zrealizowano regresję odpowiednią do fazy, testy bezpieczeństwa, a tam gdzie dotyczy — potwierdzono web/iOS/Android.
@@ -2095,13 +2131,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I03 — Design system, navigation & i18n`
-- **Status:** DONE — T01–T04 i V01–V02 zweryfikowane 2026-10-31; bramka Phase 0 pozostaje niezamknięta.
-- **Następna iteracja po akceptacji:** `P0-I04 — Spring Boot, PostgreSQL & API skeleton`
-- **Otwarte blokery:** brak dla P0-I03. Pełna manualna nawigacja dotykiem na iOS Simulator/Android Emulator NOT VERIFIED przez agenta (brak narzędzia do syntetycznych gestów); render, i18n i guard tras zweryfikowano zrzutami ekranu i deep-linkami. Android development APK nadal NOT VERIFIED (brak platformy SDK 37, z P0-I02). Firebase/EAS/hosting poza zakresem, NOT VERIFIED.
-- **Wymagana akceptacja:** osobne polecenie rozpoczęcia P0-I04. `/docs` zachowano w .gitignore na polecenie właściciela.
+- **Aktualna iteracja:** `P0-I03A — Docelowy kierunek UI i akceptacja wizualna`
+- **Status:** IN_PROGRESS — T01/T02/T03/T05 wykonane; 2026-11-01 zaakceptowano v4 i oba motywy. T04 oraz V01–V03 otwarte. Phase 0 niezamknięta.
+- **Następny krok:** P0-I03A-T04 — wdrożenie zaakceptowanego wzorca, domyślnej Śliwki i jasnego fioletowo-białego, przełącznika i zapisu wyboru; następnie V01–V03. P0-I04 nie rozpoczęto.
+- **Otwarte blokery:** brak decyzji oczekujących o motywach. Niewdrożone T04; testy natywne i pełne a11y nadal NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
+- **Wymagana akceptacja:** motywy i układ v4 zaakceptowano 2026-11-01. Logo/font i przyszłe istotne zmiany poza tym zakresem wymagają odrębnej decyzji. `/docs` pozostaje lokalne i ignorowane przez Git na polecenie właściciela.
 - **Korekta P0-I03 (2026-10-31, aktualna):** menu ☰ ma osiem głównych pozycji według listy właściciela, emoji, bez grup i podpisów Planowane. Check PASS, Playwright 10/10 PASS. Natywne runtime NOT VERIFIED; następny krok P0-I03: sprawdzić osiem pozycji, otwieranie/zamykanie i a11y na iOS/Android. P0-I04 nie rozpoczęto.
 - **Ostatni potwierdzony wynik testów:** `pnpm run check` (lint+typecheck+format+secrets) exit 0; Jest 6/6 suites, 15/15 PASS; Playwright web 6/6 PASS (desktop+mobile-web, nowy test guardu tras); `pnpm run build` i `export:native` exit 0. iOS Simulator (Expo Go 58.0.7) i Android Emulator (Expo Go 58.0.5): render + i18n + deep-linki `/account`, `/verification-pending` PASS; pełna nawigacja dotykiem NOT VERIFIED (brak narzędzia do gestów w środowisku agenta).
+
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2131,6 +2168,7 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 
 # 8. Wymagania globalne i kryteria jakości
 
+- **Spójność UI:** kolejne moduły rozwijają wzorzec zaakceptowany w P0-I03A i opisany w `docs/BRANDING.md`; projektuj ich szczegóły w odpowiednich iteracjach. Przed publicznym MVP obowiązuje wspólny odbiór P2-I06-T05/V03.
 - **Misja:** aktywnie wspieraj wybór życia bez alkoholu, bez moralizowania ani zawstydzania. Wiedza naukowa i społeczność/eventy są równie ważne; najważniejszy rodzaj wydarzeń to sober party/rave, poszerzony o sober lifestyle.
 - **Wiarygodność:** każde twierdzenie naukowe ma źródło, poziom pewności, rok/dataset i ograniczenia. Nie przedstawiaj wyników badań obserwacyjnych jako dowodu przyczynowości ani dowodów populacyjnych jako prognozy dla osoby.
 - **Dostępność i internacjonalizacja:** web/iOS/Android, minimum en/pl od startu, poprawne daty i strefy IANA, waluty ISO, klawiatura i podstawowa obsługa screen reader.
@@ -2149,3 +2187,21 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-10-31 | P0-I03 — menu ☰ i emoji | Web VERIFIED; native runtime NOT VERIFIED | SideMenu/public layout/navigation/tłumaczenia/testy/token backdrop. Hamburger w lewym górnym rogu otwiera modal, 45 pozycji z emoji bez podpisów Planowane. Check, Jest 15/15, build/export PASS; web bazowe 6/6 oraz powtórzone testy menu 4/4 PASS po korekcie asercji RN Web. Lokalny BRANDING zaktualizowany. | Następnie sprawdzić menu na iOS/Android, czytniki ekranu i duży font (P0-I03); P0-I04 nie rozpoczęto. |
 
 | 2026-10-31 | P0-I03 — uproszczenie menu | Web VERIFIED; native runtime NOT VERIFIED | navigation.ts, SideMenu, EN/PL, testy, lokalny BRANDING. Osiem pozycji zamiast 45, bez grup, zachowano ☰ i emoji. Check PASS, web 10/10 PASS; zrzut mobile-web sprawdzony. | Następny krok P0-I03: sprawdzenie menu i a11y na iOS/Android; P0-I04 nie rozpoczęto. |
+
+| 2026-11-01 | Plan — P0-I03A / P2-I06 | Rozszerzono roadmapę na polecenie właściciela; brak rozpoczęcia implementacji | Wyłącznie PHASES.md: dodano P0-I03A (TODO), zależność P0-I04, wzorzec UI dla kolejnych modułów i odbiór wizualny MVP w P2-I06; zaktualizowano liczniki do 4/79 (Phase 0: 4/15). Weryfikacja dokumentu: diff, spójność ID/statusów i git diff --check. Bez testów aplikacji i wpisu w CHANGELOG — zmiana planu. | Następna P0-I03A na osobne polecenie; otwarte kontrole natywnego menu P0-I03 pozostają NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A | IN_PROGRESS; T01/T02 zweryfikowane, projekt v1 do oceny | PHASES.md i design/previews/P0-I03A-v1: audyt UI, podgląd Home/Science/Events EN/PL, mobile/desktop, 12 screenshotów i skrypt weryfikacji. Chromium 12 wariantów PASS, PL 320 px/powiększenie PASS, ESLint/Prettier/składnia JS PASS. Bez zmian aplikacji i BRANDING. | T03: właściciel ocenia konkretną wersję; T04 dopiero po akceptacji. Brak uruchomionych symulatorów; runtime natywny i pełne a11y NOT VERIFIED. Bez CHANGELOG: propozycja jeszcze niezatwierdzona, brak wdrożonej funkcji. |
+
+| 2026-11-01 | P0-I03A — projekt v2 | IN_PROGRESS; uwagi T03 uwzględnione, akceptacja nadal oczekuje | Właściciel odrzucił v1: dwie karty wejściowe Science/Events i zbyt sucha prezentacja. Dodano design/previews/P0-I03A-v2: sekcje odkrywania, wybór tematów, panele lektury i wydarzeń, agenda zamiast kart, filtry miasta/kategorii, reset/pusty stan, ręczna zmiana plakatów, reakcje hover/focus i reduced motion. Chromium 12 wariantów EN/PL PASS; 320 px/powiększenie i reduced motion PASS; ESLint/Prettier/składnia PASS. V1 zachowana z zapisem odrzucenia. | Następny krok T03: ocena wersji v2. Bez zmian współdzielonego UI, BRANDING i CHANGELOG (prototyp); natywne i pełne a11y nadal NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — projekt v3 | IN_PROGRESS; doprecyzowano Home na polecenie właściciela | design/previews/P0-I03A-v3 i PHASES; lokalny BRANDING: Home tylko powitanie i najnowsze artykuły/badania. Chronologiczny feed, typy, daty, filtry i panel lektury; bez promocji eventów. Science/Events w osobnych sekcjach. Chromium 12 wariantów i interakcje, PL 320 px/powiększenie, reduced motion, ESLint/Prettier/składnia i diff check — wyniki w verification.txt/README. | Następny krok T03: ocena v3. Akceptacja zakresu Home nie oznacza akceptacji całego wyglądu. Bez zmian aplikacji i wpisu CHANGELOG; runtime natywny/pełne a11y nadal NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — projekt v4 | IN_PROGRESS; dopracowano T03 według uwag właściciela | design/previews/P0-I03A-v4, PHASES i lokalny BRANDING. Usunięto CTA „Czytaj podgląd”, zmniejszono nagłówki i użyto fioletu; Home w układzie wyróżnionej publikacji z trzema mniejszymi, cztery lokalne ilustracje SVG, segmentowe filtry i interakcja całego wpisu. Chromium 12 wariantów EN/PL PASS, kontrola h1/ilustracji/CTA, PL 320 px/powiększenie i reduced motion PASS; lint/format/składnia/diff PASS. | T03: ocena v4. Bez zmian aplikacji Expo i wpisu CHANGELOG; runtime natywny oraz pełne a11y nadal NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — warianty kolorystyczne v4 | IN_PROGRESS; przygotowano 5 propozycji na życzenie właściciela | design/previews/P0-I03A-colors: Fiolet/Indygo/Błękit/Morski/Terakota, przełącznik, przemalowane SVG i porównanie desktop/mobile. Chromium 20 kombinacji EN/PL PASS, 35 par kontrastu PASS (tekst min. 4.93:1), lokalny HTML PASS; 10 screenshotów PL. ESLint/Prettier/składnia/diff PASS. | Następny krok T03: wybór palety i odbiór projektu. BRANDING, tokeny i Expo bez zmian; bez CHANGELOG (propozycje). Testy natywne/pełne a11y pozostają NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — ciemne motywy v4 | IN_PROGRESS; 5 ciemnych propozycji na polecenie właściciela | design/previews/P0-I03A-dark i PHASES: Śliwka/Północ/Grafit/Laguna/Kakao, osobne ciemne tokeny, dekoracyjne SVG, kontrast onPrimary, przełącznik i porównanie desktop/mobile. Chromium 20 kombinacji EN/PL PASS, 50 par kontrastu PASS (tekst min. 5.81:1), lokalny HTML PASS; 10 screenshotów PL. ESLint/Prettier/składnia/diff PASS. | T03: wybór palety i akceptacja projektu. Dotychczasowe BRANDING, tokeny i Expo bez zmian; bez wpisu CHANGELOG (prototyp). Natywne runtime/pełne a11y NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — jaśniejsza Śliwka | IN_PROGRESS; korekta preferowanego motywu do oceny | Właściciel preferuje Śliwkę i poprosił o lekkie rozjaśnienie. design/previews/P0-I03A-plum i PHASES: tło #211B2A, panele #2A2235/#342A43, lawenda #C1A4F6 bez zmiany; oryginał zachowany w przełączniku. Chromium 8 kombinacji EN/PL PASS, 20 par kontrastu PASS (nowa wersja: tekst min. 6.07:1); 4 screenshoty PL. ESLint/Prettier/składnia/diff PASS. | T03: ocena plum-soft i odbiór projektu. Bez zmiany BRANDING/tokenów/Expo i wpisu CHANGELOG; natywne runtime/pełne a11y NOT VERIFIED. |
+
+| 2026-11-01 | P0-I03A — akceptacja motywów i porządkowanie | IN_PROGRESS; T03/T05 zakończone, T04/V01–V03 otwarte | Właściciel zaakceptował default plum-soft i jasny violet. PHASES, lokalny BRANDING i AGENTS zsynchronizowane. Zatwierdzone referencje oraz raporty przeniesiono do design/reference/P0-I03A; usunięto 7 katalogów previews na wyraźne polecenie. Referencja: Chromium 8 wariantów i 20 par kontrastu PASS; lint/format/składnia/diff PASS. CHANGELOG: wpis o zatwierdzonym projekcie, bez deklaracji wdrożenia. | Następny krok P0-I03A-T04: implementacja obu motywów/przełącznika/zapisu wyboru i testy. Bez twierdzenia, że aplikacja już używa Śliwki. |

@@ -1,0 +1,29 @@
+plum-soft contrast primary/bg: 7.90:1 PASS
+plum-soft contrast primary/alt: 6.36:1 PASS
+plum-soft contrast primary/surface: 7.19:1 PASS
+plum-soft contrast secondary/bg: 9.94:1 PASS
+plum-soft contrast secondary/alt: 8.01:1 PASS
+plum-soft contrast onPrimary/primary: 8.79:1 PASS
+plum-soft contrast focus/alt: 8.28:1 PASS
+plum-soft contrast text/surface: 13.12:1 PASS
+plum-soft contrast secondary/surface: 9.05:1 PASS
+plum-soft contrast muted/bg: 7.53:1 PASS
+violet contrast primary/bg: 6.49:1 PASS
+violet contrast primary/alt: 5.63:1 PASS
+violet contrast primary/surface: 6.81:1 PASS
+violet contrast secondary/bg: 8.96:1 PASS
+violet contrast secondary/alt: 7.76:1 PASS
+violet contrast onPrimary/primary: 6.81:1 PASS
+violet contrast focus/alt: 7.42:1 PASS
+violet contrast text/surface: 15.60:1 PASS
+violet contrast secondary/surface: 9.39:1 PASS
+violet contrast muted/bg: 4.61:1 PASS
+pl/desktop/plum-soft: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/plum-soft: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/plum-soft: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/plum-soft: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+Local file:// preview and palette switching PASS

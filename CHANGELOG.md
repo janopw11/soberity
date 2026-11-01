@@ -54,3 +54,12 @@
   Uproszczenie zweryfikowano przez check i Playwright 10/10 PASS. Check, Jest 15/15, bazowe testy web 6/6
   i ponowione testy menu 4/4 oraz eksporty web/iOS/Android PASS.
   Runtime menu iOS/Android pozostaje NOT VERIFIED.
+
+## 2026-11-01
+
+- Zatwierdzono układ UI v4 i dwa motywy Soberity: domyślną jaśniejszą Śliwkę
+  oraz jasny fioletowo-biały. Specyfikację i stan dalszych prac zapisano
+  w BRANDING/PHASES; zachowano jedną referencję w `design/reference/P0-I03A`
+  i usunięto robocze podglądy. Referencję sprawdzono w Chromium (8 wariantów
+  EN/PL oraz 20 par kontrastu). Wdrożenie motywów w aplikacji Expo i jej testy
+  pozostają otwarte w P0-I03A; ta decyzja nie zamyka iteracji.

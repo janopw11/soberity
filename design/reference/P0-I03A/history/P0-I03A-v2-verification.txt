@@ -1,0 +1,14 @@
+en/desktop/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+en/desktop/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+en/desktop/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+en/mobile/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+en/mobile/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+en/mobile/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/desktop/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/desktop/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/desktop/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/mobile/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/mobile/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+pl/mobile/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation + topic/filter/detail/poster/language interactions PASS
+PL/320px enlarged text: no horizontal page overflow PASS (browser check; native font scaling NOT VERIFIED)
+Reduced motion: animation disabled PASS

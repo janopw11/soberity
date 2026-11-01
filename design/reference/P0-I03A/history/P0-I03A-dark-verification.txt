@@ -1,0 +1,71 @@
+plum contrast primary/bg: 8.79:1 PASS
+plum contrast primary/alt: 7.63:1 PASS
+plum contrast primary/surface: 8.26:1 PASS
+plum contrast secondary/bg: 9.74:1 PASS
+plum contrast secondary/alt: 8.45:1 PASS
+plum contrast onPrimary/primary: 8.79:1 PASS
+plum contrast focus/alt: 9.94:1 PASS
+plum contrast text/surface: 15.08:1 PASS
+plum contrast secondary/surface: 9.14:1 PASS
+plum contrast muted/alt: 6.30:1 PASS
+midnight contrast primary/bg: 9.78:1 PASS
+midnight contrast primary/alt: 7.85:1 PASS
+midnight contrast primary/surface: 8.86:1 PASS
+midnight contrast secondary/bg: 10.55:1 PASS
+midnight contrast secondary/alt: 8.46:1 PASS
+midnight contrast onPrimary/primary: 9.78:1 PASS
+midnight contrast focus/alt: 10.14:1 PASS
+midnight contrast text/surface: 14.47:1 PASS
+midnight contrast secondary/surface: 9.56:1 PASS
+midnight contrast muted/alt: 5.84:1 PASS
+graphite contrast primary/bg: 12.36:1 PASS
+graphite contrast primary/alt: 9.97:1 PASS
+graphite contrast primary/surface: 11.28:1 PASS
+graphite contrast secondary/bg: 10.23:1 PASS
+graphite contrast secondary/alt: 8.25:1 PASS
+graphite contrast onPrimary/primary: 12.36:1 PASS
+graphite contrast focus/alt: 12.42:1 PASS
+graphite contrast text/surface: 14.76:1 PASS
+graphite contrast secondary/surface: 9.34:1 PASS
+graphite contrast muted/alt: 6.03:1 PASS
+lagoon contrast primary/bg: 10.84:1 PASS
+lagoon contrast primary/alt: 8.41:1 PASS
+lagoon contrast primary/surface: 9.82:1 PASS
+lagoon contrast secondary/bg: 10.61:1 PASS
+lagoon contrast secondary/alt: 8.23:1 PASS
+lagoon contrast onPrimary/primary: 10.84:1 PASS
+lagoon contrast focus/alt: 10.60:1 PASS
+lagoon contrast text/surface: 14.38:1 PASS
+lagoon contrast secondary/surface: 9.61:1 PASS
+lagoon contrast muted/alt: 6.15:1 PASS
+cocoa contrast primary/bg: 10.62:1 PASS
+cocoa contrast primary/alt: 8.73:1 PASS
+cocoa contrast primary/surface: 9.82:1 PASS
+cocoa contrast secondary/bg: 9.95:1 PASS
+cocoa contrast secondary/alt: 8.18:1 PASS
+cocoa contrast onPrimary/primary: 10.62:1 PASS
+cocoa contrast focus/alt: 10.97:1 PASS
+cocoa contrast text/surface: 14.41:1 PASS
+cocoa contrast secondary/surface: 9.20:1 PASS
+cocoa contrast muted/alt: 5.81:1 PASS
+pl/desktop/plum: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/midnight: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/graphite: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/lagoon: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/cocoa: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/plum: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/midnight: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/graphite: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/lagoon: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/cocoa: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/plum: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/midnight: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/graphite: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/lagoon: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/cocoa: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/plum: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/midnight: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/graphite: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/lagoon: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/cocoa: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+Local file:// preview and palette switching PASS

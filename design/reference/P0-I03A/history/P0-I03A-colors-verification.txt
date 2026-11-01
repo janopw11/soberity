@@ -1,0 +1,56 @@
+violet contrast primary/bg: 6.49:1 PASS
+violet contrast primary/alt: 5.63:1 PASS
+violet contrast primary/surface: 6.81:1 PASS
+violet contrast secondary/bg: 8.96:1 PASS
+violet contrast secondary/alt: 7.76:1 PASS
+violet contrast white/primary: 6.81:1 PASS
+violet contrast focus/alt: 7.42:1 PASS
+indigo contrast primary/bg: 6.46:1 PASS
+indigo contrast primary/alt: 5.77:1 PASS
+indigo contrast primary/surface: 6.80:1 PASS
+indigo contrast secondary/bg: 7.49:1 PASS
+indigo contrast secondary/alt: 6.69:1 PASS
+indigo contrast white/primary: 6.80:1 PASS
+indigo contrast focus/alt: 7.83:1 PASS
+ocean contrast primary/bg: 6.34:1 PASS
+ocean contrast primary/alt: 5.69:1 PASS
+ocean contrast primary/surface: 6.60:1 PASS
+ocean contrast secondary/bg: 6.88:1 PASS
+ocean contrast secondary/alt: 6.17:1 PASS
+ocean contrast white/primary: 6.60:1 PASS
+ocean contrast focus/alt: 7.76:1 PASS
+teal contrast primary/bg: 6.16:1 PASS
+teal contrast primary/alt: 5.47:1 PASS
+teal contrast primary/surface: 6.42:1 PASS
+teal contrast secondary/bg: 6.79:1 PASS
+teal contrast secondary/alt: 6.03:1 PASS
+teal contrast white/primary: 6.42:1 PASS
+teal contrast focus/alt: 7.59:1 PASS
+clay contrast primary/bg: 5.61:1 PASS
+clay contrast primary/alt: 4.93:1 PASS
+clay contrast primary/surface: 5.87:1 PASS
+clay contrast secondary/bg: 7.07:1 PASS
+clay contrast secondary/alt: 6.22:1 PASS
+clay contrast white/primary: 5.87:1 PASS
+clay contrast focus/alt: 6.82:1 PASS
+pl/desktop/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/indigo: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/ocean: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/teal: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/desktop/clay: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/indigo: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/ocean: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/teal: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+pl/mobile/clay: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/indigo: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/ocean: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/teal: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/desktop/clay: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/violet: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/indigo: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/ocean: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/teal: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+en/mobile/clay: switch, CSS tokens, SVG decoding, filters, reading panel, focus, language + 3 routes retained palette, overflow PASS
+Local file:// preview and palette switching PASS

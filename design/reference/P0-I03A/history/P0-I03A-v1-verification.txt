@@ -1,0 +1,13 @@
+en/desktop/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+en/desktop/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+en/desktop/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+en/mobile/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+en/mobile/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+en/mobile/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/desktop/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/desktop/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/desktop/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/mobile/home: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/mobile/science: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+pl/mobile/events: HTTP, heading, overflow, menu, Escape, focus, backdrop, navigation PASS
+PL/320px enlarged text: no horizontal page overflow PASS (browser check; native font scaling NOT VERIFIED)
