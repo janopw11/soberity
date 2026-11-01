@@ -10,12 +10,14 @@
 - Zweryfikowano lokalnie: `./mvnw verify` (3 testy jednostkowe, 21 testów
   integracyjnych) oraz scenariusz end-to-end na emulatorze (rejestracja,
   weryfikacja e-maila, logowanie, odrzucone tokeny). Nie zweryfikowano podpisu
-  względem kluczy Google, konsoli Firebase ani ścieżki produkcyjnej; P0-I05
-  pozostaje IN_PROGRESS.
+  względem kluczy Google, konsoli Firebase ani ścieżki produkcyjnej (uzupełnione
+  przez testy na realnym projekcie dev poniżej).
 - Sprawdzono na realnym projekcie dev: filtr Spring z tokenami konta testowego
   (bez tokena 401, niezweryfikowany e-mail 403, zmodyfikowany token 401,
-  po weryfikacji 200). Konto testowe usunięto. Staging i produkcja pozostają
-  otwarte; P0-I05 nie jest zamknięte bez decyzji właściciela.
+  po weryfikacji 200). Konto testowe usunięto. Staging i produkcja (T01)
+  odłożone przez właściciela.
+- Zamknięto P0-I05 (DONE 2026-11-01) decyzją właściciela. T01 (konfiguracja
+  staging/prod) pozostaje niezaznaczone i wymaga ID projektów.
 
 - Ukończono P0-I04: backend Spring Boot 4.1.2 na Java 21 z modułami
   `common`, `identity` i `profile`, migracją Flyway tabeli profilu
