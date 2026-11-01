@@ -59,5 +59,16 @@
     },
     "open": "Otwórz menu",
     "close": "Zamknij menu"
+  },
+  "preferences": {
+    "title": "Ustawienia wyświetlania",
+    "theme": "Motyw",
+    "plumSoft": "Ciemny · Śliwka",
+    "violet": "Jasny · Fiolet",
+    "language": "Język",
+    "english": "English",
+    "polish": "Polski",
+    "errorTitle": "Nie zapisano ustawień",
+    "errorMessage": "Nie udało się wczytać lub zapisać ustawień wyświetlania. Spróbuj ponownie."
   }
 }

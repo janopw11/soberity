@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, spacing } from '@soberity/design-tokens';
+import { spacing } from '@soberity/design-tokens';
+import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 type ScreenProps = PropsWithChildren<{
   /** Wraps content in a ScrollView. Defaults to true. */
@@ -25,6 +26,8 @@ export function Screen({
   maxWidth = 1120,
   avoidKeyboard = false,
 }: ScreenProps) {
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
   const content = (
     <View style={[styles.content, { maxWidth }]}>{children}</View>
   );
@@ -56,13 +59,17 @@ export function Screen({
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: colors.background },
-  flexFill: { flex: 1 },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.space16,
-    paddingVertical: spacing.space24,
-  },
-  content: { width: '100%', alignSelf: 'center', gap: spacing.space24 },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: colors.background },
+    flexFill: { flex: 1 },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.space16,
+      paddingVertical: spacing.space24,
+    },
+    content: { width: '100%', alignSelf: 'center', gap: spacing.space24 },
+  });
+}

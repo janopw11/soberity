@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text } from 'react-native';
 
-import { typography, colors } from '@soberity/design-tokens';
+import { typography } from '@soberity/design-tokens';
 
 import { useAuthStatus } from './auth/AuthStatusContext';
 import { Alert, Button, EmptyState, Screen } from './ui';
+import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 /**
  * Placeholder for the "verification-pending" auth state: reached once a user
@@ -15,6 +16,8 @@ import { Alert, Button, EmptyState, Screen } from './ui';
 export default function VerificationPendingScreen() {
   const { t } = useTranslation();
   const { setStatus } = useAuthStatus();
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
 
   return (
     <Screen>
@@ -45,10 +48,14 @@ export default function VerificationPendingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  helper: {
-    fontSize: typography.small.fontSize,
-    lineHeight: typography.small.lineHeight,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    helper: {
+      fontSize: typography.small.fontSize,
+      lineHeight: typography.small.lineHeight,
+      color: colors.textSecondary,
+    },
+  });
+}

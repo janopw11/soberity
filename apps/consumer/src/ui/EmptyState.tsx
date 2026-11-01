@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing, typography } from '@soberity/design-tokens';
+import { spacing, typography } from '@soberity/design-tokens';
+import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 type EmptyStateProps = {
   eyebrow?: string;
@@ -17,6 +18,8 @@ export function EmptyState({
   description,
   children,
 }: EmptyStateProps) {
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
   return (
     <View style={styles.container}>
       {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
@@ -29,24 +32,28 @@ export function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { gap: spacing.space16 },
-  eyebrow: {
-    fontSize: typography.label.fontSize,
-    fontWeight: typography.label.fontWeight,
-    letterSpacing: 1.5,
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-  },
-  title: {
-    fontSize: typography.h1.fontSize,
-    lineHeight: typography.h1.lineHeight,
-    fontWeight: typography.h1.fontWeight,
-    color: colors.textPrimary,
-  },
-  description: {
-    fontSize: typography.body.fontSize,
-    lineHeight: typography.body.lineHeight,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    container: { gap: spacing.space16 },
+    eyebrow: {
+      fontSize: typography.label.fontSize,
+      fontWeight: typography.label.fontWeight,
+      letterSpacing: 1.5,
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+    },
+    title: {
+      fontSize: typography.h1.fontSize,
+      lineHeight: typography.h1.lineHeight,
+      fontWeight: typography.h1.fontWeight,
+      color: colors.textPrimary,
+    },
+    description: {
+      fontSize: typography.body.fontSize,
+      lineHeight: typography.body.lineHeight,
+      color: colors.textSecondary,
+    },
+  });
+}

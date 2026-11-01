@@ -61,5 +61,16 @@
   oraz jasny fioletowo-biały. Specyfikację i stan dalszych prac zapisano
   w BRANDING/PHASES; zachowano jedną referencję w `design/reference/P0-I03A`
   i usunięto robocze podglądy. Referencję sprawdzono w Chromium (8 wariantów
-  EN/PL oraz 20 par kontrastu). Wdrożenie motywów w aplikacji Expo i jej testy
-  pozostają otwarte w P0-I03A; ta decyzja nie zamyka iteracji.
+  EN/PL oraz 20 par kontrastu). Akceptacja projektu nie zamknęła iteracji;
+  stan wdrożenia i weryfikacji opisuje kolejny wpis.
+- W P0-I03A wdrożono zatwierdzone tokeny obu motywów w kliencie Expo,
+  dostępne przełączniki wyglądu i języka EN/PL oraz lokalny zapis preferencji
+  dla gościa; dostosowano istniejące ekrany, menu i wspólne komponenty.
+  `pnpm run check`, Jest 17/17, testy referencji 8 wariantów, web export i
+  build/install iOS Simulator przeszły. Playwright 12/12 przeszedł przed
+  ostatnią korektą klawiatury, a ukierunkowany test preferencji desktop/mobile
+  web 2/2 po niej. Android build nie został ukończony: pierwszą próbę
+  zatrzymano przy 535 MiB wolnego miejsca; po odzyskaniu miejsca instalacja
+  NDK 27.1.12297006 pobrała 136 MiB i również została zatrzymana przed
+  ukończeniem. Kontrola VoiceOver/TalkBack, dużego fontu i pełne testy
+  natywne pozostają NOT VERIFIED. P0-I03A pozostaje IN_PROGRESS.

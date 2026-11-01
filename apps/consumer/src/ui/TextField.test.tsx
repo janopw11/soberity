@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 
+import { render } from '../test-utils';
 import { TextField } from './TextField';
 
 describe('TextField', () => {

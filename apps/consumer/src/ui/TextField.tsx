@@ -8,7 +8,8 @@ import {
   type TextInputProps,
 } from 'react-native';
 
-import { colors, radii, spacing, typography } from '@soberity/design-tokens';
+import { radii, spacing, typography } from '@soberity/design-tokens';
+import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
@@ -37,6 +38,8 @@ export function TextField({
 }: TextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
   const hasError = Boolean(errorText);
 
   return (
@@ -92,50 +95,54 @@ export function TextField({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { gap: spacing.space8 },
-  label: {
-    fontSize: typography.label.fontSize,
-    lineHeight: typography.label.lineHeight,
-    fontWeight: typography.label.fontWeight,
-    color: colors.textPrimary,
-  },
-  inputRow: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.space16,
-  },
-  inputRowFocused: { borderColor: colors.focusRing, borderWidth: 2 },
-  inputRowError: { borderColor: colors.danger },
-  input: {
-    flex: 1,
-    minHeight: 48,
-    fontSize: typography.body.fontSize,
-    lineHeight: typography.body.lineHeight,
-    color: colors.textPrimary,
-  },
-  toggle: {
-    paddingHorizontal: spacing.space8,
-    paddingVertical: spacing.space8,
-  },
-  toggleLabel: {
-    fontSize: typography.small.fontSize,
-    fontWeight: typography.label.fontWeight,
-    color: colors.primary,
-  },
-  errorText: {
-    fontSize: typography.small.fontSize,
-    lineHeight: typography.small.lineHeight,
-    color: colors.danger,
-  },
-  helperText: {
-    fontSize: typography.small.fontSize,
-    lineHeight: typography.small.lineHeight,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    container: { gap: spacing.space8 },
+    label: {
+      fontSize: typography.label.fontSize,
+      lineHeight: typography.label.lineHeight,
+      fontWeight: typography.label.fontWeight,
+      color: colors.textPrimary,
+    },
+    inputRow: {
+      minHeight: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radii.md,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.space16,
+    },
+    inputRowFocused: { borderColor: colors.focusRing, borderWidth: 2 },
+    inputRowError: { borderColor: colors.danger },
+    input: {
+      flex: 1,
+      minHeight: 48,
+      fontSize: typography.body.fontSize,
+      lineHeight: typography.body.lineHeight,
+      color: colors.textPrimary,
+    },
+    toggle: {
+      paddingHorizontal: spacing.space8,
+      paddingVertical: spacing.space8,
+    },
+    toggleLabel: {
+      fontSize: typography.small.fontSize,
+      fontWeight: typography.label.fontWeight,
+      color: colors.primary,
+    },
+    errorText: {
+      fontSize: typography.small.fontSize,
+      lineHeight: typography.small.lineHeight,
+      color: colors.danger,
+    },
+    helperText: {
+      fontSize: typography.small.fontSize,
+      lineHeight: typography.small.lineHeight,
+      color: colors.textSecondary,
+    },
+  });
+}

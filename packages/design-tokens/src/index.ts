@@ -1,6 +1,6 @@
 /**
  * Soberity design tokens — single source of truth for color, type, spacing
- * and radius values, per `docs/BRANDING.md` (light theme, purple accent).
+ * and radius values, per `docs/BRANDING.md` (plum-soft and violet themes).
  * Consumed by apps/consumer (and later by other clients) instead of
  * hardcoded hex/pixel values.
  */
@@ -16,15 +16,15 @@ export const brand = {
   slate: '#6B7280',
 } as const;
 
-/** Semantic color tokens — light theme (default and, for now, only theme). */
-export const colors = {
+/** Semantic color tokens — light theme (violet). */
+const lightColors = {
   background: '#FAF9FD',
   backdrop: 'rgba(36, 33, 54, 0.4)',
   surface: '#FFFFFF',
   surfaceAlt: '#EDE7F6',
   textPrimary: '#242136',
   textSecondary: '#4B425D',
-  textMuted: '#6B7280',
+  textMuted: '#5D6470',
   primary: '#6D3CC3',
   primaryPressed: '#5B2AA8',
   onPrimary: '#FFFFFF',
@@ -33,8 +33,41 @@ export const colors = {
   success: '#176B48',
   warning: '#865500',
   danger: '#B42318',
+  onDanger: '#FFFFFF',
   info: '#2256A5',
 } as const;
+
+/** Semantic color tokens — dark theme (plum-soft). */
+const darkColors = {
+  background: '#211B2A',
+  backdrop: 'rgba(20, 17, 28, 0.72)',
+  surface: '#2A2235',
+  surfaceAlt: '#342A43',
+  textPrimary: '#F1ECF8',
+  textSecondary: '#D0C2E0',
+  textMuted: '#B9A7CB',
+  primary: '#C1A4F6',
+  primaryPressed: '#D8C0FF',
+  onPrimary: '#14111C',
+  border: '#5B4A6C',
+  focusRing: '#D8C0FF',
+  success: '#79D6A5',
+  warning: '#F2C66D',
+  danger: '#FF8A8A',
+  onDanger: '#331B21',
+  info: '#9BC4FF',
+} as const;
+
+export const themes = {
+  light: lightColors,
+  dark: darkColors,
+} as const;
+
+export type ColorScheme = keyof typeof themes;
+export type Colors = (typeof themes)[ColorScheme];
+
+/** Backwards-compatible light palette; apps should use the active theme context. */
+export const colors = lightColors;
 
 /** 4-pt base spacing scale (docs/BRANDING.md §5). */
 export const spacing = {
@@ -85,7 +118,6 @@ export const minTouchTarget = {
 } as const;
 
 export type Brand = typeof brand;
-export type Colors = typeof colors;
 export type Spacing = typeof spacing;
 export type Radii = typeof radii;
 export type Typography = typeof typography;

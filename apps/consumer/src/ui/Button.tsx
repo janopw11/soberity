@@ -9,7 +9,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { colors, radii, spacing, typography } from '@soberity/design-tokens';
+import { radii, spacing, typography } from '@soberity/design-tokens';
+import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 export type ButtonVariant =
   'primary' | 'secondary' | 'tertiary' | 'destructive';
@@ -37,8 +38,10 @@ export function Button({
   style,
 }: ButtonProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
   const isDisabled = disabled || loading;
-  const variantStyle = variantStyles[variant];
+  const variantStyle = createVariantStyles(colors)[variant];
 
   return (
     <Pressable
@@ -69,28 +72,34 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    minHeight: 48,
-    paddingHorizontal: spacing.space24,
-    borderRadius: radii.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  disabled: { opacity: 0.5 },
-  focused: {
-    borderWidth: 2,
-    borderColor: colors.focusRing,
-  },
-  label: {
-    fontSize: typography.label.fontSize,
-    lineHeight: typography.label.lineHeight,
-    fontWeight: typography.label.fontWeight,
-  },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    base: {
+      minHeight: 48,
+      paddingHorizontal: spacing.space24,
+      borderRadius: radii.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+    },
+    disabled: { opacity: 0.5 },
+    focused: {
+      borderWidth: 2,
+      borderColor: colors.focusRing,
+    },
+    label: {
+      fontSize: typography.label.fontSize,
+      lineHeight: typography.label.lineHeight,
+      fontWeight: typography.label.fontWeight,
+    },
+  });
+}
 
-const variantStyles: Record<
+function createVariantStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+): Record<
   ButtonVariant,
   {
     container: ViewStyle;
@@ -98,33 +107,35 @@ const variantStyles: Record<
     label: { color: string; textDecorationLine?: 'underline' };
     indicatorColor: string;
   }
-> = {
-  primary: {
-    container: { backgroundColor: colors.primary },
-    pressed: { backgroundColor: colors.primaryPressed },
-    label: { color: colors.onPrimary },
-    indicatorColor: colors.onPrimary,
-  },
-  secondary: {
-    container: {
-      backgroundColor: colors.surfaceAlt,
-      borderWidth: 1,
-      borderColor: colors.border,
+> {
+  return {
+    primary: {
+      container: { backgroundColor: colors.primary },
+      pressed: { backgroundColor: colors.primaryPressed },
+      label: { color: colors.onPrimary },
+      indicatorColor: colors.onPrimary,
     },
-    pressed: { backgroundColor: colors.border },
-    label: { color: colors.textPrimary },
-    indicatorColor: colors.textPrimary,
-  },
-  tertiary: {
-    container: { backgroundColor: 'transparent' },
-    pressed: { backgroundColor: colors.surfaceAlt },
-    label: { color: colors.primary, textDecorationLine: 'underline' },
-    indicatorColor: colors.primary,
-  },
-  destructive: {
-    container: { backgroundColor: colors.danger },
-    pressed: { opacity: 0.85 },
-    label: { color: colors.onPrimary },
-    indicatorColor: colors.onPrimary,
-  },
-};
+    secondary: {
+      container: {
+        backgroundColor: colors.surfaceAlt,
+        borderWidth: 1,
+        borderColor: colors.border,
+      },
+      pressed: { backgroundColor: colors.border },
+      label: { color: colors.textPrimary },
+      indicatorColor: colors.textPrimary,
+    },
+    tertiary: {
+      container: { backgroundColor: 'transparent' },
+      pressed: { backgroundColor: colors.surfaceAlt },
+      label: { color: colors.primary, textDecorationLine: 'underline' },
+      indicatorColor: colors.primary,
+    },
+    destructive: {
+      container: { backgroundColor: colors.danger },
+      pressed: { opacity: 0.85 },
+      label: { color: colors.onDanger },
+      indicatorColor: colors.onDanger,
+    },
+  };
+}

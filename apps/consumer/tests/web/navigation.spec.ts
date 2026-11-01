@@ -120,7 +120,7 @@ test('hamburger at top left opens all features with emoji and closes after navig
   ];
   // The close control is separate from the eight product destinations.
   await expect(menu.getByRole('link')).toHaveCount(3);
-  await expect(menu.getByRole('button')).toHaveCount(6);
+  await expect(menu.getByRole('button')).toHaveCount(10);
   for (const label of labels) {
     await expect(
       menu
@@ -159,6 +159,45 @@ test('hamburger at top left opens all features with emoji and closes after navig
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test('theme and language preferences persist after reload', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    locale: 'en-US',
+    viewport: { width: 390, height: 844 },
+  });
+  const page = await context.newPage();
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu', exact: true }).click();
+  const menu = page.getByTestId('side-menu');
+
+  const darkTheme = menu.getByRole('button', { name: 'Dark · Plum' });
+  await expect(darkTheme).toHaveAttribute('aria-pressed', 'true');
+  const lightTheme = menu.getByRole('button', { name: 'Light · Violet' });
+  await lightTheme.focus();
+  await expect(lightTheme).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(lightTheme).toHaveAttribute('aria-pressed', 'true');
+  await menu.getByRole('button', { name: 'Polski' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Więcej z życia. Razem.' }),
+  ).toBeVisible();
+  await page.reload();
+
+  await page.getByRole('button', { name: 'Otwórz menu', exact: true }).click();
+  const restoredMenu = page.getByTestId('side-menu');
+  await expect(
+    restoredMenu.getByRole('button', { name: 'Jasny · Fiolet' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    restoredMenu.getByRole('button', { name: 'Polski' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('heading', { name: 'Więcej z życia. Razem.' }),
+  ).toBeVisible();
+  await context.close();
 });
 
 test('Polish hamburger menu shows emoji without planned captions', async ({

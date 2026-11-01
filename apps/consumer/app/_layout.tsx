@@ -2,13 +2,15 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 
-import { colors } from '@soberity/design-tokens';
-
 import '../src/i18n';
 import {
   AuthStatusProvider,
   useAuthStatus,
 } from '../src/auth/AuthStatusContext';
+import {
+  ThemePreferencesProvider,
+  useThemePreferences,
+} from '../src/preferences/ThemePreferencesContext';
 
 /**
  * Guards the three top-level route groups against the current auth status.
@@ -19,41 +21,49 @@ import {
 function RootNavigator() {
   const { status } = useAuthStatus();
   const { t } = useTranslation();
+  const { colors, theme } = useThemePreferences();
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.textPrimary,
-        contentStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-      }}
-    >
-      <Stack.Protected guard={status === 'guest'}>
-        <Stack.Screen name="(public)" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Protected guard={status === 'verification-pending'}>
+    <>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.textPrimary,
+          contentStyle: { backgroundColor: colors.background },
+          headerShadowVisible: false,
+        }}
+      >
+        <Stack.Protected guard={status === 'guest'}>
+          <Stack.Screen name="(public)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={status === 'verification-pending'}>
+          <Stack.Screen
+            name="verification-pending"
+            options={{ title: t('verificationPending.title') }}
+          />
+        </Stack.Protected>
+        <Stack.Protected guard={status === 'authenticated'}>
+          <Stack.Screen
+            name="(authenticated)"
+            options={{ headerShown: false }}
+          />
+        </Stack.Protected>
         <Stack.Screen
-          name="verification-pending"
-          options={{ title: t('verificationPending.title') }}
+          name="+not-found"
+          options={{ title: t('notFound.title') }}
         />
-      </Stack.Protected>
-      <Stack.Protected guard={status === 'authenticated'}>
-        <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Screen
-        name="+not-found"
-        options={{ title: t('notFound.title') }}
-      />
-    </Stack>
+      </Stack>
+    </>
   );
 }
 
 export default function RootLayout() {
   return (
-    <AuthStatusProvider>
-      <StatusBar style="dark" />
-      <RootNavigator />
-    </AuthStatusProvider>
+    <ThemePreferencesProvider>
+      <AuthStatusProvider>
+        <RootNavigator />
+      </AuthStatusProvider>
+    </ThemePreferencesProvider>
   );
 }

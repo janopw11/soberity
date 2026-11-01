@@ -1,12 +1,12 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { colors } from '@soberity/design-tokens';
-
 import SideMenu from '../../src/SideMenu';
+import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
 
 export default function PublicLayout() {
   const { t } = useTranslation();
+  const { colors } = useThemePreferences();
 
   return (
     <Stack

@@ -1,10 +1,11 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { colors } from '@soberity/design-tokens';
+import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
 
 export default function AuthenticatedLayout() {
   const { t } = useTranslation();
+  const { colors } = useThemePreferences();
 
   return (
     <Stack

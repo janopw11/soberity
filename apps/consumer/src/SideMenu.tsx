@@ -11,9 +11,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, radii, spacing, typography } from '@soberity/design-tokens';
+import { radii, spacing, typography } from '@soberity/design-tokens';
 
 import { navigationItems } from './navigation';
+import { AppearancePreferences } from './preferences/AppearancePreferences';
+import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 /** Header hamburger opens the shared navigation without reducing screen width. */
 export default function SideMenu() {
@@ -22,6 +24,8 @@ export default function SideMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  const styles = createStyles(colors);
   const close = () => setOpen(false);
 
   const toggle = (inMenu = false) => (
@@ -122,6 +126,9 @@ export default function SideMenu() {
                   'href' in entry ? entry.href : undefined,
                 ),
               )}
+              <View style={styles.preferences}>
+                <AppearancePreferences />
+              </View>
             </ScrollView>
           </SafeAreaView>
         </View>
@@ -130,58 +137,68 @@ export default function SideMenu() {
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: colors.backdrop },
-  panel: {
-    flex: 1,
-    width: '85%',
-    maxWidth: 360,
-    backgroundColor: colors.surface,
-    borderRightWidth: 1,
-    borderColor: colors.border,
-  },
-  top: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.space8,
-    gap: spacing.space8,
-  },
-  brand: { ...typography.h3, color: colors.primary, flexShrink: 1 },
-  toggle: {
-    minHeight: 48,
-    minWidth: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
-    borderRadius: radii.sm,
-  },
-  hamburger: { gap: spacing.space4 },
-  line: {
-    width: spacing.space24,
-    height: 2,
-    borderRadius: radii.sm,
-    backgroundColor: colors.textPrimary,
-  },
-  content: { padding: spacing.space8, gap: spacing.space16 },
-  item: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.space12,
-    padding: spacing.space8,
-    borderRadius: radii.sm,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  selected: { backgroundColor: colors.surfaceAlt },
-  pressed: { backgroundColor: colors.border },
-  focused: { borderColor: colors.focusRing },
-  icon: { ...typography.h3, textAlign: 'center', minWidth: 32 },
-  label: {
-    ...typography.label,
-    color: colors.textPrimary,
-    flex: 1,
-    minWidth: 0,
-  },
-});
+function createStyles(
+  colors: ReturnType<typeof useThemePreferences>['colors'],
+) {
+  return StyleSheet.create({
+    overlay: { flex: 1, backgroundColor: colors.backdrop },
+    panel: {
+      flex: 1,
+      width: '85%',
+      maxWidth: 360,
+      backgroundColor: colors.surface,
+      borderRightWidth: 1,
+      borderColor: colors.border,
+    },
+    top: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.space8,
+      gap: spacing.space8,
+    },
+    brand: { ...typography.h3, color: colors.primary, flexShrink: 1 },
+    toggle: {
+      minHeight: 48,
+      minWidth: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: 'transparent',
+      borderRadius: radii.sm,
+    },
+    hamburger: { gap: spacing.space4 },
+    line: {
+      width: spacing.space24,
+      height: 2,
+      borderRadius: radii.sm,
+      backgroundColor: colors.textPrimary,
+    },
+    content: { padding: spacing.space8, gap: spacing.space16 },
+    preferences: {
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: spacing.space16,
+      paddingHorizontal: spacing.space8,
+    },
+    item: {
+      minHeight: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.space12,
+      padding: spacing.space8,
+      borderRadius: radii.sm,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    selected: { backgroundColor: colors.surfaceAlt },
+    pressed: { backgroundColor: colors.border },
+    focused: { borderColor: colors.focusRing },
+    icon: { ...typography.h3, textAlign: 'center', minWidth: 32 },
+    label: {
+      ...typography.label,
+      color: colors.textPrimary,
+      flex: 1,
+      minWidth: 0,
+    },
+  });
+}

@@ -59,5 +59,16 @@
     },
     "open": "Open menu",
     "close": "Close menu"
+  },
+  "preferences": {
+    "title": "Display preferences",
+    "theme": "Theme",
+    "plumSoft": "Dark · Plum",
+    "violet": "Light · Violet",
+    "language": "Language",
+    "english": "English",
+    "polish": "Polski",
+    "errorTitle": "Preferences not saved",
+    "errorMessage": "Your display preference could not be loaded or saved. Please try again."
   }
 }
