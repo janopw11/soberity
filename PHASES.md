@@ -307,25 +307,25 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I05 — Firebase project & backend token verification
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS  
+**Started:** 2026-11-01  
 **Finished:** —  
 **Zależności iteracji:** P0-I04  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** `docs/testing/P0-I05-results.md` (lokalnie): `./mvnw verify` exit 0 (3 unit, 21 IT); emulator E2E: nieweryfikowany e-mail 403, prawidłowy 200, wygasły/obcy projekt/obcy issuer/śmieciowy/brak tokena 401; projekt dev `soberity-f9e4b`: prawdziwy token zaakceptowany przez Google'owe klucze (aud=soberity-f9e4b), zmodyfikowany token odrzucony, testowe konto usunięte.  
+**Blokery:** T01 otwarte: staging/prod odłożone decyzją właściciela (brak ID projektów). Iteracja nie jest DONE do czasu decyzji właściciela o T01.
 
 **Zakres zadań:**
 
 - [ ] `P0-I05-T01` Zdefiniuj konfiguracje Firebase dev/staging/prod i manualne kroki w konsoli.
-- [ ] `P0-I05-T02` Włącz Email/Password, e-mail verification, domeny i action links.
-- [ ] `P0-I05-T03` Skonfiguruj Firebase Admin SDK przez bezpieczne poświadczenia.
-- [ ] `P0-I05-T04` Dodaj filtr Spring Security weryfikujący podpis, issuer, audience, exp i projekt.
-- [ ] `P0-I05-T05` Zdefiniuj zasady email_verified i role zaufane.
+- [x] `P0-I05-T02` Włącz Email/Password, e-mail verification, domeny i action links (dev `soberity-f9e4b`; staging/prod NOT VERIFIED).
+- [x] `P0-I05-T03` Skonfiguruj Firebase Admin SDK przez bezpieczne poświadczenia (ADC; dev `soberity-f9e4b` zweryfikowany).
+- [x] `P0-I05-T04` Dodaj filtr Spring Security weryfikujący podpis, issuer, audience, exp i projekt (dev `soberity-f9e4b`, test na koncie testowym).
+- [x] `P0-I05-T05` Zdefiniuj zasady email_verified i role zaufane.
 
 **Weryfikacja:**
 
-- [ ] `P0-I05-V01` Testuj brak/wadliwy/wygasły/obcy token: 401.
-- [ ] `P0-I05-V02` Testuj ograniczony dostęp do prywatnego endpointu i brak eskalacji roli.
+- [x] `P0-I05-V01` Testuj brak/wadliwy/wygasły/obcy token: 401.
+- [x] `P0-I05-V02` Testuj ograniczony dostęp do prywatnego endpointu i brak eskalacji roli.
 
 **Definition of Done:** Backend nie ufa UID ani roli dostarczonej z klienta; brak sekretów w repo. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2147,9 +2147,10 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I04 — Spring Boot, PostgreSQL & API skeleton` (DONE 2026-11-01); poprzednia `P0-I03A` pozostaje IN_PROGRESS
-- **Status:** IN_PROGRESS — T01–T05 i V01 zweryfikowane; T04 wdrożone. V02/V03 otwarte. 2026-11-01 zaakceptowano v4 i oba motywy. Phase 0 niezamknięta.
-- **Następny krok:** dokończyć instalację NDK 27.1.12297006 przez Android SDK Manager lub przy stabilnym łączu, ponowić Android build/eksport; wykonać kontrole runtime i a11y na iOS/Android (w tym VoiceOver/TalkBack i duży font). Następnie zamknąć V02/V03, jeśli testy przejdą; P0-I04 ukończono 2026-11-01 (DONE). P0-I05 wyłącznie po osobnym poleceniu.
+- **Aktualna iteracja:** `P0-I05 — Firebase project & backend token verification` (IN_PROGRESS 2026-11-01; T02–T05, V01, V02 zweryfikowane dla dev); P0-I04 pozostaje DONE 2026-11-01
+- **Status:** IN_PROGRESS — jedyny otwarty punkt to T01 (staging/prod), odłożony decyzją właściciela. Start deweloperski działa przez emulator bez internetu. P0-I03A V02/V03 otwarte. Phase 0 niezamknięta.
+- **Następny krok:** właściciel decyduje, czy P0-I05 zamykamy jako DONE z odłożonym T01, czy wraca do T01 po podaniu ID projektów staging/prod. P0-I03A V02/V03 otwarte. P0-I06 wyłącznie po osobnym poleceniu.
+
 - **Otwarte blokery:** instalacja NDK 27.1.12297006 nie została ukończona (pobrano 136 MiB, po zatrzymaniu usunięto jej niekompletny katalog). Android build/eksport, runtime natywny, VoiceOver/TalkBack i duży font NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
 - **Wymagana akceptacja:** motywy i układ v4 zaakceptowano 2026-11-01. Logo/font i przyszłe istotne zmiany poza tym zakresem wymagają odrębnej decyzji. `/docs` pozostaje lokalne i ignorowane przez Git na polecenie właściciela.
 - **Korekta P0-I03 (2026-10-31, aktualna):** menu ☰ ma osiem głównych pozycji według listy właściciela, emoji, bez grup i podpisów Planowane. Check PASS, Playwright 10/10 PASS. Natywne runtime NOT VERIFIED; następny krok P0-I03: sprawdzić osiem pozycji, otwieranie/zamykanie i a11y na iOS/Android. P0-I04 nie rozpoczęto.
@@ -2166,6 +2167,7 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 | 2026-10-29 | P0-I00 | Właściciel zatwierdził D1–D4; DoD spełnione, DONE | ADR-001–003 ACCEPTED, audyt i raport uzupełnione o zapis akceptacji; historyczne wyniki pozostawiono jawne | Zlecono P0-I01; katalog docs lokalny na wyraźne polecenie właściciela |
 | 2026-10-29 | P0-I01 | DONE; T01–T04 i V01–V02 zweryfikowane | apps/consumer, packages, backend/pom.xml i wrapper, infra/compose, konfiguracje root, lockfile, scripts, README, PHASES, CHANGELOG; lokalnie docs/testing/P0-I01-results.md. Bootstrap czystej kopii i powtórzenie, pnpm check/build/-r lint, Maven verify — exit 0; negatywne scenariusze narzędzi i konfiguracji PASS | Brak blokera P0-I01; brak testów platform (brak aplikacji). P0-I02 wyłącznie po kolejnym poleceniu; Android do sprawdzenia. |
 | 2026-11-01 | P0-I04 | DONE; T01–T06 i V01–V04 zweryfikowane | backend (pom Spring Boot 4.1.2, kod common/identity/profile, Flyway V1, profile, Dockerfile), infra/compose (compose.yml, .env.example, README), docs/testing/P0-I04-results.md (lokalnie), CHANGELOG, PHASES. `./mvnw verify` exit 0 (3 unit, 15 IT); compose: healthy, probes 200, 401 problem+json, OpenAPI 200, 2 repliki, graceful stop; brak sekretów w obrazie; `pnpm check` exit 0 | Brak blokera backendu. P0-I03A V02/V03 otwarte. Następna P0-I05 wyłącznie po poleceniu. |
+| 2026-11-01 | P0-I05 | IN_PROGRESS; T02–T05, V01, V02 zweryfikowane dla dev | backend: Firebase Admin SDK (`identity/token`), filtr `FirebaseAuthenticationFilter`, `/api/v1/identity/me`, reguły ROLE_USER/ROLE_UNVERIFIED; infra/compose (emulator Auth, env), infra/firebase (README, firebase.json), docs/testing/P0-I05-results.md (lokalnie), CHANGELOG, PHASES. `./mvnw verify` exit 0 (3 unit, 21 IT); emulator E2E 403/200/401; realny projekt dev: filtr na koncie testowym (bez tokena 401, niezweryfikowany 403, zmodyfikowany token 401, po weryfikacji 200), ADC przez gcloud; konto testowe usunięte. | T01 staging/prod odłożone decyzją właściciela; iteracja nie jest DONE bez decyzji o T01. Nie commitowano. |
 
 # 7. Wzór raportu kończącego sesję Codex
 

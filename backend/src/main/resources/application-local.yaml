@@ -7,3 +7,5 @@ spring:
 soberity:
   cors:
     allowed-origins: ${SOBERITY_CORS_ALLOWED_ORIGINS:http://localhost:8081,http://127.0.0.1:8081}
+  firebase:
+    project-id: ${SOBERITY_FIREBASE_PROJECT_ID:demo-soberity}

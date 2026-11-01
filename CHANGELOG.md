@@ -2,6 +2,21 @@
 
 ## 2026-11-01
 
+- Rozpoczęto P0-I05: backend weryfikuje Firebase ID tokeny przez Firebase Admin
+  SDK (sprawdzenie issuera, audience, wygaśnięcia i projektu). Endpointy
+  `/api/v1/**` wymagają zweryfikowanego e-maila; niezweryfikowane konto
+  dostaje 403, a brak lub zły token 401. Dodano emulator Firebase Auth do
+  Docker Compose, dzięki czemu start deweloperski działa bez internetu.
+- Zweryfikowano lokalnie: `./mvnw verify` (3 testy jednostkowe, 21 testów
+  integracyjnych) oraz scenariusz end-to-end na emulatorze (rejestracja,
+  weryfikacja e-maila, logowanie, odrzucone tokeny). Nie zweryfikowano podpisu
+  względem kluczy Google, konsoli Firebase ani ścieżki produkcyjnej; P0-I05
+  pozostaje IN_PROGRESS.
+- Sprawdzono na realnym projekcie dev: filtr Spring z tokenami konta testowego
+  (bez tokena 401, niezweryfikowany e-mail 403, zmodyfikowany token 401,
+  po weryfikacji 200). Konto testowe usunięto. Staging i produkcja pozostają
+  otwarte; P0-I05 nie jest zamknięte bez decyzji właściciela.
+
 - Ukończono P0-I04: backend Spring Boot 4.1.2 na Java 21 z modułami
   `common`, `identity` i `profile`, migracją Flyway tabeli profilu
   (`firebase_uid` unikalny, nullable `locale` en/pl), PostgreSQL 17 w Docker

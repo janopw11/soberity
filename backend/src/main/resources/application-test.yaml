@@ -2,3 +2,5 @@
 soberity:
   cors:
     allowed-origins: http://localhost:8081
+  firebase:
+    project-id: demo-soberity-test

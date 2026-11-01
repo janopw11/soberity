@@ -1,7 +1,8 @@
 # Lokalne usługi
 
-Docker Compose uruchamia PostgreSQL 17 i backend Spring Boot (P0-I04).
-Stos nie zawiera Kafki, Kubernetes ani mikroserwisów.
+Docker Compose uruchamia emulator Firebase Auth, PostgreSQL 17 i backend Spring
+Boot (P0-I04, P0-I05). Stos nie zawiera Kafki, Kubernetes ani mikroserwisów.
+Szczegóły Firebase: [infra/firebase/README.md](../firebase/README.md).
 
 ## Przygotowanie
 

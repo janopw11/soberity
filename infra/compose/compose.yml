@@ -1,6 +1,39 @@
 name: soberity
 
 services:
+  firebase-auth-emulator:
+    image: node:22-alpine
+    working_dir: /tmp/firebase
+    command:
+      [
+        'npx',
+        '--yes',
+        'firebase-tools@15.34.2',
+        'emulators:start',
+        '--only',
+        'auth',
+        '--project',
+        'demo-soberity',
+        '--config',
+        '/tmp/firebase/firebase.json',
+      ]
+    volumes:
+      - ../firebase/firebase.json:/tmp/firebase/firebase.json:ro
+    ports:
+      - '127.0.0.1:9099:9099'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:9099/', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+      start_period: 120s
+
   postgres:
     image: postgres:17-alpine
     environment:
@@ -24,12 +57,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      firebase-auth-emulator:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: local
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/soberity
       SPRING_DATASOURCE_USERNAME: soberity
       SOBERITY_DB_PASSWORD: ${SOBERITY_DB_PASSWORD:?Set SOBERITY_DB_PASSWORD in infra/compose/.env (see .env.example)}
       SOBERITY_CORS_ALLOWED_ORIGINS: ${SOBERITY_CORS_ALLOWED_ORIGINS:-http://localhost:8081,http://127.0.0.1:8081}
+      SOBERITY_FIREBASE_PROJECT_ID: demo-soberity
+      FIREBASE_AUTH_EMULATOR_HOST: firebase-auth-emulator:9099
     ports:
       - '127.0.0.1::8080'
     stop_grace_period: 35s
