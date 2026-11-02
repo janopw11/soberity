@@ -1,16 +1,31 @@
 import {
   applyActionCode,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   onIdTokenChanged,
   reload,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  verifyPasswordResetCode,
   type ActionCodeSettings,
 } from 'firebase/auth';
 
-import { readEmailVerificationContinueUrl } from './config';
+import {
+  readEmailVerificationContinueUrl,
+  readPasswordResetContinueUrl,
+} from './config';
 import { getFirebaseAuth } from './firebaseInstance';
+
+/** Firebase reports this only when email enumeration protection is disabled. */
+const USER_NOT_FOUND = 'auth/user-not-found';
+
+function actionCodeSettings(
+  url: string | undefined,
+): ActionCodeSettings | undefined {
+  return url ? { url, handleCodeInApp: true } : undefined;
+}
 
 export type AuthUser = {
   uid: string;
@@ -26,6 +41,11 @@ export type AuthAdapter = {
   sendEmailVerification: () => Promise<void>;
   reload: () => Promise<void>;
   applyEmailVerificationAction: (oobCode: string) => Promise<void>;
+  /** Resolves the same way for unknown addresses, so the UI cannot reveal accounts. */
+  requestPasswordReset: (email: string) => Promise<void>;
+  /** Validates a reset code and returns the account e-mail it belongs to. */
+  checkPasswordResetCode: (oobCode: string) => Promise<string>;
+  confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Returns a fresh ID token; the SDK refreshes it when needed. */
   getIdToken: (forceRefresh?: boolean) => Promise<string | null>;
@@ -43,11 +63,10 @@ export const firebaseAuthAdapter: AuthAdapter = {
       email,
       password,
     );
-    const continueUrl = readEmailVerificationContinueUrl();
-    const actionCodeSettings: ActionCodeSettings | undefined = continueUrl
-      ? { url: continueUrl, handleCodeInApp: true }
-      : undefined;
-    await sendEmailVerification(credential.user, actionCodeSettings);
+    await sendEmailVerification(
+      credential.user,
+      actionCodeSettings(readEmailVerificationContinueUrl()),
+    );
   },
   async signIn(email, password) {
     await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
@@ -59,11 +78,10 @@ export const firebaseAuthAdapter: AuthAdapter = {
         'Cannot send verification email without a signed-in user.',
       );
     }
-    const continueUrl = readEmailVerificationContinueUrl();
-    const actionCodeSettings: ActionCodeSettings | undefined = continueUrl
-      ? { url: continueUrl, handleCodeInApp: true }
-      : undefined;
-    await sendEmailVerification(user, actionCodeSettings);
+    await sendEmailVerification(
+      user,
+      actionCodeSettings(readEmailVerificationContinueUrl()),
+    );
   },
   async reload() {
     const user = getFirebaseAuth().currentUser;
@@ -72,6 +90,23 @@ export const firebaseAuthAdapter: AuthAdapter = {
   async applyEmailVerificationAction(oobCode) {
     await applyActionCode(getFirebaseAuth(), oobCode);
   },
+  async requestPasswordReset(email) {
+    try {
+      await sendPasswordResetEmail(
+        getFirebaseAuth(),
+        email,
+        actionCodeSettings(readPasswordResetContinueUrl()),
+      );
+    } catch (error) {
+      if (!isFirebaseCode(error, USER_NOT_FOUND)) throw error;
+    }
+  },
+  async checkPasswordResetCode(oobCode) {
+    return verifyPasswordResetCode(getFirebaseAuth(), oobCode);
+  },
+  async confirmPasswordReset(oobCode, newPassword) {
+    await confirmPasswordReset(getFirebaseAuth(), oobCode, newPassword);
+  },
   async signOut() {
     await firebaseSignOut(getFirebaseAuth());
   },
@@ -79,3 +114,12 @@ export const firebaseAuthAdapter: AuthAdapter = {
     return getFirebaseAuth().currentUser?.getIdToken(forceRefresh) ?? null;
   },
 };
+
+function isFirebaseCode(error: unknown, code: string): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === code
+  );
+}

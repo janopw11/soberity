@@ -99,6 +99,9 @@ export default function SignInScreen() {
       <Link href="/sign-up" style={styles.link}>
         {t('auth.noAccountLink')}
       </Link>
+      <Link href="/forgot-password" style={styles.link}>
+        {t('auth.forgotPasswordLink')}
+      </Link>
     </Screen>
   );
 }

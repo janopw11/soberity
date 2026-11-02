@@ -55,17 +55,6 @@ potrzebnej Gradle. Uruchom AVD przed `android`.
 `EXPO_PUBLIC_API_URL` pozostaje publicznym szablonem dla przyszłego klienta
 API. Obecna aplikacja go nie używa i nie uruchamia backendu.
 
-## Weryfikacja e-maila
-
-Rejestracja od razu wysyła wiadomość weryfikacyjną Firebase. Ekran
-`verification-pending` umożliwia ponowne wysłanie po 60-sekundowym lokalnym
-limicie oraz odświeżenie użytkownika i tokena przed ponownym sprawdzeniem
-backendu. `EXPO_PUBLIC_FIREBASE_EMAIL_CONTINUE_URL` może wskazywać
-autoryzowany adres, który prowadzi do `/verify-email` i zachowuje parametr
-`oobCode`; bez niego używany jest domyślny handler Firebase. Trasa action linku
-obsługuje kody nieważne i wygasłe, a backend pozostaje źródłem prawdy i zwraca
-403 do czasu otrzymania tokena z `email_verified=true`.
-
 Expo Go i emulatory nie potwierdzają dostarczenia produkcyjnej wiadomości ani
 allow-listy Firebase. Do pełnej weryfikacji potrzebny jest rzeczywisty projekt
 dev Firebase, dostarczony e-mail oraz build web/natywny z deep linkiem.
@@ -85,3 +74,45 @@ podłączaniu API; obecny smoke test nie testuje sieci backendu.
 
 Wyniki i ograniczenia: [PHASES.md](../../PHASES.md). Lokalne screenshoty i
 raporty w ignorowanym `docs/testing/` nie są wymagane do uruchomienia klona.
+
+## Weryfikacja e-maila
+
+Rejestracja od razu wysyła wiadomość weryfikacyjną Firebase. Ekran
+`verification-pending` umożliwia ponowne wysłanie po 60-sekundowym lokalnym
+limicie oraz odświeżenie użytkownika i tokena przed ponownym sprawdzeniem
+backendu. Trasa action linku `/verify-email` obsługuje parametr `oobCode`,
+kody nieważne i wygasłe, a backend pozostaje źródłem prawdy i zwraca
+403 do czasu otrzymania tokena z `email_verified=true`.
+
+Adresy akcji e-maili ustawia się w konsoli Firebase (Authentication → Templates
+→ Customize action URL), a nie w aplikacji. Dla weryfikacji wskaż trasę
+`/verify-email`. Zmienna `EXPO_PUBLIC_FIREBASE_EMAIL_CONTINUE_URL` to `continueUrl`
+przesyłany z mailem; powinna być autoryzowanym adresem, np. `https://HOST/sign-in`.
+
+Expo Go i emulatory nie potwierdzają dostarczenia produkcyjnej wiadomości ani
+allow-listy Firebase. Do pełnej weryfikacji potrzebny jest rzeczywisty projekt
+dev Firebase, dostarczony e-mail oraz build web/natywny z deep linkiem.
+
+## Reset hasła i sesja
+
+Ekran logowania prowadzi do `/forgot-password`. Odpowiedź po wysłaniu jest taka
+sama dla każdego adresu, także nieistniejącego, aby nie ujawniać kont.
+Link z e-maila otwiera `/reset-password`: kod jest sprawdzany przed pokazaniem
+formularza, a wygasły, nieprawidłowy lub niedostępny offline kod ma własny
+komunikat i ponowienie.
+
+Konfiguracja w konsoli Firebase: szablon „Password reset” → Customize action URL
+→ `https://HOST/reset-password` (adres na autoryzowanej domenie, Authentication →
+Settings → Authorized domains). `EXPO_PUBLIC_FIREBASE_PASSWORD_RESET_CONTINUE_URL`
+to opcjonalny `continueUrl`, np. `https://HOST/sign-in`.
+
+Bez własnej domeny zostaw domyślny handler Firebase (bez zmian w konsoli).
+Test lokalny: wyślij reset z `/forgot-password`, ustaw hasło przez link z maila
+(strona Firebase), a potem sprawdź nasz ekran, podając w `http://localhost:8081/reset-password?oobCode=KOD`
+`oobCode` z tego samego linku. Kod jest jednorazowy, więc do drugiego testu weź
+świeży mail.
+
+Sesja jest przywracana przez Firebase po restarcie i potwierdzana przez backend.
+Wylogowanie czyści stan lokalnie od razu, a późne odpowiedzi poprzedniej sesji
+są ignorowane. Testy automatyczne nie zastępują ręcznej weryfikacji prawdziwego
+maila na web i na urządzeniach.

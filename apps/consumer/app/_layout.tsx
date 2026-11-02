@@ -71,6 +71,10 @@ function RootNavigator() {
           name="verify-email"
           options={{ title: t('verificationAction.title') }}
         />
+        <Stack.Screen
+          name="reset-password"
+          options={{ title: t('resetPassword.title') }}
+        />
       </Stack>
     </>
   );

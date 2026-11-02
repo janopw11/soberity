@@ -45,6 +45,7 @@
     "signInSubmit": "Zaloguj się",
     "signUpSubmit": "Utwórz konto",
     "noAccountLink": "Nie masz konta? Utwórz je",
+    "forgotPasswordLink": "Nie pamiętasz hasła?",
     "haveAccountLink": "Masz już konto? Zaloguj się",
     "errorTitle": "Wymaga Twojej uwagi",
     "fieldErrors": {
@@ -102,6 +103,31 @@
     "pendingButton": "Przejdź do potwierdzenia e-maila",
     "signInLink": "Masz już potwierdzone konto? Zaloguj się",
     "signOutButton": "Wróć na stronę główną"
+  },
+  "forgotPassword": {
+    "title": "Resetuj hasło",
+    "intro": "Podaj adres e-mail swojego konta. Jeśli konto istnieje, wyślemy link do ustawienia nowego hasła.",
+    "submit": "Wyślij link resetujący",
+    "sentTitle": "Sprawdź swoją skrzynkę",
+    "sentMessage": "Jeśli konto dla tego adresu istnieje, link do resetu hasła jest już w drodze. Sprawdź skrzynkę i folder spam.",
+    "backToSignIn": "Wróć do logowania"
+  },
+  "resetPassword": {
+    "badge": "Reset hasła",
+    "title": "Ustaw nowe hasło",
+    "intro": "Wybierz nowe hasło dla konta {{email}}.",
+    "submit": "Zapisz nowe hasło",
+    "checkingTitle": "Sprawdzamy link",
+    "checkingDescription": "Poczekaj, aż potwierdzimy link do resetu hasła.",
+    "offlineTitle": "Nie udało się sprawdzić linku",
+    "retryButton": "Spróbuj ponownie",
+    "invalidTitle": "Link do resetu niedostępny",
+    "invalidDescription": "Ten link jest nieprawidłowy lub wygasł. Poproś o nowy.",
+    "requestNewButton": "Poproś o nowy link resetujący",
+    "successTitle": "Hasło zmienione",
+    "successDescription": "Twoje hasło zostało zmienione.",
+    "successMessage": "Możesz się teraz zalogować nowym hasłem.",
+    "signInButton": "Przejdź do logowania"
   },
   "notFound": {
     "title": "Nie znaleziono strony",

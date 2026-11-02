@@ -36,6 +36,9 @@ type AuthStatusContextValue = AuthState & {
   resendVerificationEmail: () => Promise<void>;
   refreshVerificationStatus: () => Promise<void>;
   applyEmailVerificationAction: (oobCode: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  checkPasswordResetCode: (oobCode: string) => Promise<string>;
+  confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Re-checks the current session with the backend (used after `offline`). */
   retry: () => Promise<void>;
@@ -134,7 +137,30 @@ export function AuthStatusProvider({
     (oobCode: string) => adapter.applyEmailVerificationAction(oobCode),
     [adapter],
   );
-  const signOut = useCallback(() => adapter.signOut(), [adapter]);
+  const requestPasswordReset = useCallback(
+    (email: string) => adapter.requestPasswordReset(email),
+    [adapter],
+  );
+  const checkPasswordResetCode = useCallback(
+    (oobCode: string) => adapter.checkPasswordResetCode(oobCode),
+    [adapter],
+  );
+  const confirmPasswordReset = useCallback(
+    (oobCode: string, newPassword: string) =>
+      adapter.confirmPasswordReset(oobCode, newPassword),
+    [adapter],
+  );
+  // Clears the session locally at once, so no private state outlives logout
+  // and late backend responses from the previous session are ignored.
+  const signOut = useCallback(async () => {
+    sequence.current++;
+    try {
+      await adapter.signOut();
+    } finally {
+      latestUser.current = null;
+      setState({ status: 'guest', user: null });
+    }
+  }, [adapter]);
   const retry = useCallback(
     () => resolveSession(latestUser.current),
     [resolveSession],
@@ -148,6 +174,9 @@ export function AuthStatusProvider({
       resendVerificationEmail,
       refreshVerificationStatus,
       applyEmailVerificationAction,
+      requestPasswordReset,
+      checkPasswordResetCode,
+      confirmPasswordReset,
       signOut,
       retry,
     }),
@@ -158,6 +187,9 @@ export function AuthStatusProvider({
       resendVerificationEmail,
       refreshVerificationStatus,
       applyEmailVerificationAction,
+      requestPasswordReset,
+      checkPasswordResetCode,
+      confirmPasswordReset,
       signOut,
       retry,
     ],

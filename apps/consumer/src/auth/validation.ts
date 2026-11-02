@@ -46,3 +46,17 @@ export function hasFieldErrors(
 ): boolean {
   return Object.values(errors).some(Boolean);
 }
+
+export function validateNewPassword(input: {
+  password: string;
+  confirmPassword: string;
+}) {
+  const password = validatePassword(input.password);
+  let confirmPassword: FieldError | undefined;
+  if (!input.confirmPassword) {
+    confirmPassword = 'required';
+  } else if (input.confirmPassword !== input.password) {
+    confirmPassword = 'passwordMismatch';
+  }
+  return { password, confirmPassword };
+}

@@ -35,6 +35,15 @@ function createFakeAdapter(token: string | null = 'id-token') {
     applyEmailVerificationAction: jest.fn<(oobCode: string) => Promise<void>>(
       async () => undefined,
     ),
+    requestPasswordReset: jest.fn<(email: string) => Promise<void>>(
+      async () => undefined,
+    ),
+    checkPasswordResetCode: jest.fn<(oobCode: string) => Promise<string>>(
+      async () => 'jane@example.com',
+    ),
+    confirmPasswordReset: jest.fn<
+      (oobCode: string, newPassword: string) => Promise<void>
+    >(async () => undefined),
     signOut: jest.fn(async () => undefined),
     getIdToken: jest.fn<(forceRefresh?: boolean) => Promise<string | null>>(
       async () => token,
@@ -179,6 +188,46 @@ describe('AuthStatusContext', () => {
 
     expect(adapter.getIdToken).toHaveBeenLastCalledWith(true);
     await waitFor(() => expect(result.current?.status).toBe('authenticated'));
+  });
+
+  it('restores a persisted session on startup without signing in again', async () => {
+    fetchMock.mockResolvedValue('verified');
+    const { adapter, emit } = createFakeAdapter();
+    const { result } = await renderAuth(adapter);
+
+    await emit(user);
+
+    await waitFor(() => expect(result.current?.status).toBe('authenticated'));
+    expect(adapter.signIn).not.toHaveBeenCalled();
+    expect(adapter.getIdToken).toHaveBeenLastCalledWith(false);
+  });
+
+  it('clears the session locally on sign-out and ignores late backend answers', async () => {
+    let resolveIdentity: ((value: 'verified') => void) | undefined;
+    fetchMock.mockResolvedValueOnce('verified');
+    const { adapter, emit } = createFakeAdapter();
+    const { result } = await renderAuth(adapter);
+
+    await emit(user);
+    await waitFor(() => expect(result.current?.status).toBe('authenticated'));
+
+    // A slow backend answer from before logout must not restore the session.
+    fetchMock.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveIdentity = resolve)),
+    );
+    await act(async () => {
+      void result.current?.refreshVerificationStatus();
+    });
+    await act(async () => {
+      await result.current?.signOut();
+    });
+    await act(async () => {
+      resolveIdentity?.('verified');
+    });
+
+    expect(result.current?.status).toBe('guest');
+    expect(result.current?.user).toBeNull();
+    expect(adapter.signOut).toHaveBeenCalledTimes(1);
   });
 
   it('throws a clear error outside of its provider', async () => {

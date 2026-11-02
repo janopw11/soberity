@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 7/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 8/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **7/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07 DONE).
+**Łącznie:** 79 iteracji agentowych; wykonane: **8/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07 i P0-I08 DONE).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -381,24 +381,25 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I08 — Session restore, logout & password reset
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-11-02  
+**Finished:** 2026-11-02  
 **Zależności iteracji:** P0-I06, P0-I07  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** kod: `authAdapter.ts` (reset przez `sendPasswordResetEmail` z ignorowaniem `auth/user-not-found`, `verifyPasswordResetCode`, `confirmPasswordReset`), `AuthStatusContext.tsx` (`signOut` przechodzi do `guest` natychmiast i unieważnia późniejsze odpowiedzi backendu), `ForgotPasswordScreen.tsx` (`/forgot-password`, jednakowy komunikat dla każdego adresu), `ResetPasswordScreen.tsx` (`/reset-password`: sprawdzenie kodu przed formularzem, stany wygasły/nieprawidłowy/offline z ponowieniem, sukces), link na ekranie logowania, EN/PL. Testy automatyczne: `pnpm check` PASS, Jest 46/46 PASS (restore przy starcie, logout z późną odpowiedzią backendu, adapter: brak enumeracji i błędy inne niż `user-not-found`), eksport web PASS. Ręczna weryfikacja właściciela 2026-11-02 na web (localhost, projekt dev `soberity-f9e4b`): pełny przepływ resetu przez mail i stronę Firebase; nasz ekran `/reset-password` z `oobCode` z maila; odświeżenie/restart z przywróceniem sesji; wylogowanie; wygasły/zużyty kod pokazuje komunikat.  
+**Blokery:** brak. Konfiguracja action URL w konsoli Firebase nie jest wymagana na localhost (domyślny handler). Hosted domain i deep-linki iOS/Android NOT VERIFIED — poza zakresem tej iteracji.
 
 **Zakres zadań:**
 
-- [ ] `P0-I08-T01` Przywracaj sesję po restartach/odświeżeniu i rozstrzygaj stan startowy.
-- [ ] `P0-I08-T02` Dodaj logout z wyczyszczeniem prywatnego stanu/cachu.
-- [ ] `P0-I08-T03` Dodaj forgot/reset password z ochroną przed enumeracją.
-- [ ] `P0-I08-T04` Zadbaj o expired links, offline i retry UI.
+- [x] `P0-I08-T01` Przywracaj sesję po restartach/odświeżeniu i rozstrzygaj stan startowy. (Firebase przywraca sesję, backend ustala stan; test regresyjny bez ponownego logowania.)
+- [x] `P0-I08-T02` Dodaj logout z wyczyszczeniem prywatnego stanu/cachu. (Stan lokalny czyszczony od razu; aplikacja nie ma innego cache prywatnych danych.)
+- [x] `P0-I08-T03` Dodaj forgot/reset password z ochroną przed enumeracją.
+- [x] `P0-I08-T04` Zadbaj o expired links, offline i retry UI.
 
 **Weryfikacja:**
 
-- [ ] `P0-I08-V01` Testuj odświeżenie web i restart app, logout, reset hasła.
-- [ ] `P0-I08-V02` Testuj błędny i wygasły kod oraz brak wycieku danych.
+- [x] `P0-I08-V01` Testuj odświeżenie web i restart app, logout, reset hasła. (Ręcznie właściciel 2026-11-02, web/localhost.)
+- [x] `P0-I08-V02` Testuj błędny i wygasły kod oraz brak wycieku danych. (Wygasły/zużyty kod pokazuje komunikat; test adaptera bez ujawniania konta.)
+
 
 **Definition of Done:** Sesja i odzyskiwanie hasła są działające i odporne na błędy. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2230,3 +2231,4 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-01 | P0-I03A — wdrożenie motywów i preferencji | T04 wdrożone, V01 zweryfikowane; iteracja IN_PROGRESS | Tokeny semantyczne dwóch motywów, provider i ustawienia dostępnego wyboru motywu oraz EN/PL z lokalnym zapisem; dostosowane istniejące ekrany/menu i wspólne komponenty; uzupełniono lokalny `docs/BRANDING.md`. `pnpm run check` PASS; Jest 7/7 suites, 17/17 PASS; Playwright 12/12 PASS przed zmianą klawiaturową, następnie ukierunkowane preferencje desktop/mobile-web 2/2 PASS; referencja 8 wariantów PASS; web export PASS; iOS Simulator build/install PASS. | Android prebuild PASS; instalacja NDK 27.1.12297006 nie została ukończona: pierwsza próba zatrzymana przy 535 MiB, druga pobrała 136 MiB po odzyskaniu miejsca i została zatrzymana przed końcem. Dokończyć instalację NDK i ponowić build/eksport. VoiceOver/TalkBack, duży font i pełny runtime natywny NOT VERIFIED; V02/V03 pozostają otwarte, P0-I04 nie rozpoczęto. |
 | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |
 | 2026-11-02 | P0-I07 | DONE; T01–T05, V01 (poprawny i wygasły link, ponowne wysłanie, token) i V02 zweryfikowane | `apps/consumer/src/auth/authAdapter.ts`, `AuthStatusContext.tsx`, `VerificationPendingScreen.tsx`, `VerifyEmailScreen.tsx` + trasa `app/verify-email.tsx`, `SignUpScreen.tsx` (przejście do oczekiwania), tłumaczenia EN/PL, README i `.env.example`. `pnpm check` PASS; Jest 41/41 PASS; eksport web PASS; backend `./mvnw test` PASS. Ręczna weryfikacja właściciela na web (dev `soberity-f9e4b`): mail z kodem, potwierdzenie linkiem, logowanie. | Brak blokerów dla P0-I07 w zakresie web. Smoke test iOS/Android NOT VERIFIED. Następna iteracja P0-I08 wyłącznie po poleceniu. |
+| 2026-11-02 | P0-I08 | DONE; T01–T04 i V01–V02 zweryfikowane ręcznie (web/localhost) | `authAdapter.ts`, `AuthStatusContext.tsx`, `ForgotPasswordScreen.tsx`, `ResetPasswordScreen.tsx`, trasy `(public)/forgot-password` i `reset-password`, link na logowaniu, EN/PL, `authAdapter.test.ts`, testy kontekstu. `pnpm check` PASS; Jest 46/46 PASS; eksport web PASS; ręcznie: mail resetu, reset na stronie Firebase, `/reset-password?oobCode=…`, przywrócenie sesji po odświeżeniu, wylogowanie, wygasły/zużyty kod. | Hosted domain i action URL w konsoli NOT VERIFIED (nie wymagane na localhost); iOS/Android poza zakresem. Następna iteracja P0-I09 wyłącznie po poleceniu. |

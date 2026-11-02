@@ -59,9 +59,19 @@ export function readAuthEmulatorUrl(): string | undefined {
 }
 
 /**
- * Optional URL to which Firebase redirects after an in-app verification link.
- * It must be allow-listed in Firebase Authentication and route to `/verify-email`.
+ * Optional `continueUrl` sent with verification e-mails. It must be allow-listed
+ * in Firebase Authentication. The action link itself is set in the console.
  */
 export function readEmailVerificationContinueUrl(): string | undefined {
   return process.env.EXPO_PUBLIC_FIREBASE_EMAIL_CONTINUE_URL || undefined;
+}
+
+/**
+ * Optional `continueUrl` sent with password reset e-mails. It must be
+ * allow-listed in Firebase Authentication. The action link itself is set in the console.
+ */
+export function readPasswordResetContinueUrl(): string | undefined {
+  return (
+    process.env.EXPO_PUBLIC_FIREBASE_PASSWORD_RESET_CONTINUE_URL || undefined
+  );
 }

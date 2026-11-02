@@ -45,6 +45,7 @@
     "signInSubmit": "Sign in",
     "signUpSubmit": "Create account",
     "noAccountLink": "No account yet? Create one",
+    "forgotPasswordLink": "Forgot your password?",
     "haveAccountLink": "Already have an account? Sign in",
     "errorTitle": "Something needs your attention",
     "fieldErrors": {
@@ -102,6 +103,31 @@
     "pendingButton": "Go to email confirmation",
     "signInLink": "Already verified? Sign in",
     "signOutButton": "Back to welcome"
+  },
+  "forgotPassword": {
+    "title": "Reset password",
+    "intro": "Enter the email address of your account. If it exists, we'll send you a link to set a new password.",
+    "submit": "Send reset link",
+    "sentTitle": "Check your email",
+    "sentMessage": "If an account exists for this address, a reset link is on its way. Check your inbox and spam folder.",
+    "backToSignIn": "Back to sign in"
+  },
+  "resetPassword": {
+    "badge": "Password reset",
+    "title": "Set a new password",
+    "intro": "Choose a new password for {{email}}.",
+    "submit": "Save new password",
+    "checkingTitle": "Checking your link",
+    "checkingDescription": "Please wait while we confirm your reset link.",
+    "offlineTitle": "Couldn't check your link",
+    "retryButton": "Try again",
+    "invalidTitle": "Reset link unavailable",
+    "invalidDescription": "This link is invalid or has expired. Request a new one.",
+    "requestNewButton": "Request a new reset link",
+    "successTitle": "Password updated",
+    "successDescription": "Your password has been changed.",
+    "successMessage": "You can now sign in with your new password.",
+    "signInButton": "Go to sign in"
   },
   "notFound": {
     "title": "Page not found",
