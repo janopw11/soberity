@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text } from 'react-native';
@@ -53,6 +53,7 @@ export default function SignUpScreen() {
     setSubmitting(true);
     try {
       await signUp(email.trim(), password);
+      router.replace('/verification-pending');
     } catch (error) {
       setFormError(t(`auth.errors.${mapAuthError(error)}`));
       setSubmitting(false);

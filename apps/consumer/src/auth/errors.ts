@@ -8,6 +8,8 @@ export type AuthErrorKey =
   | 'invalidCredentials'
   | 'tooManyRequests'
   | 'userDisabled'
+  | 'invalidActionCode'
+  | 'expiredActionCode'
   | 'network'
   | 'notConfigured'
   | 'generic';
@@ -43,6 +45,10 @@ export function mapAuthError(error: unknown): AuthErrorKey {
       return 'tooManyRequests';
     case 'auth/user-disabled':
       return 'userDisabled';
+    case 'auth/invalid-action-code':
+      return 'invalidActionCode';
+    case 'auth/expired-action-code':
+      return 'expiredActionCode';
     case 'auth/network-request-failed':
       return 'network';
     case 'auth/not-configured':

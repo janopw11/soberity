@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 6/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 7/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **6/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE).
+**Łącznie:** 79 iteracji agentowych; wykonane: **7/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07 DONE).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -357,25 +357,25 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I07 — Email verification end-to-end
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P0-I06  
-**Dowód:** —  
-**Blokery:** —
+**Status:** DONE
+**Started:** 2026-11-02
+**Finished:** 2026-11-02
+**Zależności iteracji:** P0-I06
+**Dowód:** klient: `apps/consumer/src/auth/authAdapter.ts` wysyła wiadomość po rejestracji, obsługuje resend, reload i wymuszone odświeżenie ID tokena; `VerificationPendingScreen` ma cooldown 60 s i odświeżenie statusu; trasa `apps/consumer/app/verify-email.tsx` obsługuje brak/nieważny link i ma ścieżki powrotu. Weryfikacja automatyczna: `pnpm check` PASS, Jest 41/41 PASS, eksport web PASS, backend `./mvnw --batch-mode test` PASS (`FirebaseAuthIT`: 403 dla niezweryfikowanego konta). Weryfikacja ręczna właściciela 2026-11-02 (web, dev `soberity-f9e4b`): mail z kodem wysłany, kliknięcie linku potwierdza konto, po weryfikacji logowanie działa i udziela dostępu.
+**Blokery:** brak. Smoke test na iOS/Android NOT VERIFIED (poza zakresem zgłoszenia).
 
 **Zakres zadań:**
 
-- [ ] `P0-I07-T01` Wysyłaj mail weryfikacyjny po rejestracji.
-- [ ] `P0-I07-T02` Dodaj ekran oczekiwania, resend z ograniczeniem częstotliwości.
-- [ ] `P0-I07-T03` Obsłuż action links i odświeżenie statusu email_verified.
-- [ ] `P0-I07-T04` Ustal backendowe ograniczenia dla kont niezweryfikowanych.
-- [ ] `P0-I07-T05` Dokumentuj zachowanie web, mobile i ograniczenia emulatorów.
+- [x] `P0-I07-T01` Wysyłaj mail weryfikacyjny po rejestracji.
+- [x] `P0-I07-T02` Dodaj ekran oczekiwania, resend z ograniczeniem częstotliwości.
+- [x] `P0-I07-T03` Obsłuż action links i odświeżenie statusu email_verified.
+- [x] `P0-I07-T04` Ustal backendowe ograniczenia dla kont niezweryfikowanych. (Backend z P0-I05: 403 dla `ROLE_UNVERIFIED`, test `FirebaseAuthIT`.)
+- [x] `P0-I07-T05` Dokumentuj zachowanie web, mobile i ograniczenia emulatorów.
 
 **Weryfikacja:**
 
-- [ ] `P0-I07-V01` Przetestuj poprawny/wygasły link, resend oraz aktualizację tokena.
-- [ ] `P0-I07-V02` Sprawdź niedostępność chronionych funkcji przed weryfikacją.
+- [x] `P0-I07-V01` Przetestuj poprawny/wygasły link, resend oraz aktualizację tokena. (Ręcznie przez właściciela na web 2026-11-02: poprawny link, wygasły link, ponowne wysłanie, aktualizacja tokena.)
+- [x] `P0-I07-V02` Sprawdź niedostępność chronionych funkcji przed weryfikacją. (Niezweryfikowane konto trafia na ekran oczekiwania; backend zwraca 403 — `FirebaseAuthIT`.)
 
 **Definition of Done:** Rejestracja → mail → weryfikacja → udzielony dostęp działa. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2228,4 +2228,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 
 | 2026-11-01 | Plan — język UI i profil (P0-I03A/P0-I04/P0-I09) | Doprecyzowano wymagania; bez rozpoczęcia nowych iteracji | PHASES: ręczny wybór EN/PL, nullable locale w profilu PostgreSQL, GET/PATCH /me, pierwszeństwo profilu nad urządzeniem, cache per konto/gość, migracja jawnego wyboru przy nowym profilu, offline/błędy i testy trwałości/ACL/drugiego urządzenia. Lokalny BRANDING uzupełniono o zachowanie języka. Sprawdzono obecny kod i18n: wykrywa urządzenie, brak ręcznej persystencji. | Aktualna iteracja nadal P0-I03A; lokalne UI języka w T04, zapis profilu w P0-I09. Bez zmiany kodu aplikacji, testów runtime i wpisu CHANGELOG — aktualizacja planu. |
 | 2026-11-01 | P0-I03A — wdrożenie motywów i preferencji | T04 wdrożone, V01 zweryfikowane; iteracja IN_PROGRESS | Tokeny semantyczne dwóch motywów, provider i ustawienia dostępnego wyboru motywu oraz EN/PL z lokalnym zapisem; dostosowane istniejące ekrany/menu i wspólne komponenty; uzupełniono lokalny `docs/BRANDING.md`. `pnpm run check` PASS; Jest 7/7 suites, 17/17 PASS; Playwright 12/12 PASS przed zmianą klawiaturową, następnie ukierunkowane preferencje desktop/mobile-web 2/2 PASS; referencja 8 wariantów PASS; web export PASS; iOS Simulator build/install PASS. | Android prebuild PASS; instalacja NDK 27.1.12297006 nie została ukończona: pierwsza próba zatrzymana przy 535 MiB, druga pobrała 136 MiB po odzyskaniu miejsca i została zatrzymana przed końcem. Dokończyć instalację NDK i ponowić build/eksport. VoiceOver/TalkBack, duży font i pełny runtime natywny NOT VERIFIED; V02/V03 pozostają otwarte, P0-I04 nie rozpoczęto. |
-| 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |
+| 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |
+| 2026-11-02 | P0-I07 | DONE; T01–T05, V01 (poprawny i wygasły link, ponowne wysłanie, token) i V02 zweryfikowane | `apps/consumer/src/auth/authAdapter.ts`, `AuthStatusContext.tsx`, `VerificationPendingScreen.tsx`, `VerifyEmailScreen.tsx` + trasa `app/verify-email.tsx`, `SignUpScreen.tsx` (przejście do oczekiwania), tłumaczenia EN/PL, README i `.env.example`. `pnpm check` PASS; Jest 41/41 PASS; eksport web PASS; backend `./mvnw test` PASS. Ręczna weryfikacja właściciela na web (dev `soberity-f9e4b`): mail z kodem, potwierdzenie linkiem, logowanie. | Brak blokerów dla P0-I07 w zakresie web. Smoke test iOS/Android NOT VERIFIED. Następna iteracja P0-I08 wyłącznie po poleceniu. |

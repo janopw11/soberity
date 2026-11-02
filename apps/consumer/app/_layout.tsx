@@ -67,6 +67,10 @@ function RootNavigator() {
           name="+not-found"
           options={{ title: t('notFound.title') }}
         />
+        <Stack.Screen
+          name="verify-email"
+          options={{ title: t('verificationAction.title') }}
+        />
       </Stack>
     </>
   );

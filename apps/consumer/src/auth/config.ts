@@ -57,3 +57,11 @@ export function readBackendApiUrl(): string {
 export function readAuthEmulatorUrl(): string | undefined {
   return process.env.EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_URL || undefined;
 }
+
+/**
+ * Optional URL to which Firebase redirects after an in-app verification link.
+ * It must be allow-listed in Firebase Authentication and route to `/verify-email`.
+ */
+export function readEmailVerificationContinueUrl(): string | undefined {
+  return process.env.EXPO_PUBLIC_FIREBASE_EMAIL_CONTINUE_URL || undefined;
+}

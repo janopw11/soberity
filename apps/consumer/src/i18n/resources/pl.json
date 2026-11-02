@@ -60,6 +60,8 @@
       "invalidCredentials": "Adres e-mail lub hasło są nieprawidłowe.",
       "tooManyRequests": "Zbyt wiele prób. Odczekaj kilka minut i spróbuj ponownie.",
       "userDisabled": "To konto zostało wyłączone. Skontaktuj się z pomocą.",
+      "invalidActionCode": "Ten link weryfikacyjny jest nieprawidłowy. Poproś o nowy.",
+      "expiredActionCode": "Ten link weryfikacyjny wygasł. Poproś o nowy.",
       "network": "Nie udało się połączyć z Soberity. Sprawdź połączenie i spróbuj ponownie.",
       "notConfigured": "Konta nie są dostępne w tej wersji aplikacji.",
       "generic": "Coś poszło nie tak. Spróbuj ponownie."
@@ -78,9 +80,28 @@
     "badge": "Wymagana weryfikacja",
     "description": "Konto zostało utworzone, ale przed dostępem do niego musisz potwierdzić adres e-mail.",
     "alertTitle": "Konto utworzone",
-    "alertMessage": "Wysyłanie e-maila potwierdzającego i ponowne wysyłanie są częścią kolejnej iteracji.",
+    "alertMessage": "Na Twój adres e-mail wysłaliśmy link weryfikacyjny.",
     "resendButton": "Wyślij e-mail weryfikacyjny ponownie",
-    "resendHelper": "Jeszcze niedostępne — weryfikacja e-maila jest planowana w kolejnej iteracji."
+    "resendHelper": "Możesz poprosić o kolejną wiadomość, jeśli pierwsza nie dotrze.",
+    "resendCooldown": "Spróbuj ponownie za {{seconds}} s.",
+    "resendSuccess": "Nowy e-mail weryfikacyjny jest już wysyłany.",
+    "refreshButton": "Potwierdziłem(-am) e-mail",
+    "refreshHint": "Po kliknięciu linku wróć tutaj i sprawdź status."
+  },
+  "verificationAction": {
+    "title": "Weryfikacja e-maila",
+    "badge": "Weryfikacja e-maila",
+    "loadingTitle": "Weryfikujemy Twój e-mail",
+    "loadingDescription": "Poczekaj, aż potwierdzimy link weryfikacyjny.",
+    "successTitle": "E-mail potwierdzony",
+    "successDescription": "Twój adres e-mail został potwierdzony.",
+    "successMessage": "Możesz teraz korzystać z Soberity.",
+    "signInButton": "Przejdź do logowania",
+    "errorTitle": "Link weryfikacyjny niedostępny",
+    "errorDescription": "Nie udało się użyć tego linku. Poproś o nowy e-mail weryfikacyjny.",
+    "pendingButton": "Przejdź do potwierdzenia e-maila",
+    "signInLink": "Masz już potwierdzone konto? Zaloguj się",
+    "signOutButton": "Wróć na stronę główną"
   },
   "notFound": {
     "title": "Nie znaleziono strony",

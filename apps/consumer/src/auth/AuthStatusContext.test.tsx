@@ -30,8 +30,15 @@ function createFakeAdapter(token: string | null = 'id-token') {
     signIn: jest.fn<(email: string, password: string) => Promise<void>>(
       async () => undefined,
     ),
+    sendEmailVerification: jest.fn(async () => undefined),
+    reload: jest.fn(async () => undefined),
+    applyEmailVerificationAction: jest.fn<(oobCode: string) => Promise<void>>(
+      async () => undefined,
+    ),
     signOut: jest.fn(async () => undefined),
-    getIdToken: jest.fn(async () => token),
+    getIdToken: jest.fn<(forceRefresh?: boolean) => Promise<string | null>>(
+      async () => token,
+    ),
   };
   return {
     adapter: adapter as AuthAdapter & typeof adapter,
@@ -126,13 +133,16 @@ describe('AuthStatusContext', () => {
     await waitFor(() => expect(result.current?.status).toBe('authenticated'));
   });
 
-  it('delegates sign-in, sign-up and sign-out to the adapter', async () => {
+  it('delegates auth actions to the adapter', async () => {
     const { adapter } = createFakeAdapter();
     const { result } = await renderAuth(adapter);
 
     await act(async () => {
       await result.current?.signIn('jane@example.com', 'secret-password');
       await result.current?.signUp('new@example.com', 'secret-password');
+      await result.current?.resendVerificationEmail();
+      await result.current?.refreshVerificationStatus();
+      await result.current?.applyEmailVerificationAction('oob-code');
       await result.current?.signOut();
     });
 
@@ -144,7 +154,31 @@ describe('AuthStatusContext', () => {
       'new@example.com',
       'secret-password',
     );
+    expect(adapter.sendEmailVerification).toHaveBeenCalledTimes(1);
+    expect(adapter.reload).toHaveBeenCalledTimes(1);
+    expect(adapter.applyEmailVerificationAction).toHaveBeenCalledWith(
+      'oob-code',
+    );
     expect(adapter.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  it('forces a fresh token when checking verification status', async () => {
+    fetchMock.mockResolvedValue('unverified');
+    const { adapter, emit } = createFakeAdapter();
+    const { result } = await renderAuth(adapter);
+
+    await emit(user);
+    await waitFor(() =>
+      expect(result.current?.status).toBe('verification-pending'),
+    );
+
+    fetchMock.mockResolvedValue('verified');
+    await act(async () => {
+      await result.current?.refreshVerificationStatus();
+    });
+
+    expect(adapter.getIdToken).toHaveBeenLastCalledWith(true);
+    await waitFor(() => expect(result.current?.status).toBe('authenticated'));
   });
 
   it('throws a clear error outside of its provider', async () => {

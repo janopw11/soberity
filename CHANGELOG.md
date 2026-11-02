@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-11-02
+
+- P0-I07 (DONE 2026-11-02): weryfikacja e-maila end-to-end na web w projekcie
+  dev. Rejestracja wysyła mail z linkiem, ekran oczekiwania obsługuje ponowne
+  wysłanie z 60-sekundowym limitem, a po kliknięciu linku właściciel potwierdził
+  logowanie i dostęp do strefy zalogowanej. Backend nadal zwraca 403 dla
+  niezweryfikowanego konta. Testy: Jest 41/41, `pnpm check`, eksport web,
+  `FirebaseAuthIT`. Ręcznie przez właściciela potwierdzono także wygasły link
+  i ponowne wysłanie maila. Smoke test iOS/Android pozostaje NOT VERIFIED.
+- Wcześniejsze wpisy P0-I07 z tego dnia: rejestracja wysyła wiadomość weryfikacyjną Firebase,
+  ekran oczekiwania obsługuje ponowne wysłanie z 60-sekundowym limitem i
+  odświeżenie sesji, a `/verify-email` stosuje Firebase action links oraz
+  komunikuje kody nieważne/wygasłe. Dodano konfigurację continue URL,
+  komunikaty en/pl i dokumentację ograniczeń emulatorów. Typecheck, lint,
+  40 testów Jest, eksport web oraz testy backendu przechodzą. Dostarczenie
+  wiadomości i deep-linki na realnym projekcie Firebase pozostają NOT VERIFIED.
+- Naprawiono przepływ po rejestracji: aplikacja przechodzi bezpośrednio do
+  ekranu oczekiwania zamiast do niedostępnej trasy action linku. Obsługa linku
+  toleruje brak parametru `oobCode`, oferuje powrót do potwierdzenia/logowania,
+  a sprawdzenie po weryfikacji wymusza odświeżenie ID tokena.
+
 ## 2026-11-01
 
 - P0-I06 (DONE 2026-11-01): logowanie i rejestracja e-mail/hasło przez Firebase

@@ -60,6 +60,8 @@
       "invalidCredentials": "The email or password is incorrect.",
       "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
       "userDisabled": "This account has been disabled. Contact support.",
+      "invalidActionCode": "This verification link is invalid. Request a new one.",
+      "expiredActionCode": "This verification link has expired. Request a new one.",
       "network": "We couldn't reach Soberity. Check your connection and try again.",
       "notConfigured": "Accounts are not available in this build.",
       "generic": "Something went wrong. Please try again."
@@ -78,9 +80,28 @@
     "badge": "Verification needed",
     "description": "Your account was created, but you need to confirm your email address before reaching your account.",
     "alertTitle": "Account created",
-    "alertMessage": "Sending the confirmation e-mail and resending it are part of the next iteration.",
+    "alertMessage": "We sent a verification link to your email address.",
     "resendButton": "Resend verification email",
-    "resendHelper": "Not available yet — email verification is planned for a later iteration."
+    "resendHelper": "You can request another email if the first one does not arrive.",
+    "resendCooldown": "Try again in {{seconds}} seconds.",
+    "resendSuccess": "A new verification email is on its way.",
+    "refreshButton": "I verified my email",
+    "refreshHint": "After clicking the link, return here and check your status."
+  },
+  "verificationAction": {
+    "title": "Verify email",
+    "badge": "Email verification",
+    "loadingTitle": "Verifying your email",
+    "loadingDescription": "Please wait while we confirm your verification link.",
+    "successTitle": "Email verified",
+    "successDescription": "Your email address is confirmed.",
+    "successMessage": "You can now continue using Soberity.",
+    "signInButton": "Continue to sign in",
+    "errorTitle": "Verification link unavailable",
+    "errorDescription": "This link could not be applied. Request a new verification email.",
+    "pendingButton": "Go to email confirmation",
+    "signInLink": "Already verified? Sign in",
+    "signOutButton": "Back to welcome"
   },
   "notFound": {
     "title": "Page not found",

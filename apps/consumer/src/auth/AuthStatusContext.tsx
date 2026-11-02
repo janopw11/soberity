@@ -33,6 +33,9 @@ type AuthState = {
 type AuthStatusContextValue = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
+  refreshVerificationStatus: () => Promise<void>;
+  applyEmailVerificationAction: (oobCode: string) => Promise<void>;
   signOut: () => Promise<void>;
   /** Re-checks the current session with the backend (used after `offline`). */
   retry: () => Promise<void>;
@@ -55,7 +58,7 @@ export function AuthStatusProvider({
   const sequence = useRef(0);
 
   const resolveSession = useCallback(
-    async (user: AuthUser | null) => {
+    async (user: AuthUser | null, forceTokenRefresh = false) => {
       const current = ++sequence.current;
       const isCurrent = () => current === sequence.current;
       latestUser.current = user;
@@ -68,7 +71,7 @@ export function AuthStatusProvider({
       setState((previous) => ({ ...previous, user }));
 
       try {
-        const token = await adapter.getIdToken();
+        const token = await adapter.getIdToken(forceTokenRefresh);
         if (!isCurrent()) return;
         if (!token) {
           setState({ status: 'guest', user: null });
@@ -119,6 +122,18 @@ export function AuthStatusProvider({
     (email: string, password: string) => adapter.signUp(email, password),
     [adapter],
   );
+  const resendVerificationEmail = useCallback(
+    () => adapter.sendEmailVerification(),
+    [adapter],
+  );
+  const refreshVerificationStatus = useCallback(async () => {
+    await adapter.reload();
+    await resolveSession(latestUser.current, true);
+  }, [adapter, resolveSession]);
+  const applyEmailVerificationAction = useCallback(
+    (oobCode: string) => adapter.applyEmailVerificationAction(oobCode),
+    [adapter],
+  );
   const signOut = useCallback(() => adapter.signOut(), [adapter]);
   const retry = useCallback(
     () => resolveSession(latestUser.current),
@@ -126,8 +141,26 @@ export function AuthStatusProvider({
   );
 
   const value = useMemo<AuthStatusContextValue>(
-    () => ({ ...state, signIn, signUp, signOut, retry }),
-    [state, signIn, signUp, signOut, retry],
+    () => ({
+      ...state,
+      signIn,
+      signUp,
+      resendVerificationEmail,
+      refreshVerificationStatus,
+      applyEmailVerificationAction,
+      signOut,
+      retry,
+    }),
+    [
+      state,
+      signIn,
+      signUp,
+      resendVerificationEmail,
+      refreshVerificationStatus,
+      applyEmailVerificationAction,
+      signOut,
+      retry,
+    ],
   );
 
   return (

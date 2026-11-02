@@ -4,9 +4,9 @@ Jeden klient Expo SDK 58, React Native 0.88, React 19.3 i Expo Router, z
 podstawowym design systemem (`@soberity/design-tokens` + `src/ui`), routingiem
 na kontraktach `public` / `verification-pending` / `authenticated` (Expo
 Router `Stack.Protected`) i i18n en/pl (i18next + react-i18next, domyślny en).
-Nie ma jeszcze prawdziwego logowania — `AuthStatusContext` to stub zawsze
-zwracający `guest`, gotowy pod Firebase z P0-I05/P0-I06/P0-I07. Dla gościa
-`/account` i `/verification-pending` przekierowują na stronę główną bez
+Logowanie, rejestracja i weryfikacja e-maila korzystają z Firebase, a backend
+potwierdza sesję i `email_verified` przed dostępem do strefy prywatnej. Dla
+gościa `/account` i `/verification-pending` przekierowują na stronę główną bez
 ujawniania prywatnej treści. Ekran powitalny prowadzi do `/science`, `/events`;
 wszystkie obszary jasno informują o niedostępności. Nieznana trasa pozwala
 wrócić na start.
@@ -54,6 +54,21 @@ potrzebnej Gradle. Uruchom AVD przed `android`.
 
 `EXPO_PUBLIC_API_URL` pozostaje publicznym szablonem dla przyszłego klienta
 API. Obecna aplikacja go nie używa i nie uruchamia backendu.
+
+## Weryfikacja e-maila
+
+Rejestracja od razu wysyła wiadomość weryfikacyjną Firebase. Ekran
+`verification-pending` umożliwia ponowne wysłanie po 60-sekundowym lokalnym
+limicie oraz odświeżenie użytkownika i tokena przed ponownym sprawdzeniem
+backendu. `EXPO_PUBLIC_FIREBASE_EMAIL_CONTINUE_URL` może wskazywać
+autoryzowany adres, który prowadzi do `/verify-email` i zachowuje parametr
+`oobCode`; bez niego używany jest domyślny handler Firebase. Trasa action linku
+obsługuje kody nieważne i wygasłe, a backend pozostaje źródłem prawdy i zwraca
+403 do czasu otrzymania tokena z `email_verified=true`.
+
+Expo Go i emulatory nie potwierdzają dostarczenia produkcyjnej wiadomości ani
+allow-listy Firebase. Do pełnej weryfikacji potrzebny jest rzeczywisty projekt
+dev Firebase, dostarczony e-mail oraz build web/natywny z deep linkiem.
 
 | Klient lokalny      | Adres przyszłego backendu                                                    |
 | ------------------- | ---------------------------------------------------------------------------- |
