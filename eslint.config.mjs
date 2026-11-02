@@ -8,6 +8,8 @@ export default tseslint.config(
       '**/dist/**',
       '**/target/**',
       '**/coverage/**',
+      '**/test-results/**',
+      '**/playwright-report/**',
       '**/.expo/**',
       'apps/consumer/ios/**',
       'apps/consumer/android/**',

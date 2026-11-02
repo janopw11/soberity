@@ -198,5 +198,35 @@
     "polish": "Polski",
     "errorTitle": "Nie zapisano ustawień",
     "errorMessage": "Nie udało się wczytać lub zapisać ustawień wyświetlania. Spróbuj ponownie."
+  },
+  "home": {
+    "welcome": "Witaj w Soberity",
+    "intro": "Trochę ciekawości. Świeże spojrzenie. Więcej życia bez alkoholu.",
+    "latest": "Najnowsze wiadomości",
+    "previewNotice": "Podgląd · Przykładowe artykuły i daty, nie opublikowane badania.",
+    "editorial": "Redakcja Soberity",
+    "kinds": {
+      "research": "Omówienie badań",
+      "article": "Artykuł"
+    },
+    "stories": {
+      "sleep": {
+        "title": "Alkohol i sen: co kryje się za wieczornym rytuałem?",
+        "summary": "Przyglądamy się pytaniom, które badacze stawiają o sen, odpoczynek i alkohol."
+      },
+      "evidence": {
+        "title": "Co sprawia, że badanie jest warte uwagi?",
+        "summary": "Od metod badawczych po niepewność: przewodnik po świadomym czytaniu dowodów."
+      },
+      "habits": {
+        "title": "Zrób miejsce na codzienność bez alkoholu",
+        "summary": "Odkrywanie codziennych rytuałów, małe eksperymenty i szukanie własnej drogi."
+      },
+      "headlines": {
+        "title": "Poza nagłówkiem: badania w szerszym kontekście",
+        "summary": "Zaglądamy do metod, badanej populacji i pytań, które pozostają bez odpowiedzi."
+      }
+    },
+    "readTime": "{{count}} min czytania"
   }
 }

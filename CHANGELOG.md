@@ -2,6 +2,18 @@
 
 ## 2026-11-02
 
+- Strona główna: krótkie powitanie i lista czterech przykładowych artykułów
+  inspirowana układem redakcyjnym Medium, z ilustracjami, datą, typem treści
+  i czasem czytania. Wspólna dla gościa i zalogowanego, EN/PL, oba motywy;
+  dane demonstracyjne oznaczone nad listą, bez niezweryfikowanych tez zdrowotnych.
+  Sprawdzono web desktop/mobile (16 testów), Jest 66/66, `pnpm check`,
+  eksport web/iOS/Android i render PL/Śliwka w Expo Go na iPhone 17 Pro / iOS 26.5.
+  Android runtime i pełne testy czytników ekranu NOT VERIFIED.
+  Późniejsza korekta właściciela: Home tylko dla zalogowanych, bez opisów
+  pod nagłówkami i bez przycisków auth; osobny ekran wejściowy dla gości.
+  Tej korekty nie testowano na wyraźne polecenie; powyższe wyniki dotyczą
+  wcześniejszej wersji.
+
 - P0-I10 (DONE 2026-11-02): ustawienia konta. Zmiana hasła i e-maila wymaga
   ponownego potwierdzenia hasła; nowy e-mail obowiązuje po otwarciu linku.
   Usunięcie czyści dane w PostgreSQL, zostawia znacznik blokujący ponowne

@@ -1,1 +1,1 @@
-export { default } from '../../src/WelcomeScreen';
+export { default } from '../../src/GuestWelcomeScreen';

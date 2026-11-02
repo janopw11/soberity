@@ -198,5 +198,35 @@
     "polish": "Polski",
     "errorTitle": "Preferences not saved",
     "errorMessage": "Your display preference could not be loaded or saved. Please try again."
+  },
+  "home": {
+    "welcome": "Welcome to Soberity",
+    "intro": "A little curiosity. A fresh perspective. More to life without alcohol.",
+    "latest": "Latest news",
+    "previewNotice": "Preview feed · Sample articles and dates, not published research.",
+    "editorial": "Soberity editorial",
+    "kinds": {
+      "research": "Research overview",
+      "article": "Article"
+    },
+    "stories": {
+      "sleep": {
+        "title": "Alcohol and sleep: beyond the bedtime story",
+        "summary": "A closer look at the questions researchers ask about sleep, rest and alcohol."
+      },
+      "evidence": {
+        "title": "What makes a study worth your attention?",
+        "summary": "From study design to uncertainty: a guide to reading the evidence with a curious mind."
+      },
+      "habits": {
+        "title": "Making room for an alcohol-free routine",
+        "summary": "An exploration of everyday rituals, small experiments and finding what works for you."
+      },
+      "headlines": {
+        "title": "Behind the headline: reading research in context",
+        "summary": "Looking past a striking title to the methods, the population and the unanswered questions."
+      }
+    },
+    "readTime": "{{count}} min read"
   }
 }

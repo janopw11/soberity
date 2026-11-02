@@ -1,54 +1,86 @@
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { spacing, typography } from '@soberity/design-tokens';
 
-import { radii, spacing, typography } from '@soberity/design-tokens';
-
-import { Button, Screen } from './ui';
+import { Screen } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
+import { ArticleIllustration } from './news/ArticleIllustration';
+import { previewArticles } from './news/previewArticles';
 
-/** Guest landing; `signedIn` renders the same Main page without auth prompts. */
-export default function WelcomeScreen({
-  signedIn = false,
-}: {
-  signedIn?: boolean;
-}) {
-  const { t } = useTranslation();
-  const router = useRouter();
+/** Member-only home, mounted by the authenticated route group. */
+export default function WelcomeScreen() {
+  const { t, i18n } = useTranslation();
   const { colors } = useThemePreferences();
+  const { width, fontScale } = useWindowDimensions();
   const styles = createStyles(colors);
+  const thumbnailSize = width < 380 ? 80 : width < 600 ? 96 : 112;
+  const showIllustrations = width >= 340 && fontScale < 1.6;
+  const dateFormat = new Intl.DateTimeFormat(
+    i18n.resolvedLanguage === 'pl' ? 'pl-PL' : 'en-GB',
+    {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    },
+  );
 
   return (
-    <Screen>
-      <Text style={styles.eyebrow}>{t('welcome.eyebrow')}</Text>
-      <Text accessibilityRole="header" style={styles.title}>
-        {t('welcome.title')}
-      </Text>
-      <Text style={styles.intro}>{t('welcome.intro')}</Text>
+    <Screen maxWidth={800}>
+      <View style={styles.welcome}>
+        <Text accessibilityRole="header" style={styles.welcomeTitle}>
+          {t('home.welcome')}
+        </Text>
+      </View>
 
-      {signedIn ? null : (
-        <>
-          <View style={styles.actions}>
-            <Button
-              label={t('welcome.signInButton')}
-              onPress={() => router.push('/sign-in')}
-              testID="welcome-sign-in"
-            />
-            <Button
-              label={t('welcome.signUpButton')}
-              variant="secondary"
-              onPress={() => router.push('/sign-up')}
-              testID="welcome-sign-up"
-            />
+      <View>
+        <View style={styles.feedHeader}>
+          <Text accessibilityRole="header" style={styles.sectionTitle}>
+            {t('home.latest')}
+          </Text>
+        </View>
+        {previewArticles.map((article) => (
+          <View
+            key={article.id}
+            style={styles.article}
+            testID={`news-${article.id}`}
+          >
+            <View style={styles.byline}>
+              <View accessible={false} style={styles.editorMark}>
+                <Text style={styles.editorInitial}>S</Text>
+              </View>
+              <Text style={styles.meta}>
+                {t('home.editorial')} ·{' '}
+                {dateFormat.format(new Date(`${article.date}T12:00:00Z`))}
+              </Text>
+            </View>
+            <View style={styles.articleBody}>
+              <View style={styles.articleText}>
+                <Text accessibilityRole="header" style={styles.articleTitle}>
+                  {t(`home.stories.${article.id}.title`)}
+                </Text>
+                <Text style={styles.body}>
+                  {t(`home.stories.${article.id}.summary`)}
+                </Text>
+              </View>
+              {showIllustrations ? (
+                <View
+                  style={styles.illustration}
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  <ArticleIllustration
+                    topic={article.id}
+                    size={thumbnailSize}
+                  />
+                </View>
+              ) : null}
+            </View>
+            <Text style={styles.meta}>
+              {t(`home.kinds.${article.kind}`)} ·{' '}
+              {t('home.readTime', { count: article.minutes })}
+            </Text>
           </View>
-
-          <View style={styles.notice}>
-            <Text style={styles.noticeTitle}>{t('welcome.previewTitle')}</Text>
-            <Text style={styles.body}>{t('welcome.previewBody')}</Text>
-          </View>
-        </>
-      )}
-
+        ))}
+      </View>
       <Text style={styles.footer}>{t('welcome.footer')}</Text>
     </Screen>
   );
@@ -58,48 +90,49 @@ function createStyles(
   colors: ReturnType<typeof useThemePreferences>['colors'],
 ) {
   return StyleSheet.create({
-    eyebrow: {
-      color: colors.textSecondary,
-      fontSize: typography.label.fontSize,
-      fontWeight: typography.label.fontWeight,
-      letterSpacing: 1.5,
-    },
-    title: {
-      color: colors.textPrimary,
-      fontSize: typography.display.fontSize,
-      lineHeight: typography.display.lineHeight,
-      fontWeight: typography.display.fontWeight,
-    },
-    intro: {
-      color: colors.textSecondary,
-      fontSize: typography.h3.fontSize,
-      lineHeight: typography.h3.lineHeight + 4,
-      maxWidth: 640,
-    },
-    actions: {
-      gap: spacing.space12,
-      maxWidth: 420,
-    },
-    notice: {
-      backgroundColor: colors.surfaceAlt,
-      borderRadius: radii.lg,
-      padding: spacing.space16,
+    welcome: { gap: spacing.space8, paddingTop: spacing.space16 },
+    welcomeTitle: { ...typography.h2, color: colors.primary },
+    body: { ...typography.body, color: colors.textSecondary },
+    feedHeader: {
       gap: spacing.space8,
+      paddingBottom: spacing.space24,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
     },
-    noticeTitle: {
-      color: colors.textPrimary,
-      fontSize: typography.bodyStrong.fontSize,
-      fontWeight: typography.bodyStrong.fontWeight,
+    sectionTitle: { ...typography.h3, color: colors.primary },
+    article: {
+      gap: spacing.space16,
+      paddingVertical: spacing.space24,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
     },
-    body: {
-      color: colors.textSecondary,
-      fontSize: typography.body.fontSize,
-      lineHeight: typography.body.lineHeight,
+    byline: { flexDirection: 'row', alignItems: 'center', gap: spacing.space8 },
+    editorMark: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: colors.surfaceAlt,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
+    editorInitial: {
+      ...typography.caption,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    meta: { ...typography.small, color: colors.textMuted, flexShrink: 1 },
+    articleBody: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.space16,
+    },
+    articleText: { flex: 1, minWidth: 0, gap: spacing.space8 },
+    articleTitle: { ...typography.h3, color: colors.textPrimary },
+    illustration: { flexShrink: 0, paddingTop: spacing.space4 },
     footer: {
-      color: colors.textSecondary,
-      fontSize: typography.small.fontSize,
-      lineHeight: typography.small.lineHeight,
+      ...typography.small,
+      color: colors.textMuted,
+      paddingBottom: spacing.space16,
     },
   });
 }

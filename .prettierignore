@@ -18,3 +18,7 @@ coverage/
 # Local agent instructions are not application sources.
 .agents/
 .codex/
+
+# Generated browser test artifacts
+**/test-results/
+**/playwright-report/

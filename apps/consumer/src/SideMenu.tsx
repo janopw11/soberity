@@ -44,6 +44,7 @@ export default function SideMenu() {
       style={styles.toggle}
     >
       <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
         source={require('../assets/images/menu-icon.png')}
         style={styles.menuIcon}
         resizeMode="contain"
