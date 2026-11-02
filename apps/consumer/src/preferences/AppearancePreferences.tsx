@@ -16,19 +16,38 @@ import {
 } from '@soberity/design-tokens';
 
 import type { SupportedLanguage } from '../i18n';
+import { useAuthStatus } from '../auth/AuthStatusContext';
+import { setAccountLanguage } from '../profile/accountLanguage';
 import { Alert } from '../ui/Alert';
 import { useThemePreferences } from './ThemePreferencesContext';
 
 export function AppearancePreferences() {
   const { t } = useTranslation();
-  const { theme, colors, language, error, ready, setTheme, setLanguage } =
-    useThemePreferences();
+  const {
+    theme,
+    colors,
+    language,
+    error,
+    ready,
+    setTheme,
+    setLanguage,
+    applyLanguage,
+  } = useThemePreferences();
+  const { status, user, getIdToken } = useAuthStatus();
   const styles = createStyles(colors);
 
   const chooseTheme = (value: ColorScheme) => {
     void setTheme(value);
   };
   const chooseLanguage = (value: SupportedLanguage) => {
+    // Signed-in users change their account language; guests keep the device choice.
+    if (status === 'authenticated' && user) {
+      void setAccountLanguage(
+        { uid: user.uid, getToken: getIdToken, applyLanguage },
+        value,
+      );
+      return;
+    }
     void setLanguage(value);
   };
 

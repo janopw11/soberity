@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text } from 'react-native';
@@ -36,6 +37,12 @@ export default function AccountScreen() {
             {t('account.signedInAs', { email: user.email })}
           </Text>
         ) : null}
+        <Button
+          label={t('account.editProfileButton')}
+          variant="secondary"
+          onPress={() => router.push('/profile')}
+          testID="account-edit-profile"
+        />
         <Button
           label={t('account.signOutButton')}
           variant="secondary"

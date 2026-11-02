@@ -31,7 +31,15 @@ type ThemePreferences = {
   error: PreferenceError;
   setTheme: (theme: ColorScheme) => Promise<void>;
   setLanguage: (language: SupportedLanguage) => Promise<void>;
+  /** Changes the UI language without saving it as the guest choice (used for account languages). */
+  applyLanguage: (language: SupportedLanguage) => Promise<void>;
 };
+
+/** Returns the language the guest explicitly chose on this device, or null when none was chosen. */
+export async function readGuestLanguageChoice(): Promise<SupportedLanguage | null> {
+  const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return isSupportedLanguage(stored) ? stored : null;
+}
 
 const ThemePreferencesContext = createContext<ThemePreferences | null>(null);
 
@@ -118,6 +126,14 @@ export function ThemePreferencesProvider({ children }: PropsWithChildren) {
     [i18n],
   );
 
+  const applyLanguage = useCallback(
+    async (nextLanguage: SupportedLanguage) => {
+      await i18n.changeLanguage(nextLanguage);
+      setLanguageState(nextLanguage);
+    },
+    [i18n],
+  );
+
   const value = useMemo(
     () => ({
       theme,
@@ -127,8 +143,9 @@ export function ThemePreferencesProvider({ children }: PropsWithChildren) {
       error,
       setTheme,
       setLanguage,
+      applyLanguage,
     }),
-    [theme, language, ready, error, setTheme, setLanguage],
+    [theme, language, ready, error, setTheme, setLanguage, applyLanguage],
   );
 
   return (

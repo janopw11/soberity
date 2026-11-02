@@ -42,6 +42,8 @@ type AuthStatusContextValue = AuthState & {
   signOut: () => Promise<void>;
   /** Re-checks the current session with the backend (used after `offline`). */
   retry: () => Promise<void>;
+  /** Current Firebase ID token (refreshed by the SDK when needed) for backend calls. */
+  getIdToken: () => Promise<string | null>;
 };
 
 const AuthStatusContext = createContext<AuthStatusContextValue | null>(null);
@@ -166,6 +168,8 @@ export function AuthStatusProvider({
     [resolveSession],
   );
 
+  const getIdToken = useCallback(() => adapter.getIdToken(), [adapter]);
+
   const value = useMemo<AuthStatusContextValue>(
     () => ({
       ...state,
@@ -179,6 +183,7 @@ export function AuthStatusProvider({
       confirmPasswordReset,
       signOut,
       retry,
+      getIdToken,
     }),
     [
       state,

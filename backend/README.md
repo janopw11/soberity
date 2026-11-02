@@ -8,6 +8,11 @@ Endpointy (P0-I04):
 
 - `GET /actuator/health/liveness` i `/actuator/health/readiness` — publiczne.
 - `GET /v3/api-docs` oraz Swagger UI — publiczne poza profilem `production`.
+- `/api/v1/me` — wymaga zweryfikowanego e-maila; `POST` tworzy lub zwraca profil
+  (P0-I09), `GET` i `PATCH` czytają/zmieniają profil właściciela tokena. Pola:
+  `displayName` (do 50 znaków), `city` (do 100), `interests`
+  (`science`, `sport`, `events`, `community`), `locale` (`en`/`pl`). Nieznane
+  pola w body są ignorowane, a niepoprawne wartości dają 400.
 - `/api/v1/**` — wymaga uwierzytelnienia; bez tokena zwraca 401 w formacie
   `application/problem+json`. Weryfikacja Firebase ID tokenów to P0-I05.
 

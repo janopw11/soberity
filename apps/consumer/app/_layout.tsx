@@ -7,6 +7,7 @@ import {
   AuthStatusProvider,
   useAuthStatus,
 } from '../src/auth/AuthStatusContext';
+import { useAccountLanguageSync } from '../src/profile/useAccountLanguage';
 import OfflineScreen from '../src/OfflineScreen';
 import {
   ThemePreferencesProvider,
@@ -23,6 +24,7 @@ function RootNavigator() {
   const { status } = useAuthStatus();
   const { t } = useTranslation();
   const { colors, theme } = useThemePreferences();
+  useAccountLanguageSync();
 
   if (status === 'loading') {
     return <LoadingState label={t('auth.checkingSession')} />;

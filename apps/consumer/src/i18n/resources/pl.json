@@ -28,6 +28,7 @@
     "badge": "Zalogowano",
     "description": "Ustawienia profilu zostaną dodane później.",
     "signedInAs": "Zalogowano jako {{email}}",
+    "editProfileButton": "Edytuj profil",
     "signOutButton": "Wyloguj się"
   },
   "auth": {
@@ -128,6 +129,30 @@
     "successDescription": "Twoje hasło zostało zmienione.",
     "successMessage": "Możesz się teraz zalogować nowym hasłem.",
     "signInButton": "Przejdź do logowania"
+  },
+  "profile": {
+    "title": "Twój profil",
+    "intro": "Wybierz, jak Soberity pokazuje Twoje konto. Imię i miasto są opcjonalne.",
+    "loading": "Wczytujemy Twój profil…",
+    "saved": "Profil zapisany.",
+    "saveButton": "Zapisz profil",
+    "displayNameLabel": "Nazwa wyświetlana",
+    "displayNameHelper": "Do 50 znaków. Zostaw puste, aby ją usunąć.",
+    "cityLabel": "Miasto",
+    "languageLabel": "Język",
+    "localeSaved": "Język zapisany na Twoim koncie.",
+    "localePending": "Język zmieniono na tym urządzeniu, ale nie zapisano go jeszcze na koncie. Zostanie wysłany ponownie przy następnym logowaniu.",
+    "localePendingHint": "Oczekuje na zapis na koncie.",
+    "interestsLabel": "Zainteresowania",
+    "interest": {
+      "science": "Nauka",
+      "sport": "Sport",
+      "events": "Wydarzenia",
+      "community": "Społeczność"
+    },
+    "loadErrorTitle": "Profil niedostępny",
+    "loadErrorMessage": "Nie udało się wczytać profilu. Sprawdź połączenie i spróbuj ponownie.",
+    "retry": "Spróbuj ponownie"
   },
   "notFound": {
     "title": "Nie znaleziono strony",

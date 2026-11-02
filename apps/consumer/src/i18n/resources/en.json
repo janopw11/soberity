@@ -28,6 +28,7 @@
     "badge": "Signed in",
     "description": "Profile settings will be added later.",
     "signedInAs": "Signed in as {{email}}",
+    "editProfileButton": "Edit profile",
     "signOutButton": "Sign out"
   },
   "auth": {
@@ -128,6 +129,30 @@
     "successDescription": "Your password has been changed.",
     "successMessage": "You can now sign in with your new password.",
     "signInButton": "Go to sign in"
+  },
+  "profile": {
+    "title": "Your profile",
+    "intro": "Choose how Soberity shows your account. Your name and city are optional.",
+    "loading": "Loading your profile…",
+    "saved": "Profile saved.",
+    "saveButton": "Save profile",
+    "displayNameLabel": "Display name",
+    "displayNameHelper": "Up to 50 characters. Leave empty to remove it.",
+    "cityLabel": "City",
+    "languageLabel": "Language",
+    "localeSaved": "Language saved to your account.",
+    "localePending": "Language changed on this device, but not yet saved to your account. It will be sent again the next time you sign in.",
+    "localePendingHint": "Waiting to be saved to your account.",
+    "interestsLabel": "Interests",
+    "interest": {
+      "science": "Science",
+      "sport": "Sport",
+      "events": "Events",
+      "community": "Community"
+    },
+    "loadErrorTitle": "Profile unavailable",
+    "loadErrorMessage": "We couldn't load your profile. Check your connection and try again.",
+    "retry": "Try again"
   },
   "notFound": {
     "title": "Page not found",

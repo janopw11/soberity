@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 8/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 9/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **8/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07 i P0-I08 DONE).
+**Łącznie:** 79 iteracji agentowych; wykonane: **9/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08 i P0-I09 DONE).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -405,31 +405,31 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I09 — Profile sync & self-service editing
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-11-02  
+**Finished:** 2026-11-02  
 **Zależności iteracji:** P0-I04, P0-I06  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** backend: migracja `V2__extend_user_profile.sql` (display_name, city, interests z CHECK), `ProfileService` (provisioning z obsługą wyścigu, PATCH tylko wskazanych pól, właściciel wyłącznie z tokena), `ProfileController` (`POST/GET/PATCH /api/v1/me`, 400 dla niepoprawnych wartości, 404 dla braku profilu), `ProfileApiIT` (9 testów: 401/403, trwałość po ponownym odczycie, ACL dwóch użytkowników, uid/role w body ignorowane, pierwszeństwo konta nad wyborem gościa, 400). `./mvnw --batch-mode clean verify` PASS (3 unit + 30 IT). Klient: `src/profile/` (`profileApi.ts`, `accountLocale.ts` z kluczem per UID, `accountLanguage.ts` z oczekującym zapisem, `useAccountLanguage.ts`), `ProfileScreen.tsx` i trasa `/profile`, zmiana języka w menu dla konta, `accountLanguage.test.ts` (7 testów). `pnpm check` PASS; Jest 53/53 PASS; eksport web PASS.  
+**Blokery:** brak. Właściciel zaakceptował V02 i V03 (2026-11-02). Kontrole iOS/Android pozostają NOT VERIFIED i nie są częścią tej akceptacji.
 
 **Zakres zadań:**
 
-- [ ] `P0-I09-T01` Dodaj bezpieczne provisioning/upsert profilu powiązanego z Firebase UID.
-- [ ] `P0-I09-T02` Zaimplementuj GET/PATCH /api/v1/me (allowed fields only).
-- [ ] `P0-I09-T03` Utwórz ekrany profilu i edycji preferencji, miasta, displayName, języka i zainteresowań.
-- [ ] `P0-I09-T04` Rozdziel pola własne Firebase i dane PostgreSQL.
-- [ ] `P0-I09-T05` Udostępnij preferencję `locale` z PostgreSQL w GET/PATCH `/api/v1/me`. Ręczny wybór EN/PL zapisuj wyłącznie we własnym profilu, po weryfikacji Firebase ID tokenu; nie w Firebase jako źródle prawdy. Backend waliduje wspieraną listę (`en`/`pl` na start), odrzuca niepoprawny kod jako 400 i nie pozwala podmieniać UID/roli.
-- [ ] `P0-I09-T06` Po ręcznej zmianie przełącz UI bez restartu i zapisz wybór w profilu oraz lokalnym cache przypisanym do konta. Po logowaniu/odczycie profilu stosuj zapisany język ponad językiem urządzenia i ustawieniem gościa; odczytuj go ponownie przy kolejnym uruchomieniu/logowaniu, aby wybór działał między urządzeniami. Zmiana języka urządzenia nie nadpisuje istniejącego `locale`.
-- [ ] `P0-I09-T07` Obsłuż gościa, brak `locale`, offline i błędy zapisu zgodnie z zasadami poniżej. Przy tworzeniu profilu można przenieść jawny wybór gościa tylko do nowego profilu bez preferencji; istniejąca preferencja konta ma pierwszeństwo. Nie zapisuj automatycznie wykrytego języka jako ręcznego wyboru.
+- [x] `P0-I09-T01` Dodaj bezpieczne provisioning/upsert profilu powiązanego z Firebase UID.
+- [x] `P0-I09-T02` Zaimplementuj GET/PATCH /api/v1/me (allowed fields only).
+- [x] `P0-I09-T03` Utwórz ekrany profilu i edycji preferencji, miasta, displayName, języka i zainteresowań.
+- [x] `P0-I09-T04` Rozdziel pola własne Firebase i dane PostgreSQL.
+- [x] `P0-I09-T05` Udostępnij preferencję `locale` z PostgreSQL w GET/PATCH `/api/v1/me`. Ręczny wybór EN/PL zapisuj wyłącznie we własnym profilu, po weryfikacji Firebase ID tokenu; nie w Firebase jako źródle prawdy. Backend waliduje wspieraną listę (`en`/`pl` na start), odrzuca niepoprawny kod jako 400 i nie pozwala podmieniać UID/roli.
+- [x] `P0-I09-T06` Po ręcznej zmianie przełącz UI bez restartu i zapisz wybór w profilu oraz lokalnym cache przypisanym do konta. Po logowaniu/odczycie profilu stosuj zapisany język ponad językiem urządzenia i ustawieniem gościa; odczytuj go ponownie przy kolejnym uruchomieniu/logowaniu, aby wybór działał między urządzeniami. Zmiana języka urządzenia nie nadpisuje istniejącego `locale`.
+- [x] `P0-I09-T07` Obsłuż gościa, brak `locale`, offline i błędy zapisu zgodnie z zasadami poniżej. Przy tworzeniu profilu można przenieść jawny wybór gościa tylko do nowego profilu bez preferencji; istniejąca preferencja konta ma pierwszeństwo. Nie zapisuj automatycznie wykrytego języka jako ręcznego wyboru.
 
 
 **Weryfikacja:**
 
-- [ ] `P0-I09-V01` Testy ACL: dwaj użytkownicy nie widzą ani nie edytują cudzych danych.
-- [ ] `P0-I09-V02` Testuj po ponownym zalogowaniu trwałość profilu.
-- [ ] `P0-I09-V03` Testuj ręczną zmianę EN↔PL: natychmiastowy UI, PATCH, odczyt z PostgreSQL po reload/restart/ponownym logowaniu oraz na drugim urządzeniu z innym językiem systemu. Zweryfikuj na web/iOS/Android; niewykonane kontrole pozostają NOT VERIFIED.
-- [ ] `P0-I09-V04` Testuj brak preferencji, gościa i przeniesienie jego jawnego wyboru do nowego profilu, pierwszeństwo istniejącego profilu nad ustawieniem gościa, brakujące tłumaczenia, niepoprawne `locale` (400), brak autoryzacji i odmowę edycji cudzego języka.
-- [ ] `P0-I09-V05` Testuj offline/błąd PATCH: lokalna zmiana nie jest fałszywie potwierdzona jako zapisana na koncie, retry nie dotyka innego użytkownika, a logout/zmiana konta nie przenosi cache ani oczekującego zapisu między kontami.
+- [x] `P0-I09-V01` Testy ACL: dwaj użytkownicy nie widzą ani nie edytują cudzych danych. (`ProfileApiIT`.)
+- [x] `P0-I09-V02` Testuj po ponownym zalogowaniu trwałość profilu. (Ręcznie zaakceptowane przez właściciela 2026-11-02; backend: odczyt z PostgreSQL w `ProfileApiIT`.)
+- [x] `P0-I09-V03` Testuj ręczną zmianę EN↔PL: natychmiastowy UI, PATCH, odczyt z PostgreSQL po reload/restart/ponownym logowaniu oraz na drugim urządzeniu z innym językiem systemu. Zweryfikuj na web/iOS/Android; niewykonane kontrole pozostają NOT VERIFIED. (Zaakceptowane przez właściciela 2026-11-02 na web; iOS/Android NOT VERIFIED.)
+- [x] `P0-I09-V04` Testuj brak preferencji, gościa i przeniesienie jego jawnego wyboru do nowego profilu, pierwszeństwo istniejącego profilu nad ustawieniem gościa, brakujące tłumaczenia, niepoprawne `locale` (400), brak autoryzacji i odmowę edycji cudzego języka. (`ProfileApiIT`, `accountLanguage.test.ts`, parzystość kluczy i18n.)
+- [x] `P0-I09-V05` Testuj offline/błąd PATCH: lokalna zmiana nie jest fałszywie potwierdzona jako zapisana na koncie, retry nie dotyka innego użytkownika, a logout/zmiana konta nie przenosi cache ani oczekującego zapisu między kontami. (`accountLanguage.test.ts`; ręczny test offline na urządzeniu nadal do wykonania.)
 
 
 **Uzgodnione zasady języka (2026-11-01):**
@@ -2231,4 +2231,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-01 | P0-I03A — wdrożenie motywów i preferencji | T04 wdrożone, V01 zweryfikowane; iteracja IN_PROGRESS | Tokeny semantyczne dwóch motywów, provider i ustawienia dostępnego wyboru motywu oraz EN/PL z lokalnym zapisem; dostosowane istniejące ekrany/menu i wspólne komponenty; uzupełniono lokalny `docs/BRANDING.md`. `pnpm run check` PASS; Jest 7/7 suites, 17/17 PASS; Playwright 12/12 PASS przed zmianą klawiaturową, następnie ukierunkowane preferencje desktop/mobile-web 2/2 PASS; referencja 8 wariantów PASS; web export PASS; iOS Simulator build/install PASS. | Android prebuild PASS; instalacja NDK 27.1.12297006 nie została ukończona: pierwsza próba zatrzymana przy 535 MiB, druga pobrała 136 MiB po odzyskaniu miejsca i została zatrzymana przed końcem. Dokończyć instalację NDK i ponowić build/eksport. VoiceOver/TalkBack, duży font i pełny runtime natywny NOT VERIFIED; V02/V03 pozostają otwarte, P0-I04 nie rozpoczęto. |
 | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |
 | 2026-11-02 | P0-I07 | DONE; T01–T05, V01 (poprawny i wygasły link, ponowne wysłanie, token) i V02 zweryfikowane | `apps/consumer/src/auth/authAdapter.ts`, `AuthStatusContext.tsx`, `VerificationPendingScreen.tsx`, `VerifyEmailScreen.tsx` + trasa `app/verify-email.tsx`, `SignUpScreen.tsx` (przejście do oczekiwania), tłumaczenia EN/PL, README i `.env.example`. `pnpm check` PASS; Jest 41/41 PASS; eksport web PASS; backend `./mvnw test` PASS. Ręczna weryfikacja właściciela na web (dev `soberity-f9e4b`): mail z kodem, potwierdzenie linkiem, logowanie. | Brak blokerów dla P0-I07 w zakresie web. Smoke test iOS/Android NOT VERIFIED. Następna iteracja P0-I08 wyłącznie po poleceniu. |
+| 2026-11-02 | P0-I09 | DONE; T01–T07 i V01–V05 zweryfikowane (V02/V03 zaakceptowane przez właściciela na web) | Backend: `V2__extend_user_profile.sql`, `ProfileService`, `ProfileController`, `ProfileApiIT`. Klient: `src/profile/*`, `ProfileScreen`, trasa `(authenticated)/profile`, zmiana języka konta w menu, EN/PL. `./mvnw clean verify` PASS (3 unit + 30 IT); `pnpm check` PASS; Jest 53/53; eksport web PASS. | iOS/Android NOT VERIFIED (poza zakresem akceptacji). Następna P0-I10 wyłącznie po poleceniu. |
 | 2026-11-02 | P0-I08 | DONE; T01–T04 i V01–V02 zweryfikowane ręcznie (web/localhost) | `authAdapter.ts`, `AuthStatusContext.tsx`, `ForgotPasswordScreen.tsx`, `ResetPasswordScreen.tsx`, trasy `(public)/forgot-password` i `reset-password`, link na logowaniu, EN/PL, `authAdapter.test.ts`, testy kontekstu. `pnpm check` PASS; Jest 46/46 PASS; eksport web PASS; ręcznie: mail resetu, reset na stronie Firebase, `/reset-password?oobCode=…`, przywrócenie sesji po odświeżeniu, wylogowanie, wygasły/zużyty kod. | Hosted domain i action URL w konsoli NOT VERIFIED (nie wymagane na localhost); iOS/Android poza zakresem. Następna iteracja P0-I09 wyłącznie po poleceniu. |

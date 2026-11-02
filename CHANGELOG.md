@@ -2,6 +2,12 @@
 
 ## 2026-11-02
 
+- P0-I09 (DONE 2026-11-02): profil konta w PostgreSQL powiązany z Firebase UID,
+  endpointy `/api/v1/me` z ACL po tokenie, język konta zapisywany w profilu i
+  stosowany po logowaniu, oczekujący zapis nieraportowany jako zapisany. Właściciel
+  zaakceptował trwałość po ponownym logowaniu oraz zmianę EN↔PL na web i na drugim
+  urządzeniu. `./mvnw clean verify` (3 unit + 30 IT), `pnpm check`, Jest 53/53 i
+  eksport web PASS. iOS/Android NOT VERIFIED.
 - P0-I08 (DONE 2026-11-02): reset hasła na localhost. Właściciel potwierdził
   pełny przepływ przez mail i stronę Firebase, obsługę `oobCode` w
   `/reset-password`, przywrócenie sesji po odświeżeniu, wylogowanie oraz komunikat
