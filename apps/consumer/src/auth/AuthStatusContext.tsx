@@ -30,6 +30,11 @@ type AuthState = {
   user: AuthUser | null;
 };
 
+type AccountActions = Pick<
+  AuthAdapter,
+  'reauthenticate' | 'updatePassword' | 'verifyNewEmail' | 'deleteUser'
+>;
+
 type AuthStatusContextValue = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
@@ -44,6 +49,8 @@ type AuthStatusContextValue = AuthState & {
   retry: () => Promise<void>;
   /** Current Firebase ID token (refreshed by the SDK when needed) for backend calls. */
   getIdToken: () => Promise<string | null>;
+  /** Sensitive account operations; each one re-checks the password where Firebase requires it. */
+  accountActions: AccountActions;
 };
 
 const AuthStatusContext = createContext<AuthStatusContextValue | null>(null);
@@ -169,6 +176,15 @@ export function AuthStatusProvider({
   );
 
   const getIdToken = useCallback(() => adapter.getIdToken(), [adapter]);
+  const accountActions = useMemo<AccountActions>(
+    () => ({
+      reauthenticate: (password) => adapter.reauthenticate(password),
+      updatePassword: (password) => adapter.updatePassword(password),
+      verifyNewEmail: (email) => adapter.verifyNewEmail(email),
+      deleteUser: () => adapter.deleteUser(),
+    }),
+    [adapter],
+  );
 
   const value = useMemo<AuthStatusContextValue>(
     () => ({
@@ -184,6 +200,7 @@ export function AuthStatusProvider({
       signOut,
       retry,
       getIdToken,
+      accountActions,
     }),
     [
       state,
@@ -197,6 +214,8 @@ export function AuthStatusProvider({
       confirmPasswordReset,
       signOut,
       retry,
+      getIdToken,
+      accountActions,
     ],
   );
 

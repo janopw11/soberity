@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 9/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 10/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **9/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08 i P0-I09 DONE).
+**Łącznie:** 79 iteracji agentowych; wykonane: **10/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -444,24 +444,26 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I10 — Sensitive account settings & deletion
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE  
+**Started:** 2026-11-02  
+**Finished:** 2026-11-02  
 **Zależności iteracji:** P0-I07, P0-I08, P0-I09  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** backend: migracja `V3__create_deleted_account.sql`, encja `DeletedAccount` (znacznik usunięcia), `ProfileService.deleteOwnAccount` (idempotentne, blokuje ponowne utworzenie profilu przy 409), `DELETE /api/v1/me` (204); `ProfileApiIT` (12 testów, w tym usunięcie, 404/409 po usunięciu, brak wpływu na inne konto, 401). `./mvnw --batch-mode clean verify` PASS (3 unit + 33 IT). Klient: `auth/authAdapter.ts` (reauth, updatePassword, verifyBeforeUpdateEmail, deleteUser), `account/accountSecurity.ts` (kolejność: reauth → znacznik „w toku” → dane backendu → konto Firebase → sprzątanie lokalne; wznawianie), `account/accountSecurity.test.ts` (7 testów: stara sesja, błędne hasło, błąd backendu, błąd Firebase i wznowienie), `AccountSettingsScreen.tsx` i trasa `(authenticated)/settings`, EN/PL. `pnpm check` PASS; Jest 60/60 PASS; eksport web PASS. Ręczna weryfikacja właściciela 2026-11-02 na koncie testowym (dev): zmiana hasła, zmiana e-maila i usunięcie konta działają; dane po usunięciu niedostępne (V02 zaakceptowane przez właściciela).  
+**Blokery:** brak. iOS/Android NOT VERIFIED (poza zakresem zaakceptowanych kontroli).
 
 **Zakres zadań:**
 
-- [ ] `P0-I10-T01` Dodaj zmianę hasła z recent login / reautoryzacją.
-- [ ] `P0-I10-T02` Dodaj zmianę e-maila z weryfikacją nowego adresu i spójną synchronizacją.
-- [ ] `P0-I10-T03` Zaimplementuj bezpieczną procedurę usunięcia konta Firebase + dane aplikacyjne z retry/reconciliation.
-- [ ] `P0-I10-T04` Dodaj ekran ustawień konta, ostrzeżenia i potwierdzenia.
+- [x] `P0-I10-T01` Dodaj zmianę hasła z recent login / reautoryzacją.
+- [x] `P0-I10-T02` Dodaj zmianę e-maila z weryfikacją nowego adresu i spójną synchronizacją. (E-mail trzyma tylko Firebase; PostgreSQL go nie przechowuje, więc nie ma rozjazdu.)
+- [x] `P0-I10-T03` Zaimplementuj bezpieczną procedurę usunięcia konta Firebase + dane aplikacyjne z retry/reconciliation.
+- [x] `P0-I10-T04` Dodaj ekran ustawień konta, ostrzeżenia i potwierdzenia.
 
 **Weryfikacja:**
 
-- [ ] `P0-I10-V01` Testuj reauth, odmowę przy starej sesji, anulowania i błędy częściowe.
-- [ ] `P0-I10-V02` Testuj, że dane po usunięciu nie są dostępne.
+- [x] `P0-I10-V01` Testuj reauth, odmowę przy starej sesji, anulowania i błędy częściowe. (Właściciel potwierdził zmianę hasła i e-maila; odmowa przy starej sesji, błędy i wznowienie pokryte `accountSecurity.test.ts`.)
+- [x] `P0-I10-V02` Testuj, że dane po usunięciu nie są dostępne. (Backend: `ProfileApiIT` 404/409; właściciel zaakceptował 2026-11-02.)
+
+
 
 **Definition of Done:** Operacje wrażliwe mają poprawne zabezpieczenia i nie pozostawiają niekontrolowanego stanu. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2232,4 +2234,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | 2026-11-01 | P0-I06 | DONE; T01–T05, V01, V02 (web) i V03 zweryfikowane | `apps/consumer/src/auth/*` (Firebase web/native, `AuthStatusContext` z realnym stanem, `identityApi` → `/api/v1/identity/me`, walidacja, mapowanie błędów, offline), ekrany sign-in/sign-up/offline/account, trasy `(public)`, tłumaczenia EN/PL (klucze zgodne), `.env.example` z placeholderami. `pnpm run check` PASS; Jest 9/9 suites, 40/40 PASS; web export PASS. Brak: konfiguracja Firebase web i konto dev (V02), iOS/Android (V03). Polityka hasła 8 znaków wymaga akceptacji właściciela; sign-up nie wysyła e-maila weryfikacyjnego (P0-I07). | V03 na iOS Simulatorze i Android Emulatorze; po wynikach status DONE lub BLOCKED. P0-I07 nie rozpoczęto. |
 | 2026-11-02 | P0-I07 | DONE; T01–T05, V01 (poprawny i wygasły link, ponowne wysłanie, token) i V02 zweryfikowane | `apps/consumer/src/auth/authAdapter.ts`, `AuthStatusContext.tsx`, `VerificationPendingScreen.tsx`, `VerifyEmailScreen.tsx` + trasa `app/verify-email.tsx`, `SignUpScreen.tsx` (przejście do oczekiwania), tłumaczenia EN/PL, README i `.env.example`. `pnpm check` PASS; Jest 41/41 PASS; eksport web PASS; backend `./mvnw test` PASS. Ręczna weryfikacja właściciela na web (dev `soberity-f9e4b`): mail z kodem, potwierdzenie linkiem, logowanie. | Brak blokerów dla P0-I07 w zakresie web. Smoke test iOS/Android NOT VERIFIED. Następna iteracja P0-I08 wyłącznie po poleceniu. |
 | 2026-11-02 | P0-I09 | DONE; T01–T07 i V01–V05 zweryfikowane (V02/V03 zaakceptowane przez właściciela na web) | Backend: `V2__extend_user_profile.sql`, `ProfileService`, `ProfileController`, `ProfileApiIT`. Klient: `src/profile/*`, `ProfileScreen`, trasa `(authenticated)/profile`, zmiana języka konta w menu, EN/PL. `./mvnw clean verify` PASS (3 unit + 30 IT); `pnpm check` PASS; Jest 53/53; eksport web PASS. | iOS/Android NOT VERIFIED (poza zakresem akceptacji). Następna P0-I10 wyłącznie po poleceniu. |
+| 2026-11-02 | P0-I10 | DONE; T01–T04 i V01–V02 zweryfikowane (właściciel potwierdził zmianę hasła, e-maila i usunięcie konta na koncie testowym dev) | Backend: `V3__create_deleted_account.sql`, `DeletedAccount`, `ProfileService.deleteOwnAccount`, `DELETE /api/v1/me`, `ProfileApiIT` (12). Klient: `authAdapter.ts`, `account/accountSecurity.ts` + test (7), `AccountSettingsScreen.tsx`, trasa `settings`, EN/PL. `./mvnw clean verify` PASS (3 unit + 33 IT); `pnpm check` PASS; Jest 60/60; eksport web PASS. Ops: lokalny backend na 8090 był starym buildem sprzed P0-I09 (404 na `/api/v1/me`, „Profile unavailable”); zrestartowano z aktualnego jara, Postgres z `infra/compose` (port 5433). | iOS/Android NOT VERIFIED. Następna P0-I11 wyłącznie po poleceniu. |
 | 2026-11-02 | P0-I08 | DONE; T01–T04 i V01–V02 zweryfikowane ręcznie (web/localhost) | `authAdapter.ts`, `AuthStatusContext.tsx`, `ForgotPasswordScreen.tsx`, `ResetPasswordScreen.tsx`, trasy `(public)/forgot-password` i `reset-password`, link na logowaniu, EN/PL, `authAdapter.test.ts`, testy kontekstu. `pnpm check` PASS; Jest 46/46 PASS; eksport web PASS; ręcznie: mail resetu, reset na stronie Firebase, `/reset-password?oobCode=…`, przywrócenie sesji po odświeżeniu, wylogowanie, wygasły/zużyty kod. | Hosted domain i action URL w konsoli NOT VERIFIED (nie wymagane na localhost); iOS/Android poza zakresem. Następna iteracja P0-I09 wyłącznie po poleceniu. |

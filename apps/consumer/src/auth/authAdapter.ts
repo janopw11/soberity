@@ -2,12 +2,17 @@ import {
   applyActionCode,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  deleteUser,
+  EmailAuthProvider,
   onIdTokenChanged,
+  reauthenticateWithCredential,
   reload,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  updatePassword,
+  verifyBeforeUpdateEmail,
   verifyPasswordResetCode,
   type ActionCodeSettings,
 } from 'firebase/auth';
@@ -46,6 +51,13 @@ export type AuthAdapter = {
   /** Validates a reset code and returns the account e-mail it belongs to. */
   checkPasswordResetCode: (oobCode: string) => Promise<string>;
   confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<void>;
+  /** Re-checks the password of the signed-in account before a sensitive change (recent login). */
+  reauthenticate: (currentPassword: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
+  /** Sends a verification link to the new address; the e-mail changes only after it is opened. */
+  verifyNewEmail: (newEmail: string) => Promise<void>;
+  /** Removes the Firebase account of the signed-in user. */
+  deleteUser: () => Promise<void>;
   signOut: () => Promise<void>;
   /** Returns a fresh ID token; the SDK refreshes it when needed. */
   getIdToken: (forceRefresh?: boolean) => Promise<string | null>;
@@ -107,6 +119,23 @@ export const firebaseAuthAdapter: AuthAdapter = {
   async confirmPasswordReset(oobCode, newPassword) {
     await confirmPasswordReset(getFirebaseAuth(), oobCode, newPassword);
   },
+  async reauthenticate(currentPassword) {
+    const user = currentUser();
+    if (!user.email) throw new Error('The account has no e-mail address.');
+    await reauthenticateWithCredential(
+      user,
+      EmailAuthProvider.credential(user.email, currentPassword),
+    );
+  },
+  async updatePassword(newPassword) {
+    await updatePassword(currentUser(), newPassword);
+  },
+  async verifyNewEmail(newEmail) {
+    await verifyBeforeUpdateEmail(currentUser(), newEmail);
+  },
+  async deleteUser() {
+    await deleteUser(currentUser());
+  },
   async signOut() {
     await firebaseSignOut(getFirebaseAuth());
   },
@@ -122,4 +151,10 @@ function isFirebaseCode(error: unknown, code: string): boolean {
     'code' in error &&
     error.code === code
   );
+}
+
+function currentUser() {
+  const user = getFirebaseAuth().currentUser;
+  if (!user) throw new Error('No signed-in user.');
+  return user;
 }

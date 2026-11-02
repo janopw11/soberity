@@ -18,6 +18,7 @@ export default function AuthenticatedLayout() {
     >
       <Stack.Screen name="account" options={{ title: t('account.title') }} />
       <Stack.Screen name="profile" options={{ title: t('profile.title') }} />
+      <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
     </Stack>
   );
 }

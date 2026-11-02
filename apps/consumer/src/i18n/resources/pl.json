@@ -29,6 +29,7 @@
     "description": "Ustawienia profilu zostaną dodane później.",
     "signedInAs": "Zalogowano jako {{email}}",
     "editProfileButton": "Edytuj profil",
+    "settingsButton": "Ustawienia konta",
     "signOutButton": "Wyloguj się"
   },
   "auth": {
@@ -64,6 +65,7 @@
       "userDisabled": "To konto zostało wyłączone. Skontaktuj się z pomocą.",
       "invalidActionCode": "Ten link weryfikacyjny jest nieprawidłowy. Poproś o nowy.",
       "expiredActionCode": "Ten link weryfikacyjny wygasł. Poproś o nowy.",
+      "recentLogin": "Ze względów bezpieczeństwa potwierdź obecne hasło i spróbuj ponownie.",
       "network": "Nie udało się połączyć z Soberity. Sprawdź połączenie i spróbuj ponownie.",
       "notConfigured": "Konta nie są dostępne w tej wersji aplikacji.",
       "generic": "Coś poszło nie tak. Spróbuj ponownie."
@@ -153,6 +155,29 @@
     "loadErrorTitle": "Profil niedostępny",
     "loadErrorMessage": "Nie udało się wczytać profilu. Sprawdź połączenie i spróbuj ponownie.",
     "retry": "Spróbuj ponownie"
+  },
+  "settings": {
+    "title": "Ustawienia konta",
+    "passwordSection": "Zmiana hasła",
+    "currentPasswordLabel": "Obecne hasło",
+    "currentPasswordRequired": "Podaj obecne hasło, aby potwierdzić tę zmianę.",
+    "newPasswordLabel": "Nowe hasło",
+    "changePasswordButton": "Zmień hasło",
+    "passwordChanged": "Hasło zostało zmienione.",
+    "emailSection": "Zmiana e-maila",
+    "emailHelp": "Wyślemy link na nowy adres. E-mail zmieni się dopiero po otwarciu tego linku.",
+    "newEmailLabel": "Nowy e-mail",
+    "passwordToConfirmLabel": "Obecne hasło",
+    "changeEmailButton": "Wyślij link potwierdzający",
+    "emailLinkSent": "Wysłaliśmy link potwierdzający na nowy adres. Otwórz go, aby dokończyć zmianę.",
+    "deleteSection": "Usunięcie konta",
+    "deleteWarningTitle": "Tej operacji nie można cofnąć",
+    "deleteWarning": "Profil i logowanie zostaną trwale usunięte. Aby ponownie korzystać z Soberity, trzeba będzie założyć nowe konto.",
+    "deletePending": "Poprzednie usuwanie nie zostało dokończone. Potwierdź hasło, aby je dokończyć.",
+    "deleteConfirmLabel": "Rozumiem, że konto i dane zostaną usunięte",
+    "deleteConfirmRequired": "Potwierdź, że rozumiesz skutki usunięcia.",
+    "deleteButton": "Usuń moje konto",
+    "deleteResumeButton": "Dokończ usuwanie konta"
   },
   "notFound": {
     "title": "Nie znaleziono strony",

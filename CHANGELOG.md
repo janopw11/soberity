@@ -2,6 +2,17 @@
 
 ## 2026-11-02
 
+- P0-I10 (DONE 2026-11-02): ustawienia konta. Zmiana hasła i e-maila wymaga
+  ponownego potwierdzenia hasła; nowy e-mail obowiązuje po otwarciu linku.
+  Usunięcie czyści dane w PostgreSQL, zostawia znacznik blokujący ponowne
+  utworzenie profilu (`409`), potem usuwa konto Firebase; przerwane usunięcie
+  można dokończyć. Właściciel potwierdził działanie zmiany hasła, e-maila i
+  usunięcia konta oraz brak dostępu do danych po usunięciu. `./mvnw clean verify`
+  (3 unit + 33 IT), `pnpm check`, Jest 60/60 i eksport web PASS. iOS/Android NOT VERIFIED.
+- Naprawiono błąd „Profile unavailable” na ekranie profilu: lokalny backend na
+  porcie 8090 działał ze starego buildu (bez `/api/v1/me`). Zrestartowano go z
+  aktualnego kodu, z Postgresem z `infra/compose`. Ten wpis dotyczy środowiska,
+  nie kodu aplikacji.
 - P0-I09 (DONE 2026-11-02): profil konta w PostgreSQL powiązany z Firebase UID,
   endpointy `/api/v1/me` z ACL po tokenie, język konta zapisywany w profilu i
   stosowany po logowaniu, oczekujący zapis nieraportowany jako zapisany. Właściciel

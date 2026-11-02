@@ -29,6 +29,7 @@
     "description": "Profile settings will be added later.",
     "signedInAs": "Signed in as {{email}}",
     "editProfileButton": "Edit profile",
+    "settingsButton": "Account settings",
     "signOutButton": "Sign out"
   },
   "auth": {
@@ -64,6 +65,7 @@
       "userDisabled": "This account has been disabled. Contact support.",
       "invalidActionCode": "This verification link is invalid. Request a new one.",
       "expiredActionCode": "This verification link has expired. Request a new one.",
+      "recentLogin": "For your security, confirm your current password and try again.",
       "network": "We couldn't reach Soberity. Check your connection and try again.",
       "notConfigured": "Accounts are not available in this build.",
       "generic": "Something went wrong. Please try again."
@@ -153,6 +155,29 @@
     "loadErrorTitle": "Profile unavailable",
     "loadErrorMessage": "We couldn't load your profile. Check your connection and try again.",
     "retry": "Try again"
+  },
+  "settings": {
+    "title": "Account settings",
+    "passwordSection": "Change password",
+    "currentPasswordLabel": "Current password",
+    "currentPasswordRequired": "Enter your current password to confirm this change.",
+    "newPasswordLabel": "New password",
+    "changePasswordButton": "Change password",
+    "passwordChanged": "Your password has been changed.",
+    "emailSection": "Change e-mail",
+    "emailHelp": "We'll send a link to the new address. Your e-mail changes only after you open that link.",
+    "newEmailLabel": "New e-mail",
+    "passwordToConfirmLabel": "Current password",
+    "changeEmailButton": "Send confirmation link",
+    "emailLinkSent": "We sent a confirmation link to the new address. Open it to finish the change.",
+    "deleteSection": "Delete account",
+    "deleteWarningTitle": "This cannot be undone",
+    "deleteWarning": "Your profile and sign-in will be permanently deleted. You will need to create a new account to use Soberity again.",
+    "deletePending": "Your previous deletion was not finished. Confirm your password to complete it.",
+    "deleteConfirmLabel": "I understand that my account and data will be deleted",
+    "deleteConfirmRequired": "Confirm that you understand the deletion.",
+    "deleteButton": "Delete my account",
+    "deleteResumeButton": "Finish deleting account"
   },
   "notFound": {
     "title": "Page not found",

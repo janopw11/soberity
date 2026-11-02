@@ -52,3 +52,7 @@ export async function writeAccountLocale(
 ): Promise<void> {
   await AsyncStorage.setItem(storageKey(uid), JSON.stringify(value));
 }
+
+export async function removeAccountLocale(uid: string): Promise<void> {
+  await AsyncStorage.removeItem(storageKey(uid));
+}

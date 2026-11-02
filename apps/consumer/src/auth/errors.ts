@@ -10,6 +10,7 @@ export type AuthErrorKey =
   | 'userDisabled'
   | 'invalidActionCode'
   | 'expiredActionCode'
+  | 'recentLogin'
   | 'network'
   | 'notConfigured'
   | 'generic';
@@ -49,6 +50,8 @@ export function mapAuthError(error: unknown): AuthErrorKey {
       return 'invalidActionCode';
     case 'auth/expired-action-code':
       return 'expiredActionCode';
+    case 'auth/requires-recent-login':
+      return 'recentLogin';
     case 'auth/network-request-failed':
       return 'network';
     case 'auth/not-configured':

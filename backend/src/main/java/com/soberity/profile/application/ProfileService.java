@@ -1,7 +1,10 @@
 package com.soberity.profile.application;
 
+import com.soberity.profile.domain.DeletedAccount;
+import com.soberity.profile.domain.DeletedAccountRepository;
 import com.soberity.profile.domain.UserProfile;
 import com.soberity.profile.domain.UserProfileRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileService {
 
     private final UserProfileRepository repository;
+    private final DeletedAccountRepository deletedAccounts;
 
-    public ProfileService(UserProfileRepository repository) {
+    public ProfileService(UserProfileRepository repository, DeletedAccountRepository deletedAccounts) {
         this.repository = repository;
+        this.deletedAccounts = deletedAccounts;
     }
 
     /**
@@ -26,6 +31,9 @@ public class ProfileService {
      * it is created; an existing account preference always wins.
      */
     public UserProfile provision(String uid, String initialLocale) {
+        if (deletedAccounts.existsById(uid)) {
+            throw new AccountDeletionPendingException();
+        }
         Optional<UserProfile> existing = repository.findByFirebaseUid(uid);
         if (existing.isPresent()) {
             return existing.get();
@@ -35,6 +43,18 @@ public class ProfileService {
         } catch (DataIntegrityViolationException ex) {
             // A concurrent request created the profile first.
             return repository.findByFirebaseUid(uid).orElseThrow(() -> ex);
+        }
+    }
+
+    /**
+     * Removes all application data of the account and records the deletion, so the profile cannot be re-created while
+     * the Firebase account still exists. Repeating the call is harmless.
+     */
+    @Transactional
+    public void deleteOwnAccount(String uid) {
+        repository.findByFirebaseUid(uid).ifPresent(repository::delete);
+        if (!deletedAccounts.existsById(uid)) {
+            deletedAccounts.save(new DeletedAccount(uid, Instant.now()));
         }
     }
 

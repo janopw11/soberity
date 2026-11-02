@@ -47,7 +47,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 
 async function request<T>(
   idToken: string,
-  init: { method: 'GET' | 'POST' | 'PATCH'; body?: unknown },
+  init: { method: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown },
 ): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -76,6 +76,7 @@ async function request<T>(
   if (response.status >= 500)
     throw new BackendUnavailableError(response.status);
   if (!response.ok) throw new ProfileRejectedError(response.status);
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 
@@ -96,5 +97,9 @@ export const profileApi = {
   },
   update(idToken: string, patch: ProfilePatch) {
     return request<Profile>(idToken, { method: 'PATCH', body: patch });
+  },
+  /** Deletes the application data of the caller; the backend keeps a marker that blocks re-creation. */
+  deleteData(idToken: string) {
+    return request<void>(idToken, { method: 'DELETE' });
   },
 };

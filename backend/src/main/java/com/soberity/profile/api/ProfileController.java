@@ -1,6 +1,7 @@
 package com.soberity.profile.api;
 
 import com.soberity.identity.token.VerifiedToken;
+import com.soberity.profile.application.AccountDeletionPendingException;
 import com.soberity.profile.application.ProfileNotFoundException;
 import com.soberity.profile.application.ProfileService;
 import com.soberity.profile.application.ProfileService.ProfileUpdate;
@@ -17,6 +18,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,11 +64,27 @@ public class ProfileController {
         return ProfileResponse.from(profiles.update(token.uid(), update));
     }
 
+    /** Deletes the application data of the caller. The Firebase account is removed by the client afterwards. */
+    @DeleteMapping
+    public ResponseEntity<Void> deleteOwnAccount(@AuthenticationPrincipal VerifiedToken token) {
+        profiles.deleteOwnAccount(token.uid());
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(ProfileNotFoundException.class)
     ResponseEntity<ProblemDetail> notFound(ProfileNotFoundException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Profile not found.");
-        problem.setTitle("Not Found");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return problem(HttpStatus.NOT_FOUND, "Not Found", "Profile not found.");
+    }
+
+    @ExceptionHandler(AccountDeletionPendingException.class)
+    ResponseEntity<ProblemDetail> deletionPending(AccountDeletionPendingException ex) {
+        return problem(HttpStatus.CONFLICT, "Conflict", "Account deletion is in progress.");
+    }
+
+    private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String title, String detail) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setTitle(title);
+        return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problem);
     }

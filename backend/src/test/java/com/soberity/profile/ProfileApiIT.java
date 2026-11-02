@@ -1,6 +1,7 @@
 package com.soberity.profile;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +36,45 @@ class ProfileApiIT extends AbstractIntegrationTest {
 
     private static MockHttpServletRequestBuilder withAuth(MockHttpServletRequestBuilder builder, String bearer) {
         return builder.header("Authorization", bearer);
+    }
+
+    @Test
+    void deletingAccountRemovesDataAndBlocksRecreationWhileFirebaseAccountExists() throws Exception {
+        String bearer = verifiedUser(newUid());
+        mockMvc.perform(withAuth(post(ME), bearer).contentType("application/json").content("{\"initialLocale\":\"pl\"}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(withAuth(delete(ME), bearer)).andExpect(status().isNoContent());
+
+        mockMvc.perform(withAuth(get(ME), bearer)).andExpect(status().isNotFound());
+        mockMvc.perform(withAuth(patch(ME), bearer).contentType("application/json").content("{\"city\":\"Łódź\"}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(withAuth(post(ME), bearer).contentType("application/json").content("{}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        // A retry of the deletion after a partial failure is harmless.
+        mockMvc.perform(withAuth(delete(ME), bearer)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deletingOneAccountLeavesAnotherAccountUntouched() throws Exception {
+        String keep = verifiedUser(newUid());
+        String gone = verifiedUser(newUid());
+        mockMvc.perform(withAuth(post(ME), keep).contentType("application/json").content("{\"initialLocale\":\"en\"}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(withAuth(post(ME), gone).contentType("application/json").content("{}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(withAuth(delete(ME), gone)).andExpect(status().isNoContent());
+
+        mockMvc.perform(withAuth(get(ME), keep))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.locale").value("en"));
+    }
+
+    @Test
+    void anonymousDeleteIsRejected() throws Exception {
+        mockMvc.perform(delete(ME)).andExpect(status().isUnauthorized());
     }
 
     @Test

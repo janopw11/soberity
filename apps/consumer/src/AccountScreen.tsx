@@ -44,6 +44,12 @@ export default function AccountScreen() {
           testID="account-edit-profile"
         />
         <Button
+          label={t('account.settingsButton')}
+          variant="secondary"
+          onPress={() => router.push('/settings')}
+          testID="account-settings"
+        />
+        <Button
           label={t('account.signOutButton')}
           variant="secondary"
           onPress={() => void handleSignOut()}
