@@ -6,7 +6,6 @@ import {
   writeAccountLocale,
 } from '../profile/accountLocale';
 import {
-  changeEmail,
   changePassword,
   deleteAccount,
   hasPendingDeletion,
@@ -19,7 +18,6 @@ function makeDeps(
 ): AccountSecurityDeps & {
   reauthenticate: jest.Mock<(password: string) => Promise<void>>;
   updatePassword: jest.Mock<(password: string) => Promise<void>>;
-  verifyNewEmail: jest.Mock<(email: string) => Promise<void>>;
   deleteUser: jest.Mock<() => Promise<void>>;
   deleteBackendData: jest.Mock<(token: string) => Promise<void>>;
 } {
@@ -30,9 +28,6 @@ function makeDeps(
       async () => undefined,
     ),
     updatePassword: jest.fn<(password: string) => Promise<void>>(
-      async () => undefined,
-    ),
-    verifyNewEmail: jest.fn<(email: string) => Promise<void>>(
       async () => undefined,
     ),
     deleteUser: jest.fn<() => Promise<void>>(async () => undefined),
@@ -75,29 +70,6 @@ describe('account security operations', () => {
         changePassword(deps, 'old-secret', 'new-secret-1'),
       ).rejects.toMatchObject({ code: 'auth/requires-recent-login' });
       expect(deps.updatePassword).not.toHaveBeenCalled();
-    });
-
-    it('sends a verification to the new address only after re-checking the password', async () => {
-      const deps = makeDeps('uid-a');
-
-      await changeEmail(deps, 'secret-123', 'new@example.com');
-
-      expect(deps.verifyNewEmail).toHaveBeenCalledWith('new@example.com');
-    });
-
-    it('does not start an e-mail change with a wrong password', async () => {
-      const deps = makeDeps('uid-a', {
-        reauthenticate: jest.fn(async () => {
-          throw Object.assign(new Error('wrong'), {
-            code: 'auth/invalid-credential',
-          });
-        }) as never,
-      });
-
-      await expect(
-        changeEmail(deps, 'bad', 'new@example.com'),
-      ).rejects.toThrow();
-      expect(deps.verifyNewEmail).not.toHaveBeenCalled();
     });
   });
 

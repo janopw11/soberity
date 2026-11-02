@@ -111,6 +111,21 @@ class ProfileApiIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void provisionAppliesSignUpUsernameOnlyWhenCreatingProfile() throws Exception {
+        String bearer = verifiedUser(newUid());
+
+        mockMvc.perform(withAuth(post(ME), bearer).contentType("application/json")
+                        .content("{\"initialLocale\":\"en\",\"initialDisplayName\":\"  Jane  \"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.displayName").value("Jane"));
+
+        mockMvc.perform(withAuth(post(ME), bearer).contentType("application/json")
+                        .content("{\"initialDisplayName\":\"Other\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.displayName").value("Jane"));
+    }
+
+    @Test
     void getReturnsNotFoundBeforeProvisioning() throws Exception {
         mockMvc.perform(withAuth(get(ME), verifiedUser(newUid())))
                 .andExpect(status().isNotFound())

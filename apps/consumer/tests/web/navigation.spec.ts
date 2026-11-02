@@ -112,15 +112,14 @@ test('hamburger at top left opens all features with emoji and closes after navig
     'Main page',
     'Science & Discover',
     'Sober Events',
-    'Sober Games',
     'Soberity (community)',
     'World Map',
     'Brain Lab',
     'Myth Buster',
   ];
-  // The close control is separate from the eight product destinations.
+  // The close control is separate from the seven product destinations.
   await expect(menu.getByRole('link')).toHaveCount(3);
-  await expect(menu.getByRole('button')).toHaveCount(10);
+  await expect(menu.getByRole('button')).toHaveCount(5);
   for (const label of labels) {
     await expect(
       menu
@@ -133,7 +132,10 @@ test('hamburger at top left opens all features with emoji and closes after navig
       menu.getByRole('button', { name: label, exact: true }),
     ).toBeDisabled();
   }
-  await expect(menu.getByText('🏠', { exact: true })).toHaveCount(1);
+  await expect(menu.getByText('🏠', { exact: true })).toHaveCount(0);
+  await expect(
+    menu.getByRole('link', { name: 'Main page', exact: true }).locator('img'),
+  ).toBeVisible();
   await expect(menu.getByText('🔬', { exact: true })).toHaveCount(1);
   await expect(menu.getByText('🎉', { exact: true })).toHaveCount(1);
   await page.screenshot({ path: testInfo.outputPath('menu-open.png') });
@@ -149,7 +151,7 @@ test('hamburger at top left opens all features with emoji and closes after navig
   await page.getByRole('button', { name: 'Open menu', exact: true }).click();
   await expect(
     menu.getByRole('link', { name: 'Sober Events', exact: true }),
-  ).toContainText('› Sober Events');
+  ).toBeVisible();
   await page
     .getByTestId('menu-backdrop')
     .click({ position: { x: page.viewportSize()!.width - 5, y: 100 } });
@@ -161,43 +163,20 @@ test('hamburger at top left opens all features with emoji and closes after navig
   ).toBe(true);
 });
 
-test('theme and language preferences persist after reload', async ({
-  browser,
+test('guest side menu no longer exposes theme or language toggles', async ({
+  page,
 }) => {
-  const context = await browser.newContext({
-    locale: 'en-US',
-    viewport: { width: 390, height: 844 },
-  });
-  const page = await context.newPage();
   await page.goto('/');
   await page.getByRole('button', { name: 'Open menu', exact: true }).click();
   const menu = page.getByTestId('side-menu');
-
-  const darkTheme = menu.getByRole('button', { name: 'Dark · Plum' });
-  await expect(darkTheme).toHaveAttribute('aria-pressed', 'true');
-  const lightTheme = menu.getByRole('button', { name: 'Light · Violet' });
-  await lightTheme.focus();
-  await expect(lightTheme).toBeFocused();
-  await page.keyboard.press('Space');
-  await expect(lightTheme).toHaveAttribute('aria-pressed', 'true');
-  await menu.getByRole('button', { name: 'Polski' }).click();
+  await expect(menu.getByRole('button', { name: 'Dark · Plum' })).toHaveCount(
+    0,
+  );
   await expect(
-    page.getByRole('heading', { name: 'Więcej z życia. Razem.' }),
-  ).toBeVisible();
-  await page.reload();
-
-  await page.getByRole('button', { name: 'Otwórz menu', exact: true }).click();
-  const restoredMenu = page.getByTestId('side-menu');
-  await expect(
-    restoredMenu.getByRole('button', { name: 'Jasny · Fiolet' }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  await expect(
-    restoredMenu.getByRole('button', { name: 'Polski' }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  await expect(
-    page.getByRole('heading', { name: 'Więcej z życia. Razem.' }),
-  ).toBeVisible();
-  await context.close();
+    menu.getByRole('button', { name: 'Light · Violet' }),
+  ).toHaveCount(0);
+  await expect(menu.getByRole('button', { name: 'English' })).toHaveCount(0);
+  await expect(menu.getByRole('button', { name: 'Polski' })).toHaveCount(0);
 });
 
 test('Polish hamburger menu shows emoji without planned captions', async ({

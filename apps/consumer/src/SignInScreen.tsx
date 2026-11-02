@@ -1,14 +1,14 @@
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { spacing, typography } from '@soberity/design-tokens';
 
 import { useAuthStatus } from './auth/AuthStatusContext';
 import { mapAuthError } from './auth/errors';
 import { hasFieldErrors, validateSignIn } from './auth/validation';
-import { Alert, Button, Screen, TextField } from './ui';
+import { Alert, Button, Screen, SettingsGroup, TextField } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 type FormErrors = Partial<Record<'email' | 'password', string | undefined>>;
@@ -51,11 +51,6 @@ export default function SignInScreen() {
 
   return (
     <Screen avoidKeyboard>
-      <Text accessibilityRole="header" style={styles.title}>
-        {t('auth.signInTitle')}
-      </Text>
-      <Text style={styles.intro}>{t('auth.signInIntro')}</Text>
-
       {formError ? (
         <Alert
           variant="danger"
@@ -65,6 +60,7 @@ export default function SignInScreen() {
       ) : null}
 
       <TextField
+        accentLabel
         label={t('auth.emailLabel')}
         value={email}
         onChangeText={setEmail}
@@ -76,6 +72,7 @@ export default function SignInScreen() {
         testID="sign-in-email"
       />
       <TextField
+        accentLabel
         label={t('auth.passwordLabel')}
         value={password}
         onChangeText={setPassword}
@@ -88,20 +85,42 @@ export default function SignInScreen() {
         testID="sign-in-password"
       />
 
-      <Button
-        label={t('auth.signInSubmit')}
-        onPress={() => void submit()}
-        loading={submitting}
-        disabled={submitting}
-        testID="sign-in-submit"
-      />
+      <View style={styles.actions}>
+        <Button
+          label={t('auth.signInSubmit')}
+          onPress={() => void submit()}
+          loading={submitting}
+          disabled={submitting}
+          testID="sign-in-submit"
+        />
 
-      <Link href="/sign-up" style={styles.link}>
-        {t('auth.noAccountLink')}
-      </Link>
-      <Link href="/forgot-password" style={styles.link}>
-        {t('auth.forgotPasswordLink')}
-      </Link>
+        <View style={styles.divider} />
+
+        <View>
+          <SettingsGroup>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push('/forgot-password')}
+              style={styles.groupAction}
+              testID="sign-in-forgot-password"
+            >
+              <Text style={styles.groupActionLabel}>
+                {t('auth.forgotPasswordLink')}
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push('/sign-up')}
+              style={styles.groupAction}
+              testID="sign-in-to-sign-up"
+            >
+              <Text style={styles.groupActionLabel}>
+                {t('auth.noAccountLink')}
+              </Text>
+            </Pressable>
+          </SettingsGroup>
+        </View>
+      </View>
     </Screen>
   );
 }
@@ -110,25 +129,25 @@ function createStyles(
   colors: ReturnType<typeof useThemePreferences>['colors'],
 ) {
   return StyleSheet.create({
-    title: {
-      color: colors.textPrimary,
-      fontSize: typography.h1.fontSize,
-      lineHeight: typography.h1.lineHeight,
-      fontWeight: typography.h1.fontWeight,
-    },
-    intro: {
-      color: colors.textSecondary,
-      fontSize: typography.body.fontSize,
-      lineHeight: typography.body.lineHeight,
-      marginBottom: spacing.space8,
-    },
-    link: {
-      color: colors.primary,
-      fontSize: typography.bodyStrong.fontSize,
-      fontWeight: typography.bodyStrong.fontWeight,
-      textDecorationLine: 'underline',
-      paddingVertical: spacing.space12,
+    groupAction: {
       minHeight: 48,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: spacing.space16,
+    },
+    groupActionLabel: {
+      color: colors.primary,
+      textAlign: 'center',
+      fontSize: typography.label.fontSize,
+      lineHeight: typography.label.lineHeight,
+      fontWeight: typography.label.fontWeight,
+    },
+    actions: {
+      gap: spacing.space8,
+    },
+    divider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
     },
   });
 }

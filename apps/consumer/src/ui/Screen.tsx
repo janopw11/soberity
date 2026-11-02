@@ -44,7 +44,7 @@ export function Screen({
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safeArea}>
       {avoidKeyboard ? (
         <KeyboardAvoidingView
           style={styles.flexFill}
@@ -68,7 +68,8 @@ function createStyles(
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: spacing.space16,
-      paddingVertical: spacing.space24,
+      paddingTop: spacing.space8,
+      paddingBottom: spacing.space24,
     },
     content: { width: '100%', alignSelf: 'center', gap: spacing.space24 },
   });

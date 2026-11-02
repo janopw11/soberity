@@ -12,6 +12,7 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updatePassword,
+  updateProfile,
   verifyBeforeUpdateEmail,
   verifyPasswordResetCode,
   type ActionCodeSettings,
@@ -35,13 +36,19 @@ function actionCodeSettings(
 export type AuthUser = {
   uid: string;
   email: string | null;
+  /** Username chosen at sign-up; the backend copy is created on the first verified sign-in. */
+  displayName: string | null;
 };
 
 /** Narrow contract the provider depends on, so tests can replace Firebase. */
 export type AuthAdapter = {
   /** Fires on sign-in, sign-out and every ID token refresh. */
   subscribe: (listener: (user: AuthUser | null) => void) => () => void;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName: string | null,
+  ) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   sendEmailVerification: () => Promise<void>;
   reload: () => Promise<void>;
@@ -66,15 +73,22 @@ export type AuthAdapter = {
 export const firebaseAuthAdapter: AuthAdapter = {
   subscribe(listener) {
     return onIdTokenChanged(getFirebaseAuth(), (user) =>
-      listener(user ? { uid: user.uid, email: user.email } : null),
+      listener(
+        user
+          ? { uid: user.uid, email: user.email, displayName: user.displayName }
+          : null,
+      ),
     );
   },
-  async signUp(email, password) {
+  async signUp(email, password, displayName) {
     const credential = await createUserWithEmailAndPassword(
       getFirebaseAuth(),
       email,
       password,
     );
+    if (displayName) {
+      await updateProfile(credential.user, { displayName });
+    }
     await sendEmailVerification(
       credential.user,
       actionCodeSettings(readEmailVerificationContinueUrl()),

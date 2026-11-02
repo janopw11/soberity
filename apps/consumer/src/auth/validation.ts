@@ -1,9 +1,15 @@
 export const PASSWORD_MIN_LENGTH = 8;
+/** Matches the backend limit on the profile display name. */
+export const DISPLAY_NAME_MAX_LENGTH = 50;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type FieldError =
-  'required' | 'invalidEmail' | 'passwordTooShort' | 'passwordMismatch';
+  | 'required'
+  | 'invalidEmail'
+  | 'passwordTooShort'
+  | 'passwordMismatch'
+  | 'displayNameTooLong';
 
 export function validateEmail(value: string): FieldError | undefined {
   const email = value.trim();
@@ -18,6 +24,13 @@ export function validatePassword(value: string): FieldError | undefined {
   return undefined;
 }
 
+/** The username is optional; only the length limit applies. */
+export function validateDisplayName(value: string): FieldError | undefined {
+  if (value.trim().length > DISPLAY_NAME_MAX_LENGTH)
+    return 'displayNameTooLong';
+  return undefined;
+}
+
 export function validateSignIn(input: { email: string; password: string }) {
   return {
     email: validateEmail(input.email),
@@ -27,6 +40,7 @@ export function validateSignIn(input: { email: string; password: string }) {
 
 export function validateSignUp(input: {
   email: string;
+  displayName?: string;
   password: string;
   confirmPassword: string;
 }) {
@@ -38,7 +52,12 @@ export function validateSignUp(input: {
     confirmPassword = 'passwordMismatch';
   }
 
-  return { email: validateEmail(input.email), password, confirmPassword };
+  return {
+    email: validateEmail(input.email),
+    displayName: validateDisplayName(input.displayName ?? ''),
+    password,
+    confirmPassword,
+  };
 }
 
 export function hasFieldErrors(

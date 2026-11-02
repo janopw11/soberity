@@ -27,10 +27,10 @@ public class ProfileService {
     }
 
     /**
-     * Returns the existing profile. A new profile takes {@code initialLocale} (the guest's explicit choice) only when
-     * it is created; an existing account preference always wins.
+     * Returns the existing profile. A new profile takes {@code initialLocale} (the guest's explicit choice) and
+     * {@code initialDisplayName} (chosen at sign-up) only when it is created; existing values always win.
      */
-    public UserProfile provision(String uid, String initialLocale) {
+    public UserProfile provision(String uid, String initialLocale, String initialDisplayName) {
         if (deletedAccounts.existsById(uid)) {
             throw new AccountDeletionPendingException();
         }
@@ -39,7 +39,11 @@ public class ProfileService {
             return existing.get();
         }
         try {
-            return repository.saveAndFlush(new UserProfile(uid, initialLocale));
+            UserProfile profile = new UserProfile(uid, initialLocale);
+            if (initialDisplayName != null) {
+                profile.setDisplayName(blankToNull(initialDisplayName));
+            }
+            return repository.saveAndFlush(profile);
         } catch (DataIntegrityViolationException ex) {
             // A concurrent request created the profile first.
             return repository.findByFirebaseUid(uid).orElseThrow(() -> ex);

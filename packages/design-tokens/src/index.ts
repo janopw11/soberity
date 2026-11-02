@@ -39,10 +39,10 @@ const lightColors = {
 
 /** Semantic color tokens — dark theme (plum-soft). */
 const darkColors = {
-  background: '#211B2A',
+  background: '#2B2339',
   backdrop: 'rgba(20, 17, 28, 0.72)',
-  surface: '#2A2235',
-  surfaceAlt: '#342A43',
+  surface: '#342A44',
+  surfaceAlt: '#3E3350',
   textPrimary: '#F1ECF8',
   textSecondary: '#D0C2E0',
   textMuted: '#B9A7CB',

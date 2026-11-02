@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
+import { SettingsIcon } from './SettingsIcon';
 
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
@@ -19,6 +20,12 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
   secureToggle?: boolean;
   showPasswordLabel?: string;
   hidePasswordLabel?: string;
+  /** `grouped` drops the box so the field sits inside a SettingsGroup row. */
+  variant?: 'boxed' | 'grouped';
+  /** Renders the label in the primary accent colour. */
+  accentLabel?: boolean;
+  /** Inline control at the trailing edge of the input, e.g. a Save action. */
+  accessory?: ReactNode;
   testID?: string;
 };
 
@@ -31,6 +38,9 @@ export function TextField({
   secureTextEntry,
   showPasswordLabel = 'Show',
   hidePasswordLabel = 'Hide',
+  variant = 'boxed',
+  accentLabel = false,
+  accessory,
   onFocus,
   onBlur,
   testID,
@@ -41,15 +51,22 @@ export function TextField({
   const { colors } = useThemePreferences();
   const styles = createStyles(colors);
   const hasError = Boolean(errorText);
+  const grouped = variant === 'grouped';
 
   return (
-    <View style={styles.container} testID={testID}>
-      <Text style={styles.label}>{label}</Text>
+    <View
+      style={grouped ? styles.groupedContainer : styles.container}
+      testID={testID}
+    >
+      <Text style={[styles.label, accentLabel && { color: colors.primary }]}>
+        {label}
+      </Text>
       <View
         style={[
-          styles.inputRow,
-          isFocused && styles.inputRowFocused,
-          hasError && styles.inputRowError,
+          grouped ? styles.groupedInputRow : styles.inputRow,
+          isFocused &&
+            (grouped ? styles.groupedInputRowFocused : styles.inputRowFocused),
+          hasError && !grouped && styles.inputRowError,
         ]}
       >
         <TextInput
@@ -68,6 +85,7 @@ export function TextField({
           style={styles.input}
           placeholderTextColor={colors.textMuted}
         />
+        {accessory}
         {secureToggle ? (
           <Pressable
             accessibilityRole="button"
@@ -78,9 +96,11 @@ export function TextField({
             hitSlop={8}
             style={styles.toggle}
           >
-            <Text style={styles.toggleLabel}>
-              {isRevealed ? hidePasswordLabel : showPasswordLabel}
-            </Text>
+            <SettingsIcon
+              name={isRevealed ? 'eyeOff' : 'eye'}
+              color={colors.textSecondary}
+              size={22}
+            />
           </Pressable>
         ) : null}
       </View>
@@ -118,6 +138,25 @@ function createStyles(
     },
     inputRowFocused: { borderColor: colors.focusRing, borderWidth: 2 },
     inputRowError: { borderColor: colors.danger },
+    groupedContainer: {
+      paddingHorizontal: spacing.space16,
+      paddingVertical: spacing.space12,
+      gap: spacing.space4,
+    },
+    groupedInputRow: {
+      minHeight: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radii.md,
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.space12,
+    },
+    groupedInputRowFocused: {
+      borderWidth: 2,
+      borderColor: colors.focusRing,
+    },
     input: {
       flex: 1,
       minHeight: 48,
@@ -126,13 +165,10 @@ function createStyles(
       color: colors.textPrimary,
     },
     toggle: {
-      paddingHorizontal: spacing.space8,
-      paddingVertical: spacing.space8,
-    },
-    toggleLabel: {
-      fontSize: typography.small.fontSize,
-      fontWeight: typography.label.fontWeight,
-      color: colors.primary,
+      minWidth: 44,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     errorText: {
       fontSize: typography.small.fontSize,

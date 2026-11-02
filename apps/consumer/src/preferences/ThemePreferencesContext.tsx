@@ -8,11 +8,10 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { themes, type ColorScheme, type Colors } from '@soberity/design-tokens';
 
-import {
+import i18n, {
   resolveDeviceLanguage,
   SUPPORTED_LANGUAGES,
   type SupportedLanguage,
@@ -52,7 +51,8 @@ function isSupportedLanguage(value: string | null): value is SupportedLanguage {
 }
 
 export function ThemePreferencesProvider({ children }: PropsWithChildren) {
-  const { i18n } = useTranslation();
+  // The module singleton is used on purpose: useTranslation().i18n gets a new identity on every
+  // language change, which would re-run the effects and callbacks below in a loop.
   const [theme, setThemeState] = useState<ColorScheme>('dark');
   const [language, setLanguageState] = useState<SupportedLanguage>(
     resolveDeviceLanguage,
@@ -100,7 +100,7 @@ export function ThemePreferencesProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [i18n]);
+  }, []);
 
   const setTheme = useCallback(async (nextTheme: ColorScheme) => {
     try {
@@ -112,27 +112,21 @@ export function ThemePreferencesProvider({ children }: PropsWithChildren) {
     }
   }, []);
 
-  const setLanguage = useCallback(
-    async (nextLanguage: SupportedLanguage) => {
-      try {
-        await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
-        await i18n.changeLanguage(nextLanguage);
-        setLanguageState(nextLanguage);
-        setError(null);
-      } catch {
-        setError('save');
-      }
-    },
-    [i18n],
-  );
-
-  const applyLanguage = useCallback(
-    async (nextLanguage: SupportedLanguage) => {
+  const setLanguage = useCallback(async (nextLanguage: SupportedLanguage) => {
+    try {
+      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
       await i18n.changeLanguage(nextLanguage);
       setLanguageState(nextLanguage);
-    },
-    [i18n],
-  );
+      setError(null);
+    } catch {
+      setError('save');
+    }
+  }, []);
+
+  const applyLanguage = useCallback(async (nextLanguage: SupportedLanguage) => {
+    await i18n.changeLanguage(nextLanguage);
+    setLanguageState(nextLanguage);
+  }, []);
 
   const value = useMemo(
     () => ({

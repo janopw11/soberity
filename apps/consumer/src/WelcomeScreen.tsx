@@ -7,7 +7,12 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Button, Screen } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
-export default function WelcomeScreen() {
+/** Guest landing; `signedIn` renders the same Main page without auth prompts. */
+export default function WelcomeScreen({
+  signedIn = false,
+}: {
+  signedIn?: boolean;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useThemePreferences();
@@ -21,24 +26,28 @@ export default function WelcomeScreen() {
       </Text>
       <Text style={styles.intro}>{t('welcome.intro')}</Text>
 
-      <View style={styles.actions}>
-        <Button
-          label={t('welcome.signInButton')}
-          onPress={() => router.push('/sign-in')}
-          testID="welcome-sign-in"
-        />
-        <Button
-          label={t('welcome.signUpButton')}
-          variant="secondary"
-          onPress={() => router.push('/sign-up')}
-          testID="welcome-sign-up"
-        />
-      </View>
+      {signedIn ? null : (
+        <>
+          <View style={styles.actions}>
+            <Button
+              label={t('welcome.signInButton')}
+              onPress={() => router.push('/sign-in')}
+              testID="welcome-sign-in"
+            />
+            <Button
+              label={t('welcome.signUpButton')}
+              variant="secondary"
+              onPress={() => router.push('/sign-up')}
+              testID="welcome-sign-up"
+            />
+          </View>
 
-      <View style={styles.notice}>
-        <Text style={styles.noticeTitle}>{t('welcome.previewTitle')}</Text>
-        <Text style={styles.body}>{t('welcome.previewBody')}</Text>
-      </View>
+          <View style={styles.notice}>
+            <Text style={styles.noticeTitle}>{t('welcome.previewTitle')}</Text>
+            <Text style={styles.body}>{t('welcome.previewBody')}</Text>
+          </View>
+        </>
+      )}
 
       <Text style={styles.footer}>{t('welcome.footer')}</Text>
     </Screen>

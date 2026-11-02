@@ -37,7 +37,11 @@ type AccountActions = Pick<
 
 type AuthStatusContextValue = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName: string | null,
+  ) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   refreshVerificationStatus: () => Promise<void>;
   applyEmailVerificationAction: (oobCode: string) => Promise<void>;
@@ -131,7 +135,8 @@ export function AuthStatusProvider({
     [adapter],
   );
   const signUp = useCallback(
-    (email: string, password: string) => adapter.signUp(email, password),
+    (email: string, password: string, displayName: string | null) =>
+      adapter.signUp(email, password, displayName),
     [adapter],
   );
   const resendVerificationEmail = useCallback(

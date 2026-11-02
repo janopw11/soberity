@@ -1,6 +1,7 @@
 {
   "common": {
     "appName": "Soberity",
+    "close": "Close",
     "backToWelcome": "Back to welcome",
     "notAvailableYetBadge": "Not available yet",
     "previewNotice": "This is a preview of a planned area. No content or services are available here yet."
@@ -24,24 +25,27 @@
     "description": "Planned: sober parties, sober raves, other alcohol-free activities and ways to connect."
   },
   "account": {
-    "title": "Your account",
-    "badge": "Signed in",
-    "description": "Profile settings will be added later.",
-    "signedInAs": "Signed in as {{email}}",
-    "editProfileButton": "Edit profile",
-    "settingsButton": "Account settings",
+    "title": "Account",
+    "emailLabel": "E-mail",
+    "sections": {
+      "personalData": "Personal data",
+      "password": "Change password",
+      "preferences": "Preferences"
+    },
+    "deleteButton": "Delete account",
+    "cancelButton": "Cancel",
     "signOutButton": "Sign out"
   },
   "auth": {
     "checkingSession": "Checking your session…",
     "signInTitle": "Sign in",
-    "signInIntro": "Use the e-mail address and password you registered with.",
     "signUpTitle": "Create account",
     "signUpIntro": "Create your account with an e-mail address and a password.",
     "emailLabel": "Email",
     "passwordLabel": "Password",
     "confirmPasswordLabel": "Confirm password",
     "passwordHelper": "At least {{min}} characters.",
+    "usernameHelper": "Optional. You can add or change it later in your account.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "signInSubmit": "Sign in",
@@ -54,7 +58,8 @@
       "required": "This field is required.",
       "invalidEmail": "Enter a valid email address.",
       "passwordTooShort": "Use at least {{min}} characters.",
-      "passwordMismatch": "The passwords do not match."
+      "passwordMismatch": "The passwords do not match.",
+      "displayNameTooLong": "Use at most {{max}} characters."
     },
     "errors": {
       "emailInUse": "An account with this email already exists. Try signing in instead.",
@@ -109,7 +114,6 @@
   },
   "forgotPassword": {
     "title": "Reset password",
-    "intro": "Enter the email address of your account. If it exists, we'll send you a link to set a new password.",
     "submit": "Send reset link",
     "sentTitle": "Check your email",
     "sentMessage": "If an account exists for this address, a reset link is on its way. Check your inbox and spam folder.",
@@ -133,49 +137,28 @@
     "signInButton": "Go to sign in"
   },
   "profile": {
-    "title": "Your profile",
-    "intro": "Choose how Soberity shows your account. Your name and city are optional.",
     "loading": "Loading your profile…",
     "saved": "Profile saved.",
-    "saveButton": "Save profile",
-    "displayNameLabel": "Display name",
-    "displayNameHelper": "Up to 50 characters. Leave empty to remove it.",
-    "cityLabel": "City",
+    "saveButton": "Save",
+    "displayNamePlaceholder": "Add a username",
+    "displayNameLabel": "Username",
     "languageLabel": "Language",
     "localeSaved": "Language saved to your account.",
     "localePending": "Language changed on this device, but not yet saved to your account. It will be sent again the next time you sign in.",
     "localePendingHint": "Waiting to be saved to your account.",
-    "interestsLabel": "Interests",
-    "interest": {
-      "science": "Science",
-      "sport": "Sport",
-      "events": "Events",
-      "community": "Community"
-    },
     "loadErrorTitle": "Profile unavailable",
     "loadErrorMessage": "We couldn't load your profile. Check your connection and try again.",
     "retry": "Try again"
   },
   "settings": {
-    "title": "Account settings",
-    "passwordSection": "Change password",
     "currentPasswordLabel": "Current password",
     "currentPasswordRequired": "Enter your current password to confirm this change.",
     "newPasswordLabel": "New password",
     "changePasswordButton": "Change password",
     "passwordChanged": "Your password has been changed.",
-    "emailSection": "Change e-mail",
-    "emailHelp": "We'll send a link to the new address. Your e-mail changes only after you open that link.",
-    "newEmailLabel": "New e-mail",
     "passwordToConfirmLabel": "Current password",
-    "changeEmailButton": "Send confirmation link",
-    "emailLinkSent": "We sent a confirmation link to the new address. Open it to finish the change.",
-    "deleteSection": "Delete account",
-    "deleteWarningTitle": "This cannot be undone",
-    "deleteWarning": "Your profile and sign-in will be permanently deleted. You will need to create a new account to use Soberity again.",
+    "deleteWarningTitle": "This action cannot be undone.",
     "deletePending": "Your previous deletion was not finished. Confirm your password to complete it.",
-    "deleteConfirmLabel": "I understand that my account and data will be deleted",
-    "deleteConfirmRequired": "Confirm that you understand the deletion.",
     "deleteButton": "Delete my account",
     "deleteResumeButton": "Finish deleting account"
   },
@@ -196,20 +179,20 @@
       "home": "Main page",
       "science": "Science & Discover",
       "events": "Sober Events",
-      "games": "Sober Games",
       "community": "Soberity (community)",
       "map": "World Map",
       "brain": "Brain Lab",
       "myths": "Myth Buster"
     },
     "open": "Open menu",
-    "close": "Close menu"
+    "close": "Close menu",
+    "openAccount": "Open account"
   },
   "preferences": {
     "title": "Display preferences",
     "theme": "Theme",
-    "plumSoft": "Dark · Plum",
-    "violet": "Light · Violet",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "language": "Language",
     "english": "English",
     "polish": "Polski",

@@ -1,14 +1,14 @@
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { spacing, typography } from '@soberity/design-tokens';
 
 import { useAuthStatus } from './auth/AuthStatusContext';
 import { mapAuthError } from './auth/errors';
 import { validateEmail } from './auth/validation';
-import { Alert, Button, Screen, TextField } from './ui';
+import { Alert, Button, Screen, SettingsGroup, TextField } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 export default function ForgotPasswordScreen() {
@@ -50,20 +50,27 @@ export default function ForgotPasswordScreen() {
           {t('forgotPassword.sentTitle')}
         </Text>
         <Alert variant="success" message={t('forgotPassword.sentMessage')} />
-        <Link href="/sign-in" style={styles.link}>
-          {t('forgotPassword.backToSignIn')}
-        </Link>
+        <View style={styles.actions}>
+          <View style={styles.divider} />
+          <SettingsGroup>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push('/sign-in')}
+              style={styles.groupAction}
+              testID="forgot-password-back"
+            >
+              <Text style={styles.groupActionLabel}>
+                {t('forgotPassword.backToSignIn')}
+              </Text>
+            </Pressable>
+          </SettingsGroup>
+        </View>
       </Screen>
     );
   }
 
   return (
     <Screen avoidKeyboard>
-      <Text accessibilityRole="header" style={styles.title}>
-        {t('forgotPassword.title')}
-      </Text>
-      <Text style={styles.intro}>{t('forgotPassword.intro')}</Text>
-
       {formError ? (
         <Alert
           variant="danger"
@@ -73,6 +80,7 @@ export default function ForgotPasswordScreen() {
       ) : null}
 
       <TextField
+        accentLabel
         label={t('auth.emailLabel')}
         value={email}
         onChangeText={setEmail}
@@ -84,17 +92,30 @@ export default function ForgotPasswordScreen() {
         testID="forgot-password-email"
       />
 
-      <Button
-        label={t('forgotPassword.submit')}
-        onPress={() => void submit()}
-        loading={submitting}
-        disabled={submitting}
-        testID="forgot-password-submit"
-      />
+      <View style={styles.actions}>
+        <Button
+          label={t('forgotPassword.submit')}
+          onPress={() => void submit()}
+          loading={submitting}
+          disabled={submitting}
+          testID="forgot-password-submit"
+        />
 
-      <Link href="/sign-in" style={styles.link}>
-        {t('forgotPassword.backToSignIn')}
-      </Link>
+        <View style={styles.divider} />
+
+        <SettingsGroup>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/sign-in')}
+            style={styles.groupAction}
+            testID="forgot-password-back"
+          >
+            <Text style={styles.groupActionLabel}>
+              {t('forgotPassword.backToSignIn')}
+            </Text>
+          </Pressable>
+        </SettingsGroup>
+      </View>
     </Screen>
   );
 }
@@ -109,19 +130,25 @@ function createStyles(
       lineHeight: typography.h1.lineHeight,
       fontWeight: typography.h1.fontWeight,
     },
-    intro: {
-      color: colors.textSecondary,
-      fontSize: typography.body.fontSize,
-      lineHeight: typography.body.lineHeight,
-      marginBottom: spacing.space8,
+    actions: {
+      gap: spacing.space8,
     },
-    link: {
-      color: colors.primary,
-      fontSize: typography.bodyStrong.fontSize,
-      fontWeight: typography.bodyStrong.fontWeight,
-      textDecorationLine: 'underline',
-      paddingVertical: spacing.space12,
+    divider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
+    },
+    groupAction: {
       minHeight: 48,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: spacing.space16,
+    },
+    groupActionLabel: {
+      color: colors.primary,
+      textAlign: 'center',
+      fontSize: typography.label.fontSize,
+      lineHeight: typography.label.lineHeight,
+      fontWeight: typography.label.fontWeight,
     },
   });
 }

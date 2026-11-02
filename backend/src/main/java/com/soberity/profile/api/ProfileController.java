@@ -48,7 +48,8 @@ public class ProfileController {
     public ProfileResponse provision(@AuthenticationPrincipal VerifiedToken token,
             @Valid @RequestBody(required = false) ProvisionRequest request) {
         String initialLocale = request == null ? null : request.initialLocale();
-        return ProfileResponse.from(profiles.provision(token.uid(), initialLocale));
+        String initialDisplayName = request == null ? null : request.initialDisplayName();
+        return ProfileResponse.from(profiles.provision(token.uid(), initialLocale, initialDisplayName));
     }
 
     @GetMapping
@@ -89,7 +90,9 @@ public class ProfileController {
                 .body(problem);
     }
 
-    public record ProvisionRequest(@Pattern(regexp = LOCALE_PATTERN) String initialLocale) {
+    public record ProvisionRequest(
+            @Pattern(regexp = LOCALE_PATTERN) String initialLocale,
+            @Size(max = 50) String initialDisplayName) {
     }
 
     public record ProfileUpdateRequest(

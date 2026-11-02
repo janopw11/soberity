@@ -1,12 +1,30 @@
 import { describe, expect, it } from '@jest/globals';
 
 import {
+  DISPLAY_NAME_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   hasFieldErrors,
+  validateDisplayName,
   validateEmail,
   validatePassword,
   validateSignUp,
 } from './validation';
+
+describe('validateDisplayName', () => {
+  it('treats the username as optional', () => {
+    expect(validateDisplayName('')).toBeUndefined();
+    expect(validateDisplayName('   ')).toBeUndefined();
+  });
+
+  it('enforces the maximum length after trimming', () => {
+    expect(
+      validateDisplayName(`  ${'x'.repeat(DISPLAY_NAME_MAX_LENGTH)}  `),
+    ).toBeUndefined();
+    expect(validateDisplayName('x'.repeat(DISPLAY_NAME_MAX_LENGTH + 1))).toBe(
+      'displayNameTooLong',
+    );
+  });
+});
 
 describe('validateEmail', () => {
   it('requires a value', () => {

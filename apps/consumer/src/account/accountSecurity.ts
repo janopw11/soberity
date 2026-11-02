@@ -8,7 +8,6 @@ export type AccountSecurityDeps = {
   getToken: () => Promise<string | null>;
   reauthenticate: (currentPassword: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
-  verifyNewEmail: (newEmail: string) => Promise<void>;
   deleteUser: () => Promise<void>;
   /** Deletes the application data on the backend (idempotent). */
   deleteBackendData: (idToken: string) => Promise<void>;
@@ -33,16 +32,6 @@ export async function changePassword(
 ): Promise<void> {
   await deps.reauthenticate(currentPassword);
   await deps.updatePassword(newPassword);
-}
-
-/** The new address becomes the login only after the user opens the link sent to it. */
-export async function changeEmail(
-  deps: AccountSecurityDeps,
-  currentPassword: string,
-  newEmail: string,
-): Promise<void> {
-  await deps.reauthenticate(currentPassword);
-  await deps.verifyNewEmail(newEmail);
 }
 
 /**

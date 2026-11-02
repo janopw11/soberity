@@ -17,6 +17,7 @@ export function useAccountLanguageSync() {
   const { status, user, getIdToken } = useAuthStatus();
   const { applyLanguage } = useThemePreferences();
   const uid = user?.uid ?? null;
+  const displayName = user?.displayName ?? null;
   const wasAuthenticated = useRef(false);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export function useAccountLanguageSync() {
           getToken: getIdToken,
           applyLanguage,
           guestLanguage,
+          initialDisplayName: displayName,
         });
       })();
       return;
@@ -42,5 +44,5 @@ export function useAccountLanguageSync() {
         await applyLanguage(guestLanguage);
       })();
     }
-  }, [status, uid, getIdToken, applyLanguage]);
+  }, [status, uid, displayName, getIdToken, applyLanguage]);
 }

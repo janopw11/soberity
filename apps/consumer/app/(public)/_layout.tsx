@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import SideMenu from '../../src/SideMenu';
+import { AppLogo } from '../../src/ui';
 import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
 
 export default function PublicLayout() {
@@ -15,11 +15,12 @@ export default function PublicLayout() {
         headerTintColor: colors.textPrimary,
         contentStyle: { backgroundColor: colors.background },
         headerShadowVisible: false,
-        headerBackVisible: false,
-        headerLeft: () => <SideMenu />,
       }}
     >
-      <Stack.Screen name="index" options={{ title: t('common.appName') }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: t('common.appName'), headerTitle: () => <AppLogo /> }}
+      />
       <Stack.Screen name="science" options={{ title: t('science.title') }} />
       <Stack.Screen name="events" options={{ title: t('events.title') }} />
       <Stack.Screen name="sign-in" options={{ title: t('auth.signInTitle') }} />

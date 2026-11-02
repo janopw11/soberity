@@ -1,6 +1,7 @@
 {
   "common": {
     "appName": "Soberity",
+    "close": "Zamknij",
     "backToWelcome": "Powrót na stronę główną",
     "notAvailableYetBadge": "Jeszcze niedostępne",
     "previewNotice": "To jest podgląd planowanego obszaru. Treści i usługi nie są tu jeszcze dostępne."
@@ -24,24 +25,27 @@
     "description": "Planowane: sober parties, sober rave'y, inne aktywności bez alkoholu oraz sposoby na kontakt."
   },
   "account": {
-    "title": "Twoje konto",
-    "badge": "Zalogowano",
-    "description": "Ustawienia profilu zostaną dodane później.",
-    "signedInAs": "Zalogowano jako {{email}}",
-    "editProfileButton": "Edytuj profil",
-    "settingsButton": "Ustawienia konta",
+    "title": "Konto",
+    "emailLabel": "E-mail",
+    "sections": {
+      "personalData": "Dane osobowe",
+      "password": "Zmiana hasła",
+      "preferences": "Preferencje"
+    },
+    "deleteButton": "Usuń konto",
+    "cancelButton": "Anuluj",
     "signOutButton": "Wyloguj się"
   },
   "auth": {
     "checkingSession": "Sprawdzamy Twoją sesję…",
     "signInTitle": "Zaloguj się",
-    "signInIntro": "Użyj adresu e-mail i hasła, z którymi się zarejestrowałeś.",
     "signUpTitle": "Utwórz konto",
     "signUpIntro": "Utwórz konto, podając adres e-mail i hasło.",
     "emailLabel": "E-mail",
     "passwordLabel": "Hasło",
     "confirmPasswordLabel": "Powtórz hasło",
     "passwordHelper": "Co najmniej {{min}} znaków.",
+    "usernameHelper": "Opcjonalnie. Możesz ją dodać lub zmienić później w koncie.",
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "signInSubmit": "Zaloguj się",
@@ -54,7 +58,8 @@
       "required": "To pole jest wymagane.",
       "invalidEmail": "Podaj poprawny adres e-mail.",
       "passwordTooShort": "Użyj co najmniej {{min}} znaków.",
-      "passwordMismatch": "Hasła nie są takie same."
+      "passwordMismatch": "Hasła nie są takie same.",
+      "displayNameTooLong": "Użyj najwyżej {{max}} znaków."
     },
     "errors": {
       "emailInUse": "Konto z tym adresem e-mail już istnieje. Spróbuj się zalogować.",
@@ -109,7 +114,6 @@
   },
   "forgotPassword": {
     "title": "Resetuj hasło",
-    "intro": "Podaj adres e-mail swojego konta. Jeśli konto istnieje, wyślemy link do ustawienia nowego hasła.",
     "submit": "Wyślij link resetujący",
     "sentTitle": "Sprawdź swoją skrzynkę",
     "sentMessage": "Jeśli konto dla tego adresu istnieje, link do resetu hasła jest już w drodze. Sprawdź skrzynkę i folder spam.",
@@ -133,49 +137,28 @@
     "signInButton": "Przejdź do logowania"
   },
   "profile": {
-    "title": "Twój profil",
-    "intro": "Wybierz, jak Soberity pokazuje Twoje konto. Imię i miasto są opcjonalne.",
     "loading": "Wczytujemy Twój profil…",
     "saved": "Profil zapisany.",
-    "saveButton": "Zapisz profil",
-    "displayNameLabel": "Nazwa wyświetlana",
-    "displayNameHelper": "Do 50 znaków. Zostaw puste, aby ją usunąć.",
-    "cityLabel": "Miasto",
+    "saveButton": "Zapisz",
+    "displayNamePlaceholder": "Dodaj nazwę użytkownika",
+    "displayNameLabel": "Nazwa użytkownika",
     "languageLabel": "Język",
     "localeSaved": "Język zapisany na Twoim koncie.",
     "localePending": "Język zmieniono na tym urządzeniu, ale nie zapisano go jeszcze na koncie. Zostanie wysłany ponownie przy następnym logowaniu.",
     "localePendingHint": "Oczekuje na zapis na koncie.",
-    "interestsLabel": "Zainteresowania",
-    "interest": {
-      "science": "Nauka",
-      "sport": "Sport",
-      "events": "Wydarzenia",
-      "community": "Społeczność"
-    },
     "loadErrorTitle": "Profil niedostępny",
     "loadErrorMessage": "Nie udało się wczytać profilu. Sprawdź połączenie i spróbuj ponownie.",
     "retry": "Spróbuj ponownie"
   },
   "settings": {
-    "title": "Ustawienia konta",
-    "passwordSection": "Zmiana hasła",
     "currentPasswordLabel": "Obecne hasło",
     "currentPasswordRequired": "Podaj obecne hasło, aby potwierdzić tę zmianę.",
     "newPasswordLabel": "Nowe hasło",
     "changePasswordButton": "Zmień hasło",
     "passwordChanged": "Hasło zostało zmienione.",
-    "emailSection": "Zmiana e-maila",
-    "emailHelp": "Wyślemy link na nowy adres. E-mail zmieni się dopiero po otwarciu tego linku.",
-    "newEmailLabel": "Nowy e-mail",
     "passwordToConfirmLabel": "Obecne hasło",
-    "changeEmailButton": "Wyślij link potwierdzający",
-    "emailLinkSent": "Wysłaliśmy link potwierdzający na nowy adres. Otwórz go, aby dokończyć zmianę.",
-    "deleteSection": "Usunięcie konta",
-    "deleteWarningTitle": "Tej operacji nie można cofnąć",
-    "deleteWarning": "Profil i logowanie zostaną trwale usunięte. Aby ponownie korzystać z Soberity, trzeba będzie założyć nowe konto.",
+    "deleteWarningTitle": "Tej operacji nie można cofnąć.",
     "deletePending": "Poprzednie usuwanie nie zostało dokończone. Potwierdź hasło, aby je dokończyć.",
-    "deleteConfirmLabel": "Rozumiem, że konto i dane zostaną usunięte",
-    "deleteConfirmRequired": "Potwierdź, że rozumiesz skutki usunięcia.",
     "deleteButton": "Usuń moje konto",
     "deleteResumeButton": "Dokończ usuwanie konta"
   },
@@ -196,20 +179,20 @@
       "home": "Strona główna",
       "science": "Science & Discover",
       "events": "Sober Events",
-      "games": "Sober Games",
       "community": "Soberity (społeczność)",
       "map": "World Map",
       "brain": "Brain Lab",
       "myths": "Myth Buster"
     },
     "open": "Otwórz menu",
-    "close": "Zamknij menu"
+    "close": "Zamknij menu",
+    "openAccount": "Otwórz konto"
   },
   "preferences": {
     "title": "Ustawienia wyświetlania",
     "theme": "Motyw",
-    "plumSoft": "Ciemny · Śliwka",
-    "violet": "Jasny · Fiolet",
+    "darkMode": "Tryb ciemny",
+    "lightMode": "Tryb jasny",
     "language": "Język",
     "english": "English",
     "polish": "Polski",

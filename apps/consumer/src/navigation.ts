@@ -1,11 +1,41 @@
 /** Main product areas; implementation details stay inside their sections. */
 export const navigationItems = [
-  { id: 'home', icon: '🏠', href: '/' },
-  { id: 'science', icon: '🔬', href: '/science' },
-  { id: 'events', icon: '🎉', href: '/events' },
-  { id: 'games', icon: '🎮' },
-  { id: 'community', icon: '👥' },
-  { id: 'map', icon: '🗺️' },
-  { id: 'brain', icon: '🧠' },
-  { id: 'myths', icon: '🤖' },
+  {
+    id: 'home',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/main-page-icon.png') as number,
+    href: '/',
+  },
+  {
+    id: 'science',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/science-icon.png') as number,
+    href: '/science',
+  },
+  {
+    id: 'events',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/events-icon.png') as number,
+    href: '/events',
+  },
+  {
+    id: 'community',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/community-icon.png') as number,
+  },
+  {
+    id: 'map',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/map-icon.png') as number,
+  },
+  {
+    id: 'brain',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/brain-icon.png') as number,
+  },
+  {
+    id: 'myths',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/myths-icon.png') as number,
+  },
 ] as const;

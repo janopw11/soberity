@@ -115,9 +115,21 @@ describe('account language', () => {
       guestLanguage: 'pl',
     });
 
-    expect(provision).toHaveBeenCalledWith('token-uid-a', 'pl');
+    expect(provision).toHaveBeenCalledWith('token-uid-a', 'pl', null);
     expect(applied).toBe('en');
     expect(applyLanguage).toHaveBeenCalledWith('en');
+  });
+
+  it('sends the sign-up username with the provisioning request', async () => {
+    provision.mockResolvedValue(profileWith('pl'));
+
+    await syncAccountLanguage({
+      ...deps('uid-a', newApply()),
+      guestLanguage: null,
+      initialDisplayName: 'Jane',
+    });
+
+    expect(provision).toHaveBeenCalledWith('token-uid-a', null, 'Jane');
   });
 
   it('keeps the current language when the account has no preference', async () => {

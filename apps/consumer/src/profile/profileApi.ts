@@ -85,12 +85,20 @@ async function request<T>(
  * owner; no user identifier is sent from the client.
  */
 export const profileApi = {
-  /** Creates the profile on first use. `initialLocale` is applied only when creating it. */
-  provision(idToken: string, initialLocale: ProfileLocale | null) {
-    return request<Profile>(idToken, {
-      method: 'POST',
-      body: initialLocale ? { initialLocale } : {},
-    });
+  /**
+   * Creates the profile on first use. `initialLocale` and `initialDisplayName` are applied only when
+   * the backend creates it.
+   */
+  provision(
+    idToken: string,
+    initialLocale: ProfileLocale | null,
+    initialDisplayName: string | null = null,
+  ) {
+    const body: { initialLocale?: ProfileLocale; initialDisplayName?: string } =
+      {};
+    if (initialLocale) body.initialLocale = initialLocale;
+    if (initialDisplayName) body.initialDisplayName = initialDisplayName;
+    return request<Profile>(idToken, { method: 'POST', body });
   },
   get(idToken: string) {
     return request<Profile>(idToken, { method: 'GET' });

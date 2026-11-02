@@ -24,7 +24,11 @@ export type AccountLanguageDeps = {
  *   no preference (the current language is kept).
  */
 export async function syncAccountLanguage(
-  deps: AccountLanguageDeps & { guestLanguage: SupportedLanguage | null },
+  deps: AccountLanguageDeps & {
+    guestLanguage: SupportedLanguage | null;
+    /** Username chosen at sign-up; sent only when the backend creates the profile. */
+    initialDisplayName?: string | null;
+  },
 ): Promise<SupportedLanguage | null> {
   const token = await deps.getToken();
   if (!token) return null;
@@ -46,7 +50,11 @@ export async function syncAccountLanguage(
   }
 
   try {
-    const profile = await profileApi.provision(token, deps.guestLanguage);
+    const profile = await profileApi.provision(
+      token,
+      deps.guestLanguage,
+      deps.initialDisplayName ?? null,
+    );
     if (!profile.locale) return null;
 
     await writeAccountLocale(deps.uid, {

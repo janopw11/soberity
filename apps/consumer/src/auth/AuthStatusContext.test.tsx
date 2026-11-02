@@ -13,7 +13,11 @@ jest.mock('./identityApi', () => {
 
 const fetchMock = jest.mocked(fetchBackendIdentity);
 
-const user: AuthUser = { uid: 'user-1', email: 'jane@example.com' };
+const user: AuthUser = {
+  uid: 'user-1',
+  email: 'jane@example.com',
+  displayName: null,
+};
 
 function createFakeAdapter(token: string | null = 'id-token') {
   let listener: ((value: AuthUser | null) => void) | undefined;
@@ -24,9 +28,13 @@ function createFakeAdapter(token: string | null = 'id-token') {
         listener = undefined;
       };
     }),
-    signUp: jest.fn<(email: string, password: string) => Promise<void>>(
-      async () => undefined,
-    ),
+    signUp: jest.fn<
+      (
+        email: string,
+        password: string,
+        displayName: string | null,
+      ) => Promise<void>
+    >(async () => undefined),
     signIn: jest.fn<(email: string, password: string) => Promise<void>>(
       async () => undefined,
     ),
@@ -148,7 +156,11 @@ describe('AuthStatusContext', () => {
 
     await act(async () => {
       await result.current?.signIn('jane@example.com', 'secret-password');
-      await result.current?.signUp('new@example.com', 'secret-password');
+      await result.current?.signUp(
+        'new@example.com',
+        'secret-password',
+        'Jane',
+      );
       await result.current?.resendVerificationEmail();
       await result.current?.refreshVerificationStatus();
       await result.current?.applyEmailVerificationAction('oob-code');
@@ -162,6 +174,7 @@ describe('AuthStatusContext', () => {
     expect(adapter.signUp).toHaveBeenCalledWith(
       'new@example.com',
       'secret-password',
+      'Jane',
     );
     expect(adapter.sendEmailVerification).toHaveBeenCalledTimes(1);
     expect(adapter.reload).toHaveBeenCalledTimes(1);
