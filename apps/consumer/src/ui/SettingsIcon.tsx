@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export type SettingsIconName =
@@ -75,7 +76,14 @@ export function SettingsIcon({
   size?: number;
 }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" accessible={false}>
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      {...(Platform.OS === 'web'
+        ? { 'aria-hidden': true }
+        : { accessible: false })}
+    >
       {ICON_PATHS[name].map((d) => (
         <Path
           key={d}

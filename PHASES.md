@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00 i P1-I01 DONE (2/7), następna P1-I02. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), następna P1-I03. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -73,7 +73,7 @@ Blockers: opis lub —
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
-| Phase 1 | Science & Discover MVP | 7 | 2/7 | IN_PROGRESS |
+| Phase 1 | Science & Discover MVP | 7 | 3/7 | IN_PROGRESS |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **15/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL).
+**Łącznie:** 79 iteracji agentowych; wykonane: **16/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -606,23 +606,23 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I02 — Editorial workflow & admin UI
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P1-I01  
-**Dowód:** —  
-**Blokery:** —
+**Status:** DONE
+**Started:** 2026-11-03
+**Finished:** 2026-11-03
+**Zależności iteracji:** P1-I01
+**Dowód:** `backend/EDITORIAL_API.md`, moduł `evidence/editorial`, Flyway V6, `EditorialApiIT`, panel `/editorial` i testy klienta/przeglądarkowe; `docs/testing/P1-I02-results.md`. Maven verify 8 unit + 73 IT PASS (9 editorial IT), Jest 76/76 PASS, Playwright realny backend/Firebase emulator/PostgreSQL 8/8 + 2/2 ukierunkowane PASS, pnpm check/build i export:native PASS.
+**Blokery:** brak dla webowego zakresu P1-I02. Role rzeczywistych redaktorów nadaje operator, brak domyślnych grantów. Native runtime i VoiceOver/TalkBack NOT VERIFIED; panel jest web-only, fallback natywny przetestowany komponentowo, eksporty iOS/Android PASS. Staging/hosted CI i otwarte bramki Phase 0 bez zmian.
 
 **Zakres zadań:**
 
-- [ ] `P1-I02-T01` Dodaj DRAFT→IN_REVIEW→PUBLISHED→ARCHIVED i audit trail.
-- [ ] `P1-I02-T02` Zbuduj minimalistyczny panel redaktorski na webie.
-- [ ] `P1-I02-T03` Rozdziel role author/reviewer i odrębne zatwierdzenie.
-- [ ] `P1-I02-T04` Zablokuj edycję opublikowanej wersji bez nowej rewizji.
+- [x] `P1-I02-T01` Dodaj DRAFT→IN_REVIEW→PUBLISHED→ARCHIVED i audit trail.
+- [x] `P1-I02-T02` Zbuduj minimalistyczny panel redaktorski na webie.
+- [x] `P1-I02-T03` Rozdziel role author/reviewer i odrębne zatwierdzenie.
+- [x] `P1-I02-T04` Zablokuj edycję opublikowanej wersji bez nowej rewizji.
 
 **Weryfikacja:**
 
-- [ ] `P1-I02-V01` Testy ról, wersji, niekompletnych źródeł i wycofania publikacji.
+- [x] `P1-I02-V01` Testy ról, wersji, niekompletnych źródeł i wycofania publikacji.
 
 **Definition of Done:** Recenzent może świadomie zatwierdzić i wycofać materiał. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2160,14 +2160,15 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 2/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
-- **Aktualna iteracja:** `P1-I01` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
-- **Następna iteracja:** `P1-I02` — Editorial workflow & admin UI; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
-- **Wykonano:** publiczne API kategorii EN/PL, claimów, artykułów i cytowań; jawne projekcje bez UID redakcji, PUBLISHED-only, ukrywanie zależności wycofanego claimu, filtrowanie/paginacja, ETag i rewalidacja, blokada zapisów; Flyway V5 i dokumentacja API. Raport: `docs/testing/P1-I01-results.md`.
-- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. Ukończenie P1-I01 nie zamyka tych bramek.
-- **Środowisko testowe:** natywny PostgreSQL 17.11, izolowany klaster `/tmp/soberity-p1-i00/pgdata`, nowe bazy `soberity_test_p1i01` i `soberity_test_p1i01_final` na loopback:25439. Nie używano istniejących danych aplikacji ani globalnej usługi. Sandbox wymagał eskalacji dla pamięci współdzielonej i połączeń localhost. Docker nie naprawiany ani ponownie testowany; CI domyślnie nadal używa Testcontainers.
-- **Ostatni potwierdzony wynik testów:** 2026-11-03 P1-I01: Maven verify PASS (8 unit + 64 IT; 14 Science API IT), Flyway fresh V1–V5 + upgrade V3→V5, ACL/profil/evidence/współbieżność PASS. `pnpm check` i `git diff --check` PASS. Bez zmian klienta i nowych testów runtime web/iOS/Android.
-- **Akceptacja i granice:** bez deploymentu, commit/push, rzeczywistych publikacji naukowych i operacji produkcyjnych. Role i mutacje redakcyjne oraz panel pozostają P1-I02. `/docs` nadal lokalne, poza Git.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
+- **Aktualna iteracja:** `P1-I02` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
+- **Następna iteracja:** `P1-I03` — Discover reading experience; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
+- **Wykonano:** prywatne API i panel web `/editorial`, role AUTHOR/REVIEWER z grantów operatora, niezależna recenzja claimów i całych artykułów, źródła/cytowania, nowe rewizje bez nadpisywania historii, publikacja/zastąpienie/wycofanie i append-only audit. EN/PL, oba motywy, formularze, stany i poprawki ARIA; Flyway V6 i dokumentacja API/provisioningu. Raport: `docs/testing/P1-I02-results.md`.
+- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. P1-I02 nie zamyka tych bramek.
+- **Środowisko testowe:** PostgreSQL 17.11, izolowany klaster `/tmp/soberity-p1-i00/pgdata`, nowe bazy `soberity_test_p1i02` i `soberity_test_p1i02_web` na loopback:25439. Realny lokalny backend :8092 i demo Firebase Auth emulator :9099; Expo web :8091. Bez istniejących danych aplikacji i globalnych usług. Sandbox wymagał eskalacji dla lokalnych usług/testów; Docker nie naprawiany, CI domyślnie nadal Testcontainers.
+- **Ostatni potwierdzony wynik testów:** 2026-11-03: Maven 8 unit + 73 IT PASS (9 nowych editorial IT); fresh V1–V6 i upgrade V3→V6; Jest 76/76 PASS; Playwright 8/8 PASS i 2/2 powtórzone scenariusze artykułów, realne API/emulator/DB, desktop/mobile-web, EN/dark i PL/light, keyboard/ARIA. pnpm check/build/export:native i git diff --check PASS. Zrzuty przejrzano wizualnie.
+- **Pokrycie platform:** panel web-only. Native fallback ma test komponentowy i poprawne eksporty iOS/Android; nowego runtime natywnego nie testowano. iPhone 17 Pro / iOS 26.5 booted, brak podłączonego Android Emulatora; VoiceOver/TalkBack NOT VERIFIED.
+- **Akceptacja i granice:** bez deploymentu, commit/push, rzeczywistych publikacji i operacji produkcyjnych. Tylko syntetyczne publikacje/granty w izolowanych testach. Realne granty operator nadaje zgodnie z `backend/EDITORIAL_API.md`. `/docs` pozostaje lokalne, poza Git. P1-I03 nie rozpoczęto.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2316,3 +2317,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-03 | P0-I11 — test coverage & E2E web | IN_PROGRESS; T01, T02, T04, V01, V02 PASS; T03 częściowo zweryfikowane | Asercje dopasowane do publicznego welcome i authenticated Home; walidacja logowania/resetu; emulatorowy Playwright account journey i bezpieczne API fixtures. Jest 71/71, `pnpm check` PASS, Maven verify 37/37. Pełny web run 17/18: desktop E2E PASS, mobile Home/navigation PASS. Raport `docs/testing/P0-I11-results.md`. | Mobile E2E utknął w stanie session-loading po profilu. Zmieniono test na SPA navigation; ponowienie zablokowane przez Docker overlay read-only. Nie oznaczać DONE do PASS. |
 
 | 2026-11-03 | P1-I01 | DONE; T01–T04 i V01 zweryfikowane | Publiczne API Science/evidence, projekcje publiczne, filtry/paginacja, ETag JSON + rewalidacja, CORS, deny-all zapisów; Flyway V5 z kategoriami i recenzowanymi wersjami artykułów. Maven 8 unit + 64 IT PASS (14 Science API IT), pnpm check i diff check PASS. Dokumentacja API, PHASES/CHANGELOG i lokalny raport P1-I01. | Izolowany PostgreSQL 17.11; migracje fresh V1–V5 i upgrade V3→V5, wycofanie i podmiana wersji/ETag potwierdzone. Skorygowano oczekiwanie testu odrzuconego tokenu: istniejący filtr daje wyłącznie dostęp anonimowy do publicznego GET; prywatne/zapis nadal 401. Bez zmian UI ani testów runtime platform; P0 nadal otwarta. Następna P1-I02 tylko po poleceniu. |
+
+| 2026-11-03 | P1-I02 | DONE; T01–T04 i V01 zweryfikowane | Prywatne API workflow, role AUTHOR/REVIEWER, Flyway V6 i immutable audit; panel web EN/PL, oba motywy, pełna karta dowodów, osobna recenzja artykułu, publikacja/wycofanie, nowe wersje; poprawki wrap/ARIA w SettingsRow i dekoracji SVG. Maven 81 testów PASS, Jest 76/76, Playwright 8/8 + 2/2 artykuły PASS na realnym lokalnym API/Firebase emulator/PostgreSQL; check/build/native exports i diff check PASS. Raport P1-I02, dokumentacja i CHANGELOG. | Role rzeczywistych redaktorów nadaje operator; brak grantów aplikacyjnych i rzeczywistych publikacji. Web-only; native runtime i czytniki natywne NOT VERIFIED. P0 otwarta; następna P1-I03 tylko po poleceniu. |

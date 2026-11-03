@@ -47,6 +47,10 @@ export default function AuthenticatedLayout() {
           ),
         }}
       />
+      <Stack.Screen
+        name="editorial"
+        options={{ title: t('editorial.title') }}
+      />
       <Stack.Screen name="account" options={{ title: t('account.title') }} />
       <Stack.Screen
         name="account-personal-data"

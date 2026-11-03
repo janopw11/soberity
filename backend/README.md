@@ -38,3 +38,7 @@ Na Windows dostępny jest `mvnw.cmd`; nie został przetestowany na Windows.
 ## Science public API
 
 P1-I01 routes, response fields, publication visibility and ETag contract are documented in [SCIENCE_API.md](SCIENCE_API.md).
+
+## Editorial workflow
+
+See [EDITORIAL_API.md](EDITORIAL_API.md) for private endpoints, operator-managed AUTHOR/REVIEWER grants, audit history and the `/editorial` web workspace.

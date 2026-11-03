@@ -165,3 +165,11 @@ potwierdzeniem IPA/APK. Aktualne schematy profili:
 Wcześniejsze lokalne raporty i akceptacja właściciela P0-I12 są w
 `docs/testing/phase-0-results.md`. Staging opisuje
 [infra/staging/README.md](../../infra/staging/README.md).
+
+## Editorial workspace (P1-I02)
+
+`/editorial` is a web workspace for users with backend-managed AUTHOR or
+REVIEWER grants. An entry appears in Account after editorial access is
+confirmed; native clients show a web-only message. Role provisioning, workflow,
+private API and isolated full-stack browser test setup are documented in
+[EDITORIAL_API.md](../../backend/EDITORIAL_API.md).

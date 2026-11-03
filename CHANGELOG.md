@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- P1-I02: dodano panel redakcyjny web EN/PL i prywatne API z rolami autora i recenzenta. Niezależne zatwierdzanie twierdzeń i całych artykułów, wersjonowanie, publikacja/wycofanie oraz nieedytowalna historia działań; poprawiono dostępność potwierdzeń recenzji na webie. Maven 81 testów, klient 76/76, Playwright na realnym lokalnym backendzie 8/8 oraz 2/2 scenariusze artykułów PASS; check i eksporty web/iOS/Android PASS. Panel web-only, nowe testy runtime natywnego nie były wykonywane.
+
 - P1-I01: dodano publiczne API kategorii EN/PL, twierdzeń, artykułów i cytowań z filtrowaniem, paginacją i rewalidacją ETag. API ujawnia wyłącznie opublikowane treści, ukrywa artykuły zależne od wycofanej wersji twierdzenia i odmawia zapisów. Flyway V5 wymaga niezależnej recenzji wersji artykułu. Maven: 8 testów unit + 64 integracyjne PASS (14 nowych Science API); pnpm check PASS na izolowanym PostgreSQL 17.11.
 
 - P1-I00: wdrożono model źródeł naukowych i wersjonowanych twierdzeń, cytowania, niezależne recenzje oraz politykę źródeł uwzględniającą The Lancet. Migracja Flyway chroni publikację przed brakiem źródeł/recenzji, samoakceptacją, nieuzasadnioną przyczynowością i nadpisaniem historii. Zweryfikowano migracje, upgrade V3→V4, JPA i współbieżność na izolowanym PostgreSQL 17.11; Maven 58 testów i pnpm check PASS.

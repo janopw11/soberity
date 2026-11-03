@@ -2,9 +2,10 @@
 
 Scope: P1-I00 scientific model/database integrity and P1-I01 public reads.
 See [SCIENCE_API.md](SCIENCE_API.md) for category, claim, article and citation
-contracts. Editorial roles, mutation workflows and admin UI remain P1-I02.
-There are no publication endpoints, automatic importers, actual research seeds
-or UI changes.
+contracts. Editorial roles, mutation workflows and the web workspace are described in
+[EDITORIAL_API.md](EDITORIAL_API.md) (P1-I02).
+There are no automatic importers or actual research seeds. Publication uses
+private reviewer-authorized endpoints; public science routes remain read-only.
 
 ## Source selection and scientific judgement
 
@@ -153,3 +154,7 @@ ETags require revalidation on every reuse, including after withdrawal. No
 editorial UIDs or article review notes are exposed. Source assessment notes
 are public citation explanations. Future editorial APIs must derive identities
 from authenticated principals; current science/evidence routes reject writes.
+
+P1-I02 implements private author/reviewer RBAC, independent approval, explicit
+publication/withdrawal and append-only action history. Source and text
+corrections still create new immutable snapshots/versions. See EDITORIAL_API.

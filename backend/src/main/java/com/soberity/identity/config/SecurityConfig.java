@@ -52,6 +52,7 @@ public class SecurityConfig {
                                 "/api/v1/science/articles/*", "/api/v1/evidence/claims",
                                 "/api/v1/evidence/claims/*", "/api/v1/evidence/claims/*/citations",
                                 "/api/v1/evidence/sources/*").permitAll()
+                        .requestMatchers("/api/v1/editorial/**").hasRole("USER")
                         .requestMatchers("/api/v1/science/**", "/api/v1/evidence/**").denyAll()
                         .requestMatchers("/api/v1/**").hasRole("USER")
                         .anyRequest().authenticated())

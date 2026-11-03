@@ -46,6 +46,8 @@ export function SettingsSectionLabel({ children }: { children: ReactNode }) {
 
 type SettingsRowProps = {
   label: string;
+  /** Allows longer acknowledgement text to remain fully visible. */
+  multilineLabel?: boolean;
   icon?: SettingsIconName;
   /** Shows the label only as a popover on the icon; the value takes its place. */
   labelAsHint?: boolean;
@@ -73,6 +75,7 @@ type SettingsRowProps = {
 export function SettingsRow({
   label,
   icon,
+  multilineLabel = false,
   labelAsHint = false,
   valueMuted = false,
   value,
@@ -107,7 +110,7 @@ export function SettingsRow({
               accent && styles.accentLabel,
               destructive && { color: colors.danger },
             ]}
-            numberOfLines={1}
+            numberOfLines={multilineLabel ? 0 : 1}
           >
             {label}
           </Text>
@@ -163,6 +166,7 @@ export function SettingsRow({
   return (
     <Pressable
       accessibilityRole={role}
+      aria-checked={checkbox ? checked : selected}
       accessibilityLabel={label}
       accessibilityValue={value ? { text: value } : undefined}
       accessibilityState={{

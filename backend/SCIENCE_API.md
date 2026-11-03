@@ -6,8 +6,8 @@ tokens retain anonymous access to public reads; they grant no identity or write
 access, matching the existing Firebase filter. Private profile/auth APIs retain
 their existing authorization. All science/evidence writes and unmatched routes
 are denied (401 anonymous, 403 authenticated), including publication attempts.
-There are no editorial mutation endpoints or client-supplied role overrides.
-The editorial workflow and roles belong to P1-I02.
+These public routes expose no editorial mutations or client-supplied role overrides.
+The private editorial workflow and roles are documented in [EDITORIAL_API.md](EDITORIAL_API.md); public writes remain denied.
 
 | Route                                    | Response / filters                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------------- |

@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { spacing } from '@soberity/design-tokens';
 
 import { useAuthStatus } from './auth/AuthStatusContext';
+import EditorialEntry from './editorial/EditorialEntry';
 import DeleteAccountSection from './account/DeleteAccountSection';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 import { Screen, SettingsGroup, SettingsRow } from './ui';
@@ -53,6 +54,7 @@ export default function AccountScreen() {
           />
         </SettingsGroup>
 
+        <EditorialEntry />
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
         <SettingsGroup>
