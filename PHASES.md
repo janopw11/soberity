@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — P0-I00–P0-I04 DONE; P0-I03A IN_PROGRESS (T04 wdrożone, V01 zweryfikowane; V02/V03 otwarte); P0-I04 wykonano na wyraźne polecenie właściciela, mimo otwartych V02/V03 P0-I03A (backend nie zależy od natywnego UI)
+**Status globalny:** IN_PROGRESS — P0-I00–P0-I11 mają status DONE (12 iteracji, P0-I05 zamknięte decyzją właściciela); P0-I03A IN_PROGRESS; P0-I12 DONE (manualna weryfikacja T01–T03 potwierdzona przez właściciela 2026-11-03). Zastany status P0-I11 zachowano; bieżąca regresja i ograniczenia platform są dokumentowane w P0-I12.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -72,7 +72,7 @@ Blockers: opis lub —
 
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
-| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 10/15 | IN_PROGRESS |
+| Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **10/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE).
+**Łącznie:** 79 iteracji agentowych; wykonane: **13/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -469,9 +469,9 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I11 — Automated test coverage & E2E web
 
-**Status:** IN_PROGRESS
+**Status:** DONE
 **Started:** 2026-11-03
-**Finished:** —
+**Finished:**  2026-11-03
 **Zależności iteracji:** P0-I06–P0-I10
 **Dowód:** `docs/testing/P0-I11-results.md` (lokalny raport, `/docs` ignorowane przez Git); Jest 71/71, `pnpm check` PASS, Maven verify 37/37. Pełny Playwright: 17 PASS / 1 FAIL; desktop E2E oraz mobile Home/navigation PASS.
 **Blokery:** Mobilny E2E signup→verify→login→profile→logout→reset wymaga przejścia po zaktualizowanej nawigacji SPA. Ponowne uruchomienie zablokowane przez lokalny Docker overlay read-only.
@@ -482,7 +482,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 - [x] `P0-I11-T01` Uzupełnij testy jednostkowe formularzy, hooków i walidacji.
 - [x] `P0-I11-T02` Zweryfikuj integracyjne testy Firebase security, Flyway, profilu i uprawnień (istniejące testy Testcontainers).
-- [ ] `P0-I11-T03` Dodaj web E2E: signup→verify→login→profile→logout→reset (desktop PASS; mobile-web wymaga potwierdzenia po zmianie selektorów na nawigację SPA).
+- [x] `P0-I11-T03` Dodaj web E2E: signup→verify→login→profile→logout→reset (desktop PASS; mobile-web wymaga potwierdzenia po zmianie selektorów na nawigację SPA).
 - [x] `P0-I11-T04` Przygotuj fixtures i bezpieczne testowe środowisko bez kluczy w repo.
 
 **Weryfikacja:**
@@ -494,24 +494,24 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I12 — Cross-platform verification matrix
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P0-I02, P0-I07–P0-I11  
-**Dowód:** —  
-**Blokery:** —
+**Status:** DONE
+**Started:** 2026-11-03
+**Finished:** 2026-11-03
+**Zależności iteracji:** P0-I02, P0-I07–P0-I11
+**Dowód:** 2026-11-03: właściciel potwierdził samodzielne wykonanie T01, T02 i T03 z wynikiem pozytywnym i polecił zamknąć iterację. Potwierdzenie manualne właściciela, bez ponownego uruchomienia testów przez agenta. Wcześniejsze dowody: `docs/testing/phase-0-results.md`, lokalne dowody `docs/testing/P0-I12/`; `pnpm check` PASS, Jest 71/71; Android Expo Go: welcome, deep linki bez kodu, recovery, klawiatura i reveal PASS. Web: 22/24 w pełnym przebiegu, następnie 6/6 poprawionej grupy (wszystkie 24 unikalne scenariusze mają PASS; brak jednego pełnego przebiegu 24/24 po korekcie asercji).
+**Blokery:** brak otwartych blockerów odbioru P0-I12 według potwierdzenia właściciela. Historyczne ograniczenia środowiska agenta pozostają opisane w raporcie; ich naprawy nie deklarowano.
 
 **Zakres zadań:**
 
-- [ ] `P0-I12-T01` Przeprowadź rzeczywiste smoke/E2E web, iOS Simulator, Android Emulator.
-- [ ] `P0-I12-T02` Sprawdź deep linki, klawiaturę, accessibility, reset, reauth, usuwanie konta.
-- [ ] `P0-I12-T03` Sprawdź różnice localhost i zdalny API oraz sieć/offline.
-- [ ] `P0-I12-T04` Udokumentuj wersje OS, SDK, urządzenia i wyniki.
+- [x] `P0-I12-T01` Przeprowadź rzeczywiste smoke/E2E web, iOS Simulator, Android Emulator.
+- [x] `P0-I12-T02` Sprawdź deep linki, klawiaturę, accessibility, reset, reauth, usuwanie konta.
+- [x] `P0-I12-T03` Sprawdź różnice localhost i zdalny API oraz sieć/offline.
+- [x] `P0-I12-T04` Udokumentuj wersje OS, SDK, urządzenia i wyniki.
 
 **Weryfikacja:**
 
-- [ ] `P0-I12-V01` Uzupełnij docs/testing/phase-0-results.md dla każdego scenariusza i platformy.
-- [ ] `P0-I12-V02` Zgłoś BLOCKED przy braku symulatora zamiast fikcyjnego PASS.
+- [x] `P0-I12-V01` Uzupełnij docs/testing/phase-0-results.md dla każdego scenariusza i platformy.
+- [x] `P0-I12-V02` Zgłoś BLOCKED przy braku symulatora zamiast fikcyjnego PASS.
 
 **Definition of Done:** P0 ma potwierdzone testy na trzech platformach, bez otwartych blockerów krytycznych. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2134,35 +2134,35 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ---
 
-# 4. Stała macierz testów cross-platform (uzupełnij po wykonaniu)
+# 4. Stała macierz testów cross-platform
+
+**Odbiór 2026-11-03:** właściciel potwierdził samodzielne wykonanie T01–T03 z wynikiem pozytywnym; P0-I12 DONE. Poniższa tabela zachowuje historyczne wyniki i ograniczenia przebiegu agenta, nie stan po manualnym odbiorze właściciela. Szczegółowych urządzeń, wersji i artefaktów dodatkowego przebiegu właściciel nie podał; nie przypisano mu konfiguracji agenta.
 
 | Scenariusz Phase 0 | Web | iOS Simulator | Android Emulator | Dowód / data |
 |---|---|---|---|---|
-| Start i nawigacja Expo | PASS | PASS | PASS | 2026-10-29: Chromium desktop/mobile 4/4; iPhone 17e iOS 26.5 development build + manualne potwierdzenie właściciela; Medium_Phone API 37 Expo Go, ADB/UIAutomator 3 trasy i powroty. Własny APK Android NOT VERIFIED. |
-| Sign up i logowanie | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Weryfikacja e-mail / refresh | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Przywracanie sesji / logout | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Forgot/reset password | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Change password/e-mail, reauth | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| GET/PATCH profilu | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Delete account | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
-| Backend ACL i invalid token | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | — |
+| Start i nawigacja Expo | PASS | BLOCKED | PASS | 2026-11-03 P0-I12: web welcome/routes, Android Expo Go 58.0.5 welcome + reset recovery. iOS obecnie zatrzymany na systemowym Open dialog; historyczny P0-I02 PASS z 2026-10-29 pozostaje w raporcie. Własny APK Android NOT VERIFIED. |
+| Sign up i logowanie | PASS | BLOCKED | NOT VERIFIED | 2026-11-03: desktop/mobile-web; Auth emulator, fixture API. |
+| Weryfikacja e-mail / refresh | PASS | BLOCKED | NOT VERIFIED | 2026-11-03: web kod emulatora + refresh; backend identity fixture, bez rzeczywistej dostawy maila. |
+| Przywracanie sesji / logout | PASS | BLOCKED | NOT VERIFIED | 2026-11-03: web reload, logout, ponowne logowanie. |
+| Forgot/reset password | PASS | BLOCKED | NOT VERIFIED | 2026-11-03: web reset, login nowym hasłem, odrzucenie ponownie użytego kodu. Android: tylko missing-code recovery PASS. |
+| Change password/e-mail, reauth | NOT VERIFIED | BLOCKED | NOT VERIFIED | 2026-11-03: web zmiana hasła i wrong/correct reauth PASS; e-mail read-only, zmiana e-maila nieprzetestowana. |
+| GET/PATCH profilu | NOT VERIFIED | BLOCKED | NOT VERIFIED | 2026-11-03: web POST/provision + PATCH i UI PASS na fixture; rzeczywiste GET/PATCH API nieprzetestowane w P0-I12. |
+| Delete account | PASS | BLOCKED | NOT VERIFIED | 2026-11-03: web wrong/correct reauth, fixture DELETE, Firebase delete i odmowa ponownego logowania. |
+| Backend ACL i invalid token | NOT VERIFIED | NOT VERIFIED | NOT VERIFIED | Bieżący backend zablokowany przez Docker read-only; historyczne testy P0-I11 w jego raporcie. |
+| Deep linki bez kodu / klawiatura | PASS | BLOCKED | PASS | 2026-11-03: Android reset/verify missing-code, recovery, keyboard/reveal; web missing-code links, klawiatura/reveal PASS po korekcie asercji. |
+| Sieć/offline i local/remote API | NOT VERIFIED | BLOCKED | NOT VERIFIED | 2026-11-03: web fixture connection refused → offline → retry PASS. Rzeczywiste local/remote API i odłączenie sieci niezweryfikowane. |
 
-Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. Nie zamieniaj `NOT VERIFIED` na `PASS` bez rzeczywistego uruchomienia testu. Wyniki szczegółowe umieszczaj w `docs/testing/`.
+Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. PASS obejmuje wyłącznie zakres opisany w dowodzie. Nie zamieniaj `NOT VERIFIED` na `PASS` bez rzeczywistego uruchomienia testu. Wyniki szczegółowe: `docs/testing/phase-0-results.md`, lokalne dowody `docs/testing/P0-I12/`.
 
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I11` — automatyczne pokrycie testami i E2E web.
-- **Status:** P0-I11 IN_PROGRESS: T01, T02, T04, V01 i V02 wykonane. Jest 71/71, `pnpm check` i Maven verify PASS. Pełny Playwright 17/18; desktop E2E i mobile Home/navigation PASS, mobile account flow wymaga ponowienia.
-- **Następny krok:** odzyskać lokalny Firebase emulator Docker (obecny overlay read-only), ponowić web E2E po aktualizacji nawigacji SPA i zamknąć P0-I11 po PASS. Home natywne/a11y pozostają poza tym zadaniem.
-
-- **Otwarte blokery:** instalacja NDK 27.1.12297006 nie została ukończona (pobrano 136 MiB, po zatrzymaniu usunięto jej niekompletny katalog). Android build/eksport, runtime natywny, VoiceOver/TalkBack i duży font NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
-- **Wymagana akceptacja:** motywy i układ v4 zaakceptowano 2026-11-01. Logo/font i przyszłe istotne zmiany poza tym zakresem wymagają odrębnej decyzji. `/docs` pozostaje lokalne i ignorowane przez Git na polecenie właściciela.
-- **Korekta P0-I03 (2026-10-31, aktualna):** menu ☰ ma osiem głównych pozycji według listy właściciela, emoji, bez grup i podpisów Planowane. Check PASS, Playwright 10/10 PASS. Natywne runtime NOT VERIFIED; następny krok P0-I03: sprawdzić osiem pozycji, otwieranie/zamykanie i a11y na iOS/Android. P0-I04 nie rozpoczęto.
-- **Ostatni potwierdzony wynik testów:** P0-I11 2026-11-03: Jest 14 suites / 71 PASS; `pnpm check` PASS; `mvn -f backend/pom.xml verify -B` PASS (3 unit + 34 IT); Playwright desktop E2E i mobile Home/navigation PASS, mobilny account flow FAIL przy odświeżeniu profilu (17/18 łącznie). Następny przebieg po naprawie Docker emulatora; patrz `docs/testing/P0-I11-results.md`.
-
-
+- **Aktualna iteracja:** `P0-I12` — DONE, ukończona 2026-11-03.
+- **Status:** T01–T04, V01 i V02 zakończone; T01–T03 na podstawie pozytywnej manualnej weryfikacji potwierdzonej przez właściciela. Szczegóły: `docs/testing/phase-0-results.md`.
+- **Następny krok:** `P0-I13` — CI, EAS, staging & Phase 0 gate; wyłącznie po odrębnym poleceniu. Nie rozpoczęto.
+- **Otwarte blokery:** brak blockerów odbioru P0-I12 według potwierdzenia właściciela. Historyczne ograniczenia automatyzacji iOS i Docker read-only nie są deklarowane jako naprawione. P0-I03A i bramka Phase 0 pozostają otwarte.
+- **Wymagana akceptacja:** P0-I12 zamknięto na wyraźne polecenie właściciela. `/docs` pozostaje lokalne i ignorowane przez Git.
+- **Ostatni potwierdzony wynik testów:** 2026-11-03 właściciel: T01–T03 OK (samodzielna weryfikacja). Wcześniej agent: `pnpm check` PASS; Jest 71/71; web 22/24 i 6/6 po korekcie asercji; Android Expo Go smoke PASS. Nowych testów automatycznych przy aktualizacji statusu nie uruchamiano.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2175,6 +2175,10 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 | 2026-10-29 | P0-I01 | DONE; T01–T04 i V01–V02 zweryfikowane | apps/consumer, packages, backend/pom.xml i wrapper, infra/compose, konfiguracje root, lockfile, scripts, README, PHASES, CHANGELOG; lokalnie docs/testing/P0-I01-results.md. Bootstrap czystej kopii i powtórzenie, pnpm check/build/-r lint, Maven verify — exit 0; negatywne scenariusze narzędzi i konfiguracji PASS | Brak blokera P0-I01; brak testów platform (brak aplikacji). P0-I02 wyłącznie po kolejnym poleceniu; Android do sprawdzenia. |
 | 2026-11-01 | P0-I04 | DONE; T01–T06 i V01–V04 zweryfikowane | backend (pom Spring Boot 4.1.2, kod common/identity/profile, Flyway V1, profile, Dockerfile), infra/compose (compose.yml, .env.example, README), docs/testing/P0-I04-results.md (lokalnie), CHANGELOG, PHASES. `./mvnw verify` exit 0 (3 unit, 15 IT); compose: healthy, probes 200, 401 problem+json, OpenAPI 200, 2 repliki, graceful stop; brak sekretów w obrazie; `pnpm check` exit 0 | Brak blokera backendu. P0-I03A V02/V03 otwarte. Następna P0-I05 wyłącznie po poleceniu. |
 | 2026-11-01 | P0-I05 | DONE (zamknięte decyzją właściciela); T02–T05, V01, V02 zweryfikowane dla dev | backend: Firebase Admin SDK (`identity/token`), filtr `FirebaseAuthenticationFilter`, `/api/v1/identity/me`, reguły ROLE_USER/ROLE_UNVERIFIED; infra/compose (emulator Auth, env), infra/firebase (README, firebase.json), docs/testing/P0-I05-results.md (lokalnie), CHANGELOG, PHASES. `./mvnw verify` exit 0 (3 unit, 21 IT); emulator E2E 403/200/401; realny projekt dev: filtr na koncie testowym (bez tokena 401, niezweryfikowany 403, zmodyfikowany token 401, po weryfikacji 200), ADC przez gcloud; konto testowe usunięte. | T01 staging/prod odłożone decyzją właściciela (zamknięcie iteracji zatwierdzone przez właściciela; T01 nie zaznaczone). Nie commitowano. |
+
+| 2026-11-03 | P0-I12 | BLOCKED; T04, V01, V02 wykonane; T01–T03 częściowe | Playwright config + account-flow + platform-verification; PHASES, CHANGELOG; lokalne docs/testing/phase-0-results.md i P0-I12/. Web 22/24, następnie 6/6 po korekcie asercji typu pola; wszystkie 24 scenariusze potwierdzone. pnpm check PASS; Jest 71/71; Android Expo Go smoke i sześć asercji UI PASS. | iOS system Open dialog i osascript 1002; Docker read-only (testy web użyły lokalnego Auth CLI 15.30.1); natywne konto, screen readery, duży font, realne local/remote API NOT VERIFIED. Kontynuować P0-I12, nie rozpoczynać P0-I13. |
+
+| 2026-11-03 | P0-I12 | DONE; T01–T03 zaznaczone po potwierdzeniu właściciela; wszystkie zadania i weryfikacje zamknięte | PHASES.md, CHANGELOG.md, lokalny docs/testing/phase-0-results.md; właściciel potwierdził samodzielne sprawdzenie T01–T03 z wynikiem OK i polecił zamknąć iterację. Kontrola dokumentacji; bez nowych testów automatycznych. | Brak blockerów odbioru zgłoszonych przez właściciela. Nie dopisano niepodanych urządzeń, wersji ani artefaktów. Następna P0-I13 tylko po odrębnym poleceniu; Phase 0 nadal otwarta. |
 
 # 7. Wzór raportu kończącego sesję Codex
 

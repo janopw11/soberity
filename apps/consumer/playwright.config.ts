@@ -18,6 +18,8 @@ export default defineConfig({
       'pnpm exec expo start --web --clear --port 8091 --localhost --max-workers 2',
     env: {
       CI: '1',
+      EXPO_NO_DOTENV: '1',
+      EXPO_OFFLINE: '1',
       EXPO_PUBLIC_API_URL: 'http://127.0.0.1:8080',
       EXPO_PUBLIC_FIREBASE_API_KEY: 'demo-api-key',
       EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: 'localhost',

@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- P0-I12: rozszerzono regresję web o przywracanie sesji, awarię API i ponowienie, edycję profilu, reauth, zmianę/reset hasła, usuwanie konta, deep linki i klawiaturę. Potwierdzono 24 scenariusze w przebiegu pełnym i poprawkowym oraz smoke Android Expo Go. Dodano lokalną macierz wyników z wersjami, dowodami i instrukcjami dokończenia; iterację zamknięto 2026-11-03 po potwierdzeniu przez właściciela samodzielnej, pozytywnej weryfikacji T01–T03. Historyczne ograniczenia testów agenta zachowano w raporcie.
+
 - Home: dopracowano układ zgodnie z briefem premium/minimal: kompaktowy tagline, „Today's spotlight” i karta mapy w jasnym, redakcyjnym stylu z etykietą kategorii, niższym obrazem i subtelną strzałką; uproszczono nagłówki oraz zmniejszono ikony nawigacji. Usunięto mock Vienna Coffee Rave; ponieważ brak źródła wydarzeń, sekcja pokazuje pusty stan zamiast fikcyjnego karuzelowego wpisu. Nie dodano sekcji science z placeholderami. Testów/buildów nie uruchamiano.
 
 - Home: wzmocniono akcent nagłówków sekcji: tytuły oraz krótkie linie po lewej są w `primary`, a długie linie po prawej pozostają neutralne. Testów/buildów nie uruchamiano.
