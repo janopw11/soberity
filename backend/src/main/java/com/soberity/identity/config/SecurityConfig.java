@@ -21,7 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Stateless API security. Firebase ID tokens are verified by {@link FirebaseAuthenticationFilter}. Every
- * {@code /api/v1/**} request requires a verified e-mail ({@code ROLE_USER}); anonymous requests get 401 and
+ * private {@code /api/v1/**} request requires a verified e-mail ({@code ROLE_USER}); anonymous requests get 401 and
  * unverified users get 403.
  */
 @Configuration
@@ -48,6 +48,11 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/health/liveness", "/actuator/health/readiness")
                         .permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/science/categories", "/api/v1/science/articles",
+                                "/api/v1/science/articles/*", "/api/v1/evidence/claims",
+                                "/api/v1/evidence/claims/*", "/api/v1/evidence/claims/*/citations",
+                                "/api/v1/evidence/sources/*").permitAll()
+                        .requestMatchers("/api/v1/science/**", "/api/v1/evidence/**").denyAll()
                         .requestMatchers("/api/v1/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
@@ -79,8 +84,8 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of(
                 HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
                 HttpMethod.PATCH.name(), HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name()));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Correlation-Id"));
-        configuration.setExposedHeaders(List.of("X-Correlation-Id"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Correlation-Id", "If-None-Match"));
+        configuration.setExposedHeaders(List.of("X-Correlation-Id", "ETag"));
         configuration.setMaxAge(600L);
         configuration.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

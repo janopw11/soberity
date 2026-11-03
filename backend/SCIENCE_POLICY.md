@@ -1,9 +1,10 @@
 # Scientific content and source policy
 
-Scope: P1-I00, scientific model and database integrity. Public APIs are P1-I01;
-editorial roles, application workflows and admin UI are P1-I02. There are no
-new publication endpoints, automatic importers, actual research seeds or UI
-changes in this iteration.
+Scope: P1-I00 scientific model/database integrity and P1-I01 public reads.
+See [SCIENCE_API.md](SCIENCE_API.md) for category, claim, article and citation
+contracts. Editorial roles, mutation workflows and admin UI remain P1-I02.
+There are no publication endpoints, automatic importers, actual research seeds
+or UI changes.
 
 ## Source selection and scientific judgement
 
@@ -139,3 +140,16 @@ only test support; application datasource configuration remains unchanged.
 
 Requirements: product report §3.2 and §24; owner addition of The Lancet.
 Implementation decision: local `docs/adr/005-scientific-evidence-and-editorial-policy.md`.
+
+## Public article catalog (P1-I01)
+
+Flyway V5 adds EN/PL category labels, claim category assignments and immutable
+article versions. Each article version references one exact evidence revision
+and requires an independent review of the full article before publication.
+Both article and evidence revision must remain PUBLISHED for public access.
+Archiving/replacing that evidence hides the dependent article immediately.
+Public source snapshots must be cited by a currently published revision.
+ETags require revalidation on every reuse, including after withdrawal. No
+editorial UIDs or article review notes are exposed. Source assessment notes
+are public citation explanations. Future editorial APIs must derive identities
+from authenticated principals; current science/evidence routes reject writes.

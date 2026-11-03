@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00 DONE (1/7), następna P1-I01. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00 i P1-I01 DONE (2/7), następna P1-I02. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -73,7 +73,7 @@ Blockers: opis lub —
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
-| Phase 1 | Science & Discover MVP | 7 | 1/7 | IN_PROGRESS |
+| Phase 1 | Science & Discover MVP | 7 | 2/7 | IN_PROGRESS |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **14/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL).
+**Łącznie:** 79 iteracji agentowych; wykonane: **15/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -584,23 +584,23 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I01 — Science public APIs & authorization
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P1-I00  
-**Dowód:** —  
-**Blokery:** —
+**Status:** DONE
+**Started:** 2026-11-03
+**Finished:** 2026-11-03
+**Zależności iteracji:** P1-I00
+**Dowód:** `backend/SCIENCE_API.md`, `SciencePublicController`, `SciencePublicReader`, `SecurityConfig`, Flyway V5 i `SciencePublicApiIT`; raport `docs/testing/P1-I01-results.md`. Maven verify PASS (8 unit + 64 IT, w tym 14 Science API IT), pnpm check PASS; migracje fresh V1–V5 i upgrade V3→V5 na izolowanym PostgreSQL 17.11.
+**Blokery:** brak dla P1-I01. Docker/Testcontainers nie uruchamiano; testy wykonano na izolowanym natywnym PostgreSQL. Bez zmian UI i bez nowych testów runtime web/iOS/Android.
 
 **Zakres zadań:**
 
-- [ ] `P1-I01-T01` Wdroż endpointy kategorii, claimów, artykułów i cytowań.
-- [ ] `P1-I01-T02` Rozdziel publiczne PUBLISHED od DRAFT/REVIEW.
-- [ ] `P1-I01-T03` Dodaj paginację, filtrowanie i cache z kontrolą wersji.
-- [ ] `P1-I01-T04` Zadbaj o odmowę nieautoryzowanej publikacji.
+- [x] `P1-I01-T01` Wdroż endpointy kategorii, claimów, artykułów i cytowań.
+- [x] `P1-I01-T02` Rozdziel publiczne PUBLISHED od DRAFT/REVIEW.
+- [x] `P1-I01-T03` Dodaj paginację, filtrowanie i cache z kontrolą wersji.
+- [x] `P1-I01-T04` Zadbaj o odmowę nieautoryzowanej publikacji.
 
 **Weryfikacja:**
 
-- [ ] `P1-I01-V01` Integracyjne testy ACL, paginacji, statusów, walidacji URL/DOI.
+- [x] `P1-I01-V01` Integracyjne testy ACL, paginacji, statusów, walidacji URL/DOI.
 
 **Definition of Done:** Publiczne API zwraca wyłącznie zatwierdzone treści. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2160,14 +2160,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 1/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
-- **Aktualna iteracja:** `P1-I00` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
-- **Następna iteracja:** `P1-I01` — Science public APIs & authorization; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
-- **Wykonano:** model źródeł, twierdzeń i rewizji, oceny cytowań, niezależne recenzje, licencje/niepewność, publikacja i historia; migracja V4, polityka redakcyjna z The Lancet, ADR-005. Raport: `docs/testing/P1-I00-results.md`.
-- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. Ukończenie P1-I00 nie zamyka tych bramek.
-- **Środowisko testowe:** Docker read-only nie naprawiony. Zainstalowano PostgreSQL 17.11; testy wykorzystały wyłącznie nowy klaster `/tmp/soberity-p1-i00/pgdata` i bazę `soberity_test_p1i00` na loopback:25439. Nie uruchamiano globalnej usługi ani nie używano istniejących baz. Testowy fallback jest ograniczony do loopback i nazw `soberity_test_*`; CI domyślnie nadal używa Testcontainers.
-- **Ostatni potwierdzony wynik testów:** 2026-11-03 P1-I00: Maven verify PASS (8 unit + 50 IT; 16 nowych evidence IT), Flyway fresh + upgrade V3→V4, Hibernate validate/JPA, ACL/profil regresja i test współbieżności PASS. `pnpm check` PASS. Bez zmian klienta i nowych testów runtime web/iOS/Android w tej iteracji.
-- **Akceptacja i granice:** nie wykonywano deploymentu, commit/push, publikacji artykułów ani operacji produkcyjnych. Własne API i panel redakcyjny pozostają w P1-I01/P1-I02. `/docs` nadal lokalne, poza Git.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 2/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
+- **Aktualna iteracja:** `P1-I01` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
+- **Następna iteracja:** `P1-I02` — Editorial workflow & admin UI; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
+- **Wykonano:** publiczne API kategorii EN/PL, claimów, artykułów i cytowań; jawne projekcje bez UID redakcji, PUBLISHED-only, ukrywanie zależności wycofanego claimu, filtrowanie/paginacja, ETag i rewalidacja, blokada zapisów; Flyway V5 i dokumentacja API. Raport: `docs/testing/P1-I01-results.md`.
+- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. Ukończenie P1-I01 nie zamyka tych bramek.
+- **Środowisko testowe:** natywny PostgreSQL 17.11, izolowany klaster `/tmp/soberity-p1-i00/pgdata`, nowe bazy `soberity_test_p1i01` i `soberity_test_p1i01_final` na loopback:25439. Nie używano istniejących danych aplikacji ani globalnej usługi. Sandbox wymagał eskalacji dla pamięci współdzielonej i połączeń localhost. Docker nie naprawiany ani ponownie testowany; CI domyślnie nadal używa Testcontainers.
+- **Ostatni potwierdzony wynik testów:** 2026-11-03 P1-I01: Maven verify PASS (8 unit + 64 IT; 14 Science API IT), Flyway fresh V1–V5 + upgrade V3→V5, ACL/profil/evidence/współbieżność PASS. `pnpm check` i `git diff --check` PASS. Bez zmian klienta i nowych testów runtime web/iOS/Android.
+- **Akceptacja i granice:** bez deploymentu, commit/push, rzeczywistych publikacji naukowych i operacji produkcyjnych. Role i mutacje redakcyjne oraz panel pozostają P1-I02. `/docs` nadal lokalne, poza Git.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2314,3 +2314,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-03 | P0-I03A — dopracowanie Home według briefu premium | Zmieniono Home i nagłówek nawigacji; NOT VERIFIED | Dodano kompaktowy tagline, „Today's spotlight” i kartę World Map z kategorią, obrazem 150–180 px oraz treścią w neutralnym panelu; uproszczono nagłówki/news cards i zmniejszono menu/profil icons. Usunięto mock eventu; event data/API brak, więc pokazany jest pusty stan. Nie dodano nowego Science placeholdera. Testów/buildów nie uruchamiano. | Karuzela wydarzeń, działające trasy mapy/eventów, runtime/a11y i debug overlay pozostają poza dostępnym kodem lub NOT VERIFIED. P0-I03A IN_PROGRESS. |
 
 | 2026-11-03 | P0-I11 — test coverage & E2E web | IN_PROGRESS; T01, T02, T04, V01, V02 PASS; T03 częściowo zweryfikowane | Asercje dopasowane do publicznego welcome i authenticated Home; walidacja logowania/resetu; emulatorowy Playwright account journey i bezpieczne API fixtures. Jest 71/71, `pnpm check` PASS, Maven verify 37/37. Pełny web run 17/18: desktop E2E PASS, mobile Home/navigation PASS. Raport `docs/testing/P0-I11-results.md`. | Mobile E2E utknął w stanie session-loading po profilu. Zmieniono test na SPA navigation; ponowienie zablokowane przez Docker overlay read-only. Nie oznaczać DONE do PASS. |
+
+| 2026-11-03 | P1-I01 | DONE; T01–T04 i V01 zweryfikowane | Publiczne API Science/evidence, projekcje publiczne, filtry/paginacja, ETag JSON + rewalidacja, CORS, deny-all zapisów; Flyway V5 z kategoriami i recenzowanymi wersjami artykułów. Maven 8 unit + 64 IT PASS (14 Science API IT), pnpm check i diff check PASS. Dokumentacja API, PHASES/CHANGELOG i lokalny raport P1-I01. | Izolowany PostgreSQL 17.11; migracje fresh V1–V5 i upgrade V3→V5, wycofanie i podmiana wersji/ETag potwierdzone. Skorygowano oczekiwanie testu odrzuconego tokenu: istniejący filtr daje wyłącznie dostęp anonimowy do publicznego GET; prywatne/zapis nadal 401. Bez zmian UI ani testów runtime platform; P0 nadal otwarta. Następna P1-I02 tylko po poleceniu. |

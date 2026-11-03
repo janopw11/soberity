@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- P1-I01: dodano publiczne API kategorii EN/PL, twierdzeń, artykułów i cytowań z filtrowaniem, paginacją i rewalidacją ETag. API ujawnia wyłącznie opublikowane treści, ukrywa artykuły zależne od wycofanej wersji twierdzenia i odmawia zapisów. Flyway V5 wymaga niezależnej recenzji wersji artykułu. Maven: 8 testów unit + 64 integracyjne PASS (14 nowych Science API); pnpm check PASS na izolowanym PostgreSQL 17.11.
+
 - P1-I00: wdrożono model źródeł naukowych i wersjonowanych twierdzeń, cytowania, niezależne recenzje oraz politykę źródeł uwzględniającą The Lancet. Migracja Flyway chroni publikację przed brakiem źródeł/recenzji, samoakceptacją, nieuzasadnioną przyczynowością i nadpisaniem historii. Zweryfikowano migracje, upgrade V3→V4, JPA i współbieżność na izolowanym PostgreSQL 17.11; Maven 58 testów i pnpm check PASS.
 
 - P0-I13: dodano zweryfikowane lokalnie workflow CI (frontend/backend/Gitleaks), profile EAS development/preview z kontrolą konfiguracji oraz konfigurację staging HTTPS, smoke, monitoring i bezpieczne skrypty backup/restore. Uaktualniono bootstrap/README i zapisano przegląd bezpieczeństwa. Testy web 24/24, klienta 71/71 i infrastruktury 10/10 PASS; staging, zdalne buildy/CI oraz pełna bramka Phase 0 pozostają nieodebrane.

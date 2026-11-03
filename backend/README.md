@@ -34,3 +34,7 @@ Testcontainers), `staging` i `production` (wszystkie wartości ze zmiennych
 `./mvnw` wymaga JDK 21 oraz curl lub wget i unzip przy pierwszym pobraniu.
 Maven pobierany jest z Maven Central, z weryfikacją SHA-256 dystrybucji.
 Na Windows dostępny jest `mvnw.cmd`; nie został przetestowany na Windows.
+
+## Science public API
+
+P1-I01 routes, response fields, publication visibility and ETag contract are documented in [SCIENCE_API.md](SCIENCE_API.md).
