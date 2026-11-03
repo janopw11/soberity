@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- P1-I00: wdrożono model źródeł naukowych i wersjonowanych twierdzeń, cytowania, niezależne recenzje oraz politykę źródeł uwzględniającą The Lancet. Migracja Flyway chroni publikację przed brakiem źródeł/recenzji, samoakceptacją, nieuzasadnioną przyczynowością i nadpisaniem historii. Zweryfikowano migracje, upgrade V3→V4, JPA i współbieżność na izolowanym PostgreSQL 17.11; Maven 58 testów i pnpm check PASS.
+
 - P0-I13: dodano zweryfikowane lokalnie workflow CI (frontend/backend/Gitleaks), profile EAS development/preview z kontrolą konfiguracji oraz konfigurację staging HTTPS, smoke, monitoring i bezpieczne skrypty backup/restore. Uaktualniono bootstrap/README i zapisano przegląd bezpieczeństwa. Testy web 24/24, klienta 71/71 i infrastruktury 10/10 PASS; staging, zdalne buildy/CI oraz pełna bramka Phase 0 pozostają nieodebrane.
 
 - P0-I12: rozszerzono regresję web o przywracanie sesji, awarię API i ponowienie, edycję profilu, reauth, zmianę/reset hasła, usuwanie konta, deep linki i klawiaturę. Potwierdzono 24 scenariusze w przebiegu pełnym i poprawkowym oraz smoke Android Expo Go. Dodano lokalną macierz wyników z wersjami, dowodami i instrukcjami dokończenia; iterację zamknięto 2026-11-03 po potwierdzeniu przez właściciela samodzielnej, pozytywnej weryfikacji T01–T03. Historyczne ograniczenia testów agenta zachowano w raporcie.

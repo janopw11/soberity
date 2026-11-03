@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS; P0-I13 BLOCKED. 2026-11-03: właściciel dopuścił lokalny rozwój Phase 1 przed uzyskaniem hosta; zdalne prace P0-I13 odroczone (approved), bez oznaczania Phase 0 jako DONE. Następna iteracja: P1-I00.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00 DONE (1/7), następna P1-I01. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -73,7 +73,7 @@ Blockers: opis lub —
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
-| Phase 1 | Science & Discover MVP | 7 | 0/7 | TODO |
+| Phase 1 | Science & Discover MVP | 7 | 1/7 | IN_PROGRESS |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **13/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela).
+**Łącznie:** 79 iteracji agentowych; wykonane: **14/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -552,7 +552,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 # Phase 1 — Science & Discover MVP
 
-**Status fazy:** TODO  
+**Status fazy:** IN_PROGRESS
 **Cel:** Źródłowa baza wiedzy, recenzja treści, Discover, fiszki, quizy i Weekly Science Drop.  
 **Zależności:** lokalne fundamenty Phase 0; odroczenie zdalnego odbioru P0-I13 zatwierdzone przez właściciela 2026-11-03 (`docs/adr/004-local-phase-1-before-staging.md`). Phase 0 pozostaje otwarta.
 **Raport główny:** §3.2, §24, §25  
@@ -560,23 +560,25 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I00 — Scientific content schema & source policy
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
+**Status:** DONE
+**Started:** 2026-11-03
+**Finished:** 2026-11-03
 **Zależności iteracji:** P0-I13 — wyjątek zatwierdzony 2026-11-03: brak hosta/EAS i zdalnego odbioru nie blokuje lokalnej implementacji P1-I00. Własne testy migracji/constraintów V01 pozostają obowiązkowe.
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** `backend/SCIENCE_POLICY.md`, moduł `evidence`, migracja V4, ADR-005 i `docs/testing/P1-I00-results.md`; Maven verify PASS: 8 unit + 50 IT (w tym 16 evidence IT), realny PostgreSQL 17.11 w izolowanym klastrze /tmp. Test upgrade V3→V4, mapowań JPA, źródeł/recenzji, wersjonowania i współbieżności PASS. `pnpm check` PASS.
+**Blokery:** brak dla P1-I00. Docker nadal read-only; testy wykonano na rzeczywistym lokalnym PostgreSQL poprzez ograniczony override testowy. Domyślny Testcontainers zachowano; nie twierdzimy, że Docker został naprawiony.
+
+**Uzgodnienie źródeł (2026-11-03):** właściciel dodał [The Lancet](https://www.thelancet.com) do planowanych źródeł artykułów i badań Science & Discover. Polityka/model mają rozróżniać typ materiału, zapisywać DOI/URL, ograniczenia i licencję oraz wymagać indywidualnej oceny i recenzji; szczegóły w raporcie §24.2. Wdrożono metadane/provider THE_LANCET i politykę oceny; nie dodano importera ani rzeczywistych publikacji (treści pilotażowe należą do P1-I06).
 
 **Zakres zadań:**
 
-- [ ] `P1-I00-T01` Zaprojektuj ScientificSource, EvidenceClaim, evidenceLevel, limitations, license i publishedAt.
-- [ ] `P1-I00-T02` Zdefiniuj wersjonowanie, datę przeglądu i relacje źródeł.
-- [ ] `P1-I00-T03` Wprowadź politykę korelacji/przyczynowości oraz informację o niepewności.
-- [ ] `P1-I00-T04` Przygotuj migracje i ADR dot. redakcji.
+- [x] `P1-I00-T01` Zaprojektuj ScientificSource, EvidenceClaim, evidenceLevel, limitations, license i publishedAt.
+- [x] `P1-I00-T02` Zdefiniuj wersjonowanie, datę przeglądu i relacje źródeł.
+- [x] `P1-I00-T03` Wprowadź politykę korelacji/przyczynowości oraz informację o niepewności.
+- [x] `P1-I00-T04` Przygotuj migracje i ADR dot. redakcji.
 
 **Weryfikacja:**
 
-- [ ] `P1-I00-V01` Test migracji i constraint: publikacja bez źródeł jest niedozwolona.
+- [x] `P1-I00-V01` Test migracji i constraint: publikacja bez źródeł jest niedozwolona.
 
 **Definition of Done:** Źródła i claims mają weryfikowalny model danych. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2158,13 +2160,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Wybrany kierunek:** lokalny rozwój Phase 1 — Science & Discover MVP, przed uzyskaniem hosta; decyzja właściciela 2026-11-03, ADR-004.
-- **Następna iteracja:** `P1-I00` — Scientific content schema & source policy; status TODO, implementacji jeszcze nie rozpoczęto.
-- **Zakres następnego kroku:** ScientificSource/EvidenceClaim, poziom pewności i ograniczenia, wersjonowanie i recenzja, polityka korelacji/przyczynowości, migracje i test zakazu publikacji bez źródeł. Jedna iteracja na polecenie.
-- **Odroczone prace:** P0-I13 BLOCKED / deferred (approved): host, domena, staging Firebase/EAS, hosted CI, rzeczywisty HTTPS, monitoring/offsite/restore. P0-I03A pozostaje IN_PROGRESS, Phase 0 13/15 DONE; bramka niezamknięta.
-- **Lokalny bloker do usunięcia:** Docker overlay read-only. Testy PostgreSQL/migracji są wymagane dla P1-I00 V01; brak hosta nie uzasadnia ich pominięcia. Nie deklarujemy naprawy Dockera ani PASS niewykonanych testów.
-- **Ostatni potwierdzony wynik testów:** P0-I13 2026-11-03: check PASS; infra 10/10, Jest 71/71, Playwright 24/24, backend unit 3/3; exports i lokalny Caddy fixture smoke 17 PASS; Gitleaks PASS. Maven IT i zdalne środowiska BLOCKED/NOT VERIFIED. Przy aktualizacji kolejności wykonano tylko kontrolę dokumentacji.
-- **Akceptacja:** właściciel dopuścił rozpoczęcie lokalnej Phase 1; nie oznacza to zgody na deployment, publikację ani pominięcie obowiązkowych testów. `/docs` nadal pozostaje lokalne, poza Git.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 1/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
+- **Aktualna iteracja:** `P1-I00` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
+- **Następna iteracja:** `P1-I01` — Science public APIs & authorization; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
+- **Wykonano:** model źródeł, twierdzeń i rewizji, oceny cytowań, niezależne recenzje, licencje/niepewność, publikacja i historia; migracja V4, polityka redakcyjna z The Lancet, ADR-005. Raport: `docs/testing/P1-I00-results.md`.
+- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. Ukończenie P1-I00 nie zamyka tych bramek.
+- **Środowisko testowe:** Docker read-only nie naprawiony. Zainstalowano PostgreSQL 17.11; testy wykorzystały wyłącznie nowy klaster `/tmp/soberity-p1-i00/pgdata` i bazę `soberity_test_p1i00` na loopback:25439. Nie uruchamiano globalnej usługi ani nie używano istniejących baz. Testowy fallback jest ograniczony do loopback i nazw `soberity_test_*`; CI domyślnie nadal używa Testcontainers.
+- **Ostatni potwierdzony wynik testów:** 2026-11-03 P1-I00: Maven verify PASS (8 unit + 50 IT; 16 nowych evidence IT), Flyway fresh + upgrade V3→V4, Hibernate validate/JPA, ACL/profil regresja i test współbieżności PASS. `pnpm check` PASS. Bez zmian klienta i nowych testów runtime web/iOS/Android w tej iteracji.
+- **Akceptacja i granice:** nie wykonywano deploymentu, commit/push, publikacji artykułów ani operacji produkcyjnych. Własne API i panel redakcyjny pozostają w P1-I01/P1-I02. `/docs` nadal lokalne, poza Git.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2185,6 +2188,10 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 | 2026-11-03 | P0-I13 | BLOCKED; T01/T03 zweryfikowane, pozostałe częściowe | .github/workflows, EAS profiles/hook, infra/staging HTTPS/monitor/backup/restore/security, staging health config, scripts i README; lokalne docs/testing/P0-I13-results.md i logi. Check, infra 10/10, Jest 71/71, web 24/24, backend unit 3/3, exports, Gitleaks, actionlint/schema PASS; Caddy TLS fixture smoke 17 PASS. | Brak hosta/domeny/projektu EAS potwierdzony przez właściciela. Docker read-only blokuje IT/image/real restore; hosted CI i zdalny smoke nieuruchomione; P0-I03A otwarte. Kontynuować P0-I13, bez przejścia do Phase 1. |
 
 | 2026-11-03 | P0-I13 / kolejność Phase 1 | Zatwierdzone odroczenie zdalnych prac; następna P1-I00 | PHASES.md, lokalny ADR-004; właściciel chce rozpocząć Phase 1 przed uzyskaniem hosta. Zmieniono zależność lokalnego startu, zachowując P0-I13 BLOCKED i Phase 0 otwartą; implementacji P1-I00 nie rozpoczęto. Kontrola dokumentacji, bez nowych testów aplikacji. | P1-I00 V01 nadal wymaga sprawnego PostgreSQL/Dockera. Brak nowego wpisu CHANGELOG: zmiana kolejności planu, bez ukończonej funkcjonalności. |
+
+| 2026-11-03 | P1-I00 — wymagania źródeł | Dodano The Lancet jako planowane źródło artykułów i badań na polecenie właściciela | Raport §24.2, PHASES.md; kontrola dokumentacji i diff. Bez zmian kodu i nowych testów aplikacji; P1-I00 pozostaje TODO. | Uwzględnić typ publikacji, metadane, ograniczenia, licencję i recenzję w P1-I00. Bez wpisu CHANGELOG — aktualizacja wymagań, nie ukończona funkcja. |
+
+| 2026-11-03 | P1-I00 | DONE; T01–T04 i V01 zweryfikowane | Moduł evidence (JPA/typy/walidacja), Flyway V4, SCIENCE_POLICY, ADR-005, testy evidence i native-PostgreSQL fallback testów; PHASES/CHANGELOG; lokalne docs/testing/P1-I00-results.md i logi. Maven 8 unit + 50 IT PASS (16 evidence IT), pnpm check PASS. | Docker nadal read-only; rzeczywisty PostgreSQL 17.11 uruchomiono jako izolowany klaster /tmp. Testy upgrade, JPA, publikacji/recenzji i współbieżności PASS. P0-I03A/P0-I13 pozostają otwarte. Następna P1-I01 tylko po poleceniu. |
 
 # 7. Wzór raportu kończącego sesję Codex
 

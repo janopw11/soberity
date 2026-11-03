@@ -744,6 +744,8 @@ Podane przedziały dotyczą przybliżonego nakładu jednego developera i **nie**
 
 ### 24.2 Siedem zasad redakcyjnych
 
+**Uzgodnione źródło publikacji (decyzja właściciela 2026-11-03):** do biblioteki Science & Discover włączamy również artykuły i badania z [The Lancet](https://www.thelancet.com). Każdy materiał oceniamy indywidualnie: rozróżniamy badanie pierwotne, przegląd/metaanalizę oraz komentarz lub editorial. Sama marka czasopisma nie określa poziomu pewności dowodów. Zapisujemy metadane, DOI/URL, ograniczenia i licencję; przygotowujemy własne omówienie z linkiem do oryginału, podlegające recenzji zgodnie z §24.5. Wykorzystanie pełnego tekstu lub ilustracji wymaga sprawdzenia warunków konkretnego materiału.
+
 1. **Weryfikowalne źródła:** każda istotna teza zdrowotna posiada przynajmniej jedno źródło i link do publikacji/dokumentu, z DOI/PMID, jeśli dostępne; nie cytować źródeł nieistniejących.
 2. **Hierarchia dowodów:** preferować aktualne przeglądy systematyczne i metaanalizy, uznane wytyczne oraz dobre badania pierwotne; oceniać jakość metodologiczną, a nie tylko typ publikacji.
 3. **Korelacja ≠ przyczynowość:** przy badaniach obserwacyjnych używać języka „wiąże się z”, nie „powoduje”, jeśli związek przyczynowy nie został wiarygodnie ustalony.

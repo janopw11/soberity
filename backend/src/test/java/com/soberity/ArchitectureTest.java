@@ -19,7 +19,7 @@ class ArchitectureTest {
     static final ArchRule commonDoesNotDependOnFeatureModules =
             ArchRuleDefinition.noClasses().that().resideInAPackage("com.soberity.common..")
                     .should().dependOnClassesThat()
-                    .resideInAnyPackage("com.soberity.identity..", "com.soberity.profile..");
+                    .resideInAnyPackage("com.soberity.identity..", "com.soberity.profile..", "com.soberity.evidence..");
 
     @ArchTest
     static final ArchRule identityDoesNotDependOnProfile =
