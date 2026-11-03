@@ -39,3 +39,25 @@ export const navigationItems = [
     image: require('../assets/images/myths-icon.png') as number,
   },
 ] as const;
+
+/** Always visible subsections beneath Science & Discover in the shared menu. */
+export const scienceNavigationItems = [
+  {
+    id: 'articles',
+    href: '/science',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/articles-icon.png') as number,
+  },
+  {
+    id: 'quizzes',
+    href: '/science/quizzes',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/quizzes-icon.png') as number,
+  },
+  {
+    id: 'flashcards',
+    href: '/science/flashcards',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+    image: require('../assets/images/flashcards-icon.png') as number,
+  },
+] as const;

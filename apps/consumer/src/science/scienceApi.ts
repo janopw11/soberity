@@ -20,7 +20,7 @@ export type Article = {
   reviewed_at: string; next_review_at: string; version: number;
 };
 export type Claim = {
-  id: string; locale: string; claim_text: string; summary: string;
+  id: string; revision_id: string; locale: string; claim_text: string; summary: string;
   evidence_level: string; evidence_rationale: string; limitations: string;
   uncertainty: string; population: string; exposure: string; outcome: string;
   inference_type: string; published_at: string; reviewed_at: string;

@@ -14,6 +14,7 @@ import {
   useThemePreferences,
 } from '../src/preferences/ThemePreferencesContext';
 import { LoadingState } from '../src/ui';
+import { useAppHeaderOptions } from '../src/navigation/useAppHeaderOptions';
 
 /**
  * Guards the top-level route groups against the current auth status. Routes
@@ -23,7 +24,8 @@ import { LoadingState } from '../src/ui';
 function RootNavigator() {
   const { status } = useAuthStatus();
   const { t } = useTranslation();
-  const { colors, theme } = useThemePreferences();
+  const { theme } = useThemePreferences();
+  const headerOptions = useAppHeaderOptions();
   useAccountLanguageSync();
 
   if (status === 'loading') {
@@ -42,14 +44,7 @@ function RootNavigator() {
   return (
     <>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.textPrimary,
-          contentStyle: { backgroundColor: colors.background },
-          headerShadowVisible: false,
-        }}
-      >
+      <Stack screenOptions={headerOptions}>
         <Stack.Protected guard={status === 'guest'}>
           <Stack.Screen name="(public)" options={{ headerShown: false }} />
         </Stack.Protected>
@@ -66,6 +61,7 @@ function RootNavigator() {
           />
         </Stack.Protected>
         <Stack.Screen name="science" options={{ headerShown: false }} />
+        <Stack.Screen name="events" options={{ title: t('events.title') }} />
         <Stack.Screen
           name="+not-found"
           options={{ title: t('notFound.title') }}

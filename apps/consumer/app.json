@@ -18,6 +18,16 @@
       "output": "static",
       "name": "Soberity"
     },
-    "plugins": ["expo-router", "expo-dev-client"]
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "asyncRoutes": {
+            "web": false
+          }
+        }
+      ],
+      "expo-dev-client"
+    ]
   }
 }

@@ -33,6 +33,7 @@ export default function EditorialEntry() {
         showChevron
         onPress={() => router.push('/editorial')}
       />
+      <SettingsRow label={t('learning.editor.title')} showChevron onPress={() => router.push('/editorial-quizzes')} />
     </SettingsGroup>
   ) : null;
 }

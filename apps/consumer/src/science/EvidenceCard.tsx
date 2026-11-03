@@ -12,7 +12,7 @@ export function useReadingDate() {
     return new Intl.DateTimeFormat(i18n.resolvedLanguage === 'pl' ? 'pl-PL' : 'en-GB', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value));
   };
 }
-export default function EvidenceCard({ claimId }: { claimId: string }) {
+export default function EvidenceCard({ claimId, expectedRevisionId }: { claimId: string; expectedRevisionId?: string }) {
   const { t } = useTranslation();
   const date = useReadingDate();
   const [data, setData] = useState<{ claim: Claim; sources: Source[] } | null>(null);
@@ -26,14 +26,14 @@ export default function EvidenceCard({ claimId }: { claimId: string }) {
     void Promise.all([
       scienceGet<Claim>(`/api/v1/evidence/claims/${encodeURIComponent(claimId)}`, controller.signal),
       scienceGet<Source[]>(`/api/v1/evidence/claims/${encodeURIComponent(claimId)}/citations`, controller.signal),
-    ]).then(([claim, sources]) => { if (!controller.signal.aborted) setData({ claim, sources }); })
+    ]).then(([claim, sources]) => { if (!controller.signal.aborted) { if (expectedRevisionId && claim.revision_id !== expectedRevisionId) setError(404); else setData({ claim, sources }); } })
       .catch((reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof ScienceError ? reason.status : 0); })
       .finally(() => clearTimeout(timeout));
     // A timeout is visible and retryable; cleanup cancellation stays silent.
     const onAbort = () => setError(0);
     controller.signal.addEventListener('abort', onAbort);
     return () => { clearTimeout(timeout); controller.signal.removeEventListener('abort', onAbort); controller.abort(); };
-  }, [claimId, attempt]);
+  }, [claimId, expectedRevisionId, attempt]);
   if (error !== null) return <ReadingCard><ReadingText heading>{t('discover.evidence')}</ReadingText><ReadingText>{t(error === 404 ? 'discover.evidenceUnavailable' : 'discover.error')}</ReadingText><Button variant="secondary" label={t('discover.retry')} onPress={() => retry(value => value + 1)} /></ReadingCard>;
   if (!data) return <LoadingState label={t('discover.loadingEvidence')} />;
   const { claim, sources } = data;

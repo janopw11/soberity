@@ -786,6 +786,10 @@ Dla treści dotyczących ostrych objawów odstawienia lub potencjalnego uzależn
 
 MVP może początkowo wykorzystywać ograniczoną, ręcznie recenzowaną bibliotekę zamiast dużej, automatycznie generowanej bazy. Nie należy automatycznie publikować zdrowotnych odpowiedzi AI bez kontroli jakości.
 
+**Korekta właściciela 2026-11-03 — quizy:** autor quizu może go opublikować bezpośrednio albo wysłać do niezależnej recenzji. Recenzja całego quizu jest w tej ścieżce opcjonalna; pochodzenie publikacji jest jawne w API i audycie (`AUTHOR` / `REVIEWED`). Każde pytanie nadal wymaga aktualnej, opublikowanej, recenzowanej wersji EvidenceClaim; bezpośrednia publikacja quizu nie omija weryfikacji dowodów. Zmiana lub wycofanie tej wersji ukrywa zależny quiz.
+
+**Korekta właściciela 2026-11-03 — uproszczenie źródeł w quizach:** nowe pytania quizów zawierają wyjaśnienie poprawnej odpowiedzi oraz przynajmniej jedno źródło badania (tytuł i link HTTPS), wyświetlane po udzieleniu odpowiedzi. Nie wymagają osobnej karty EvidenceClaim ani jej publikacji. Ta decyzja zastępuje wcześniejszy wymóg EvidenceClaim dla quizów; autor nadal odpowiada za weryfikowalność źródeł i opis ograniczeń w wyjaśnieniu. Istniejące powiązania EvidenceClaim pozostają obsługiwane z kontrolą wycofania. Zasady niezależnie recenzowanych kart dowodów, fiszek i RAG pozostają bez zmian.
+
 ### 24.6 Implementacja techniczna
 
 Proponowane encje w PostgreSQL:

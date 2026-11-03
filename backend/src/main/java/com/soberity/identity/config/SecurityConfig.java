@@ -48,11 +48,14 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/health/liveness", "/actuator/health/readiness")
                         .permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/science/categories", "/api/v1/science/articles",
+                        .requestMatchers(HttpMethod.GET, "/api/v1/science/categories", "/api/v1/science/feed", "/api/v1/science/articles",
                                 "/api/v1/science/articles/*", "/api/v1/science/posts", "/api/v1/science/posts/*",
                                 "/api/v1/science/media/*", "/api/v1/evidence/claims",
                                 "/api/v1/evidence/claims/*", "/api/v1/evidence/claims/*/citations",
                                 "/api/v1/evidence/sources/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/learning/quizzes", "/api/v1/learning/quizzes/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/learning/quizzes/*/answers").permitAll()
+                        .requestMatchers("/api/v1/learning/**").denyAll()
                         .requestMatchers("/api/v1/editorial/**").hasRole("USER")
                         .requestMatchers("/api/v1/science/**", "/api/v1/evidence/**").denyAll()
                         .requestMatchers("/api/v1/**").hasRole("USER")

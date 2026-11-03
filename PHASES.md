@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), P1-I03 i P1-I04 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -655,12 +655,18 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I04 — Flashcards & quizzes
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — implementacja do ręcznego odbioru; NOT VERIFIED  
+**Started:** 2026-11-03  
 **Finished:** —  
 **Zależności iteracji:** P1-I02, P1-I03  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** kod `src/learning/*`, trasy Science/editorial-quizzes, backend `evidence/learning/*`, migracja V8 i `backend/LEARNING_API.md`. T01–T04 zaimplementowane, checkboxy otwarte do weryfikacji.  
+**Blokery:** P1-I03 nadal NOT VERIFIED. Właściciel zlecił P1-I04 bez testów; nie uruchomiono testów, check/lint/typecheck, kompilacji/buildów, eksportów, API ani UI. Migracja V8 nie została zastosowana w tej sesji.
+
+**Implementacja 2026-11-03:** fiszki z recenzowanych EvidenceClaim (teza → wyjaśnienie/źródła/ograniczenia, powtórki), quizy TRUE_FALSE/SINGLE_CHOICE/MULTIPLE_CHOICE, serwerowa ocena dokładnego zbioru odpowiedzi, wyjaśnienia i źródła po odpowiedzi. Niemutowalne quizy przypięte do wersji dowodów, przygotowanie AUTHOR i niezależna publikacja REVIEWER w nowym panelu web. Wycofanie/zastąpienie dowodu ukrywa zależny quiz. Opcjonalny zapis na koncie z jawnym włączeniem, wznowieniem, kasowaniem i czyszczeniem przy usunięciu konta; anonimowo bez zapisu. Brak danych zdrowotnych, kar, timerów i XP. Wspólne RN UI web/iOS/Android, EN/PL, stany empty/loading/error/retry, wejścia z Discover i konta/panelu. Nie dodano treści pilotażowych ani Myth Battle (P1-I06), nie rozpoczęto P1-I05.
+
+**Korekta właściciela 2026-11-03 — publikacja quizu:** AUTHOR może wybrać bezpośrednie Opublikuj albo wysłanie do recenzji; może też opublikować własny istniejący IN_REVIEW quiz. V9 i API rozróżniają AUTHOR/REVIEWED, obowiązek opublikowanego recenzowanego EvidenceClaim pozostaje. Backend zbudowano z -DskipTests i uruchomiono; log potwierdza migrację V9 i gotowość aplikacji. UI i ścieżki publikacji nadal NOT VERIFIED — testów nie wykonywano.
+
+**Aktualna korekta właściciela 2026-11-03 — źródła przy wyjaśnieniu:** nowy quiz nie wymaga osobnej karty EvidenceClaim. Każde pytanie ma wyjaśnienie i 1–10 źródeł (tytuł/HTTPS URL), pokazywanych od razu po odpowiedzi. Formularz nie pobiera już listy kart dowodów; Publish/Review pozostają. Istniejące quizy z przypiętymi wersjami i fiszki są nadal obsługiwane. ADR-007 oraz zatwierdzona korekta raportu dokumentują zastąpienie wcześniejszego wymogu. Kod backendu zbudowano z pominięciem testów i uruchomiono; UI i scenariusze nadal NOT VERIFIED.
 
 **Zakres zadań:**
 
@@ -2164,12 +2170,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. P0-I03A i P0-I13 pozostają otwarte; lokalny rozwój przed stagingiem zatwierdzony (ADR-004).
-- **Aktualna praca:** `P1-I03` — Discover reading experience, rozpoczęta 2026-11-03 na polecenie właściciela. Implementacja przygotowana do ręcznego odbioru; status NOT VERIFIED, bez daty ukończenia i zaliczenia checkboxów.
-- **Wykonano w kodzie:** publiczne wspólne trasy Science dla gości i członków, feed publikacji blogowych/recenzowanych/kart dowodów, czytnik treści Tiptap JSON, obrazy i źródła, metadane badań i ograniczenia, EN/PL, stany pobierania i retry, paginacja/filtry recenzowanej biblioteki. Home używa opublikowanych wpisów zamiast demonstracyjnych newsów. Publikacje autora są jawnie odróżnione od recenzowanych.
-- **Weryfikacja:** żadnych testów, check/lint/typecheck, buildów, eksportów ani uruchomień UI/API — zgodnie z wyraźnym poleceniem właściciela. Web/iOS/Android, a11y i kontrakty runtime NOT VERIFIED. Historyczne wyniki poprzednich iteracji nie są dowodami P1-I03.
-- **Dokumentacja:** opis P1-I03 i ręcznej ścieżki w `apps/consumer/README.md`; dziennik poniżej. CHANGELOG bez nowego wpisu do czasu weryfikacji znaczącej funkcjonalności.
-- **Następny krok:** ręczny odbiór P1-I03 przez właściciela (feed → artykuł → źródła/karta dowodów). P1-I04 nie rozpoczęta. Automatyczne tłumaczenia nadal odroczone; nowe BlogApiIT z P1-I02 nadal nieuruchomione zgodnie z wcześniejszą decyzją.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. P0-I03A i P0-I13 pozostają otwarte; P1-I03 wciąż NOT VERIFIED.
+- **Aktualna praca:** `P1-I04` — Flashcards & quizzes, rozpoczęta 2026-11-03 na wyraźne polecenie właściciela mimo niezweryfikowanego P1-I03. Implementacja do ręcznego odbioru; bez Finished/DONE i zaliczenia checkboxów.
+- **Wykonano w kodzie:** fiszki z recenzowanych EvidenceClaim, trzy typy pytań, serwerowa ocena odpowiedzi/wyjaśnienia, dowody przypięte do wersji, panel przygotowania i niezależnej recenzji quizów, optional opt-in postępu i wznowienie/usuwanie, ochrona usuniętych kont i limit odpowiedzi. RN UI EN/PL i tokeny obu motywów; wejścia `/science/learn`, `/science/flashcards`, `/science/quiz/{id}`, `/editorial-quizzes`.
+- **Weryfikacja:** żadnych testów, check/lint/typecheck, kompilacji/buildów/eksportów ani runtime — zgodnie z poleceniem właściciela. Migracja V8 zapisana, nieuruchomiona; web/iOS/Android, a11y i kontrakty NOT VERIFIED. Historyczne wyniki poprzednich iteracji nie są dowodami P1-I04.
+- **Dokumentacja:** `backend/LEARNING_API.md`, README backendu/klienta i dziennik. CHANGELOG bez nowego wpisu do czasu weryfikacji znaczącej funkcjonalności.
+- **Następny krok:** uruchomienie zaktualizowanego backendu z V8 i ręczny odbiór P1-I04 przez właściciela. P1-I05 nie rozpoczęta, seed/Myth Battle pozostają P1-I06. Automatyczne tłumaczenia nadal odroczone. P1-I03 i nowe BlogApiIT z P1-I02 pozostają niezweryfikowane zgodnie z poprzednimi decyzjami.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2324,3 +2330,43 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-03 | P1-I02 — korekta blog editora | Nowy kod i UI wdrożone lokalnie; pełna integracja NOT VERIFIED / skipped (approved) | Tiptap, panel blogowy, JSON allowlist, źródła, kategorie, obrazy, wersje i audit, autor Publish / Send for review, uwagi recenzenta; V7, helper lokalnego restartu, API docs/ADR-006/BRANDING/raport. Backend 13 unit PASS, klient 76/76, UI 8/8 PASS z symulowanymi API, check/build/native exports i odczytowy smoke PASS. | Właściciel ręcznie zainstalował Tiptap po awarii automatycznego przeglądu uprawnień i zgodził się pominąć Docker integration; 7 BlogApiIT skompilowane, nieuruchomione. Bez automatycznych tłumaczeń, deploymentu i P1-I03. Historyczny DONE pierwotnego P1-I02 zachowany. |
 
 | 2026-11-03 | P1-I03 | IN_PROGRESS; implementacja T01–T04, NOT VERIFIED | `src/science/*`, `app/science/*`, root/public layouts, Home, guest entry, EN/PL i README klienta. Feed, czytnik artykułów i EvidenceCard, źródła, metadane, retry, paginacja i filtry. | Na wyraźne polecenie właściciela nie uruchomiono żadnych testów ani check/build/runtime. Checkboxy otwarte, brak Finished/DONE. CHANGELOG bez wpisu do odbioru; następny krok: ręczna weryfikacja P1-I03. |
+
+| 2026-11-03 | P1-I04 | IN_PROGRESS; implementacja T01–T04, NOT VERIFIED | `src/learning/*`, trasy Science/editorial-quizzes, integracje Discover/panel/konto, EN/PL; backend learning API/service/limiter, SecurityConfig, Flyway V8, LEARNING_API i README. Fiszki, quizy, review, serwerowa ocena i opt-in progress/account erasure. | Na wyraźne polecenie właściciela bez testów, check/typecheck/lint, buildów, migracji i runtime. Checkboxy otwarte, brak Finished/DONE i wpisu CHANGELOG do odbioru. Następny krok: backend V8 i ręczna weryfikacja P1-I04; bez startu P1-I05. |
+
+| 2026-11-03 | P1-I04 — lokalny runtime Expo | Usunięto konflikt procesów Metro; UI NOT VERIFIED | Po zgłoszeniu unknown module 839 znaleziono dwa potwierdzone serwery Expo tego checkoutu na porcie 8082 (IPv4 localhost i IPv6 wildcard). Zatrzymano tylko te procesy, uruchomiono jedną instancję z --clear; jeden listener 127.0.0.1:8082 i komunikat Waiting potwierdzone odczytem procesu/logu. | Bez testów/buildów i otwierania UI na życzenie właściciela. Następny krok: twarde odświeżenie przeglądarki przez właściciela. Bez wpisu CHANGELOG do potwierdzenia naprawy w UI; P1-I04 nadal NOT VERIFIED. |
+
+| 2026-11-03 | P1-I04 — unknown module 839 | Poprawka konfiguracji web; UI NOT VERIFIED | Właściciel potwierdził, że poprzedni restart nie usunął błędu. Log wskazał lazy import trasy i brakujące trasy w grafie. Po sprawdzeniu lokalnego pluginu oraz oficjalnej migracji Expo SDK 58 ustawiono asyncRoutes.web=false w app.json; zrestartowano pojedynczą instancję Metro z --clear na 8082. README opisuje konfigurację. | Odczyt logu/procesu potwierdza gotowość serwera; bez testów i sprawdzania UI. Właściciel powinien wczytać świeżą stronę. Brak deklaracji usunięcia błędu runtime lub wpisu CHANGELOG do potwierdzenia. |
+
+| 2026-11-03 | P1-I03/P1-I04 — obrazy web | Poprawka ReadingImage, NOT VERIFIED | Po zgłoszeniu wyjątku width sprawdzono lokalny ImageLoader RN Web: onLoad zawiera DOM event w nativeEvent, a nie nativeEvent.source. Dodano bezpieczny odczyt source.width/height dla native i target.naturalWidth/naturalHeight dla web, z walidacją skończonych dodatnich wymiarów; bez wymiarów pozostaje domyślna proporcja. | Bez testów/buildów zgodnie z poleceniem. Ręczny odbiór obrazu przez właściciela; CHANGELOG bez wpisu do potwierdzenia naprawy. |
+
+| 2026-11-03 | P1-I03 — uproszczenie artykułu | Usunięto komunikat na polecenie właściciela; NOT VERIFIED | Usunięto osobny blok discover.authorNote z ArticleScreen i nieużywane tłumaczenia EN/PL. | Bez testów i buildów zgodnie z wcześniejszym poleceniem. Drobna korekta UI; bez nowego wpisu CHANGELOG. |
+
+| 2026-11-03 | P1-I03 — stopka źródeł artykułu | Uproszczono UI na polecenie właściciela; NOT VERIFIED | Blok Sprawdź badania i objaśnienie zastąpiono ArticleSources: hr na web/separator native, mały nagłówek Źródła/Sources i subtelne linki bez karty. Zachowano focus i obszary dotyku. Usunięto nieużywane linkOnlyEvidence EN/PL. | Bez testów/buildów. Drobna korekta UI; bez wpisu CHANGELOG do odbioru. |
+
+| 2026-11-03 | P1-I03 — ponowne zgłoszenie błędu obrazów | Usunięto onLoad wymiarów; NOT VERIFIED | Błąd nadal wskazywał dawny callback mimo braku destrukturyzacji w kodzie. ReadingImage używa teraz SizedReadingImage z Image.getSize dla inline, stałym 16:9 cover, walidacją wymiarów i anulowaniem aktualizacji po unmount. Stan jest resetowany przy zmianie URI. Zrestartowano pojedynczy Metro z --clear. | Bez testów/buildów i weryfikacji UI. Właściciel musi odświeżyć dokument przeglądarki; CHANGELOG bez wpisu do potwierdzenia naprawy. |
+
+| 2026-11-03 | P1-I03 — stopka publikacji | Usunięto tekst na polecenie właściciela; NOT VERIFIED | Usunięto discover.education z ArticleScreen i nieużywane tłumaczenia EN/PL. Właściciel odroczył umieszczenie informacji w polityce prywatności; tej polityki nie zmieniano. | Bez testów/buildów. Drobna korekta UI; bez wpisu CHANGELOG. |
+
+| 2026-11-03 | P1-I03 — uproszczenie dat artykułu | Zmieniono metadane czytnika na polecenie właściciela; NOT VERIFIED | ArticleScreen: usunięto wiersz Utworzono/Zmodyfikowano oraz wersję przy Opublikowano; pozostała data publikacji. | Bez testów/buildów. Drobna korekta UI; bez nowego wpisu CHANGELOG. |
+
+| 2026-11-03 | P1-I03 — etykieta publikacji autora | Usunięto na polecenie właściciela; NOT VERIFIED | Usunięto authorPublication z czytnika, feedu i tłumaczeń EN/PL. Etykieta recenzowanej publikacji nadal dotyczy wyłącznie faktycznie recenzowanych materiałów. | Bez testów/buildów. Drobna korekta UI; bez wpisu CHANGELOG. |
+
+| 2026-11-03 | P1-I04 — uruchomienie API quizów | Backend zaktualizowany; testy nadal skipped | Zgłoszony błąd panelu: działał JAR z 18:48 sprzed dodania quizów. Helper start-local-backend zbudował aktualny kod z -DskipTests (BUILD SUCCESS, Tests are skipped), zastąpił wyłącznie lokalny JAR i uruchomił API 8090. Flyway zastosował V8; log potwierdza schema v8 i Started SoberityBackendApplication. | Bez testów automatycznych, bez sprawdzenia UI i prywatnego API. Ręczny odbiór panelu przez właściciela; P1-I04 nadal IN_PROGRESS / NOT VERIFIED. Bez CHANGELOG — operacyjny restart lokalnej aplikacji. |
+
+| 2026-11-03 | P1-I04 — bezpośrednia publikacja autora | Implementacja i lokalny startup, testy skipped | Na wyraźne polecenie właściciela dodano Publish/Send for review przy tworzeniu oraz AUTHOR_PUBLISH dla własnego IN_REVIEW. V9, publikacja AUTHOR/REVIEWED i audit, aktualizacja UI/i18n, raportu wymagań i dokumentacji. Maven BUILD SUCCESS z Tests are skipped; Flyway V9 i Started potwierdzone w logu. | Bez testów API/UI; P1-I04 nadal IN_PROGRESS/NOT VERIFIED. Nie opublikowano żadnego istniejącego quizu. CHANGELOG bez wpisu do ręcznego odbioru. |
+
+| 2026-11-03 | P1-I04 — widoczność Opublikuj | Dodano bezpośrednią akcję na liście i uporządkowano Metro; NOT VERIFIED | QuizEditorialScreen: własny quiz IN_REVIEW ma Opublikuj bez otwierania szczegółów; formularz nadal ma Publish/Review. Ponownie znaleziono dwa serwery na 8082 (web localhost i Expo run:ios IPv6); zastąpiono je jednym wspólnym Metro z --clear, bez --localhost. | Bez testów/buildów. Ręczny odbiór po odświeżeniu; bez wpisu CHANGELOG do potwierdzenia. |
+
+| 2026-11-03 | P1-I04 — źródła w wyjaśnieniu | Implementacja i lokalny startup; bez testów | Na polecenie właściciela zastąpiono wybór EvidenceClaim polami źródeł (tytuł/HTTPS URL) przy wyjaśnieniu. Backend waliduje i zwraca źródła po odpowiedzi/wznowieniu; UI pokazuje je pod wyjaśnieniem. Legacy przypięcia i fiszki zachowane; brak nowej migracji. Formularz pokazuje powód niekompletności. ADR-007, raport, branding i README/API zaktualizowane. Maven BUILD SUCCESS, Tests are skipped, Started backend. | Bez testów API/UI/native. P1-I04 nadal IN_PROGRESS/NOT VERIFIED; brak wpisu CHANGELOG do odbioru. Nie opublikowano żadnych quizów. |
+
+| 2026-11-03 | P1-I03/P1-I04 — uproszczenie Science i menu | Implementacja na polecenie właściciela; NOT VERIFIED | Wspólny paginowany feed POST/ARTICLE/CLAIM z publicznymi projekcjami; brak filtrów i banera języka, nagłówek Artykuły. Menu zalogowanych we wszystkich trasach Science, podsekcje Artykuły/Quizy/Fiszki, osobny katalog quizów i powrót do niego. Home zachowuje najnowsze blogi. EN/PL, branding i README zaktualizowane. | Bez testów i buildów klienta. P1-I03/P1-I04 nadal NOT VERIFIED; CHANGELOG bez wpisu do ręcznego odbioru. |
+
+| 2026-11-03 | P1-I03 — wspólny feed runtime | Lokalny backend zaktualizowany; testy skipped | Kompilacja i pakowanie BUILD SUCCESS z Tests are skipped; uruchomiono backend z nowym DiscoverReader/DiscoverController na 8090. Bez nowej migracji. | Nie uruchomiono testów API/UI/native ani buildów klienta; ręczny odbiór feedu i menu pozostaje otwarty. |
+
+| 2026-11-03 | P1-I03/Home — klikalne karty i nagłówki | Implementacja na polecenie właściciela; NOT VERIFIED | PublicationCard: Expo Link asChild i Pressable z href, semantyką linku, hover/focus; cała karta Home/Discover otwiera czytnik, bez Czytaj publikację. Usunięto mission headline/subtitle Home, wszystkie trzy nagłówki korzystają z ReadingText heading i wspólnych odstępów. Branding uzupełniony. | Bez testów/buildów. Drobna korekta UI; CHANGELOG bez wpisu do ręcznego odbioru. |
+
+| 2026-11-03 | Home — mock Sober rave Vienna | Dodano na wyraźne polecenie właściciela; NOT VERIFIED | Karta Schönbrunn w sekcji Wydarzenia w pobliżu, oryginalne załączone zdjęcie w assets i responsywny kadr eksponujący pałac. Styl jak karta mapy, EN/PL, etykieta Podgląd/Preview. Bez fikcyjnej daty/ceny i bez zapisu wydarzenia w API. Branding dokumentuje wyjątek właściciela. | Bez testów/buildów. Drobna zmiana UI; CHANGELOG bez wpisu do ręcznego odbioru. Nie rozpoczęto nowej iteracji/fazy Events. |
+
+| 2026-11-03 | Nawigacja — menu i profil na każdym poziomie | Implementacja na polecenie właściciela; NOT VERIFIED | Wspólny useAppHeaderOptions dla root/public/authenticated/Science; menu i profil na wszystkich ekranach członka, kontekstowy powrót i brak duplikowania konta. Events przeniesione do wspólnej trasy root z zachowaniem placeholdera. EN/PL, README i branding uzupełnione. | Bez testów/buildów. Ręczny odbiór web/iOS/Android nadal otwarty; CHANGELOG bez wpisu do potwierdzenia. Bez rozpoczęcia nowej iteracji/fazy. |
+
+| 2026-11-03 | Menu — ikony podsekcji Science | Podłączono wygenerowane assety; NOT VERIFIED | navigation.ts i SideMenu: articles-icon.png, quizzes-icon.png, flashcards-icon.png przy Artykuły/Quizy/Fiszki. Rozmiar i sposób wyświetlania jak pozostałe ikony menu, obrazy dekoracyjne dla czytnika ekranu. | Bez testów/buildów na polecenie właściciela. Drobna korekta UI; bez wpisu CHANGELOG. |

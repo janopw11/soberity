@@ -46,3 +46,13 @@ See [EDITORIAL_API.md](EDITORIAL_API.md) for private endpoints, operator-managed
 ## Blog workspace update
 
 The active web editor and direct/optional-review publication API are documented in [BLOG_EDITORIAL_API.md](BLOG_EDITORIAL_API.md). Start the current local JAR and migrations from the repository root with `node scripts/start-local-backend.mjs`.
+
+P1-I04 adds reviewed quizzes and opt-in educational progress in migration V8.
+See [LEARNING_API.md](LEARNING_API.md) for contracts, publication rules,
+account erasure and client entry points. This implementation has not been
+compiled, tested, started or migrated in this session at the owner's request.
+
+Discover uses `GET /api/v1/science/feed?locale=en&page=0` for one timeline of
+published blog posts, reviewed articles and evidence cards (20/page, newest
+publication first). It reuses the existing public projections within a repeatable
+read transaction, preserving withdrawal rules. Existing catalogs remain.

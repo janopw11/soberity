@@ -199,3 +199,69 @@ No tests, lint, typecheck, builds, exports or runtime checks were run for this
 iteration, at the owner's explicit request. Web/iOS/Android and accessibility
 remain NOT VERIFIED. Manual entry: open `/science`, or use Science & Discover
 in the menu; publish an article in `/editorial` to populate the blog catalog.
+
+### P1-I04 — Flashcards & quizzes (implementation, not verified)
+
+Open **Science & Discover → Flashcards & quizzes** (`/science/learn`).
+Flashcards (`/science/flashcards`) use published, independently reviewed
+EvidenceClaims in the selected EN/PL language. Reveal the explanation, open
+research/limitations, mark as reviewed or repeat. Quiz routes
+(`/science/quiz/{id}`) support true/false, single choice and multiple correct
+options; answers are graded by the API, followed by explanation and evidence.
+No timers, streaks or penalties. Published quiz material disappears when its
+pinned evidence revision is withdrawn/replaced.
+
+Saving is off by default. Guests can learn without saving. Members can opt in
+to loading/resuming account progress, save subsequent answers/reviewed cards,
+stop saving, or erase all saved learning progress with confirmation. Private
+state is scoped to the current account; no learning history is written to
+AsyncStorage/localStorage. Account deletion erases saved progress in V8.
+
+Web authors/reviewers use `/editorial-quizzes`, linked from Account and the
+article library. Authors prepare 1–30 questions with options, correct answers,
+explanations and published EvidenceClaim revisions. An independent reviewer
+checks and publishes the quiz; authors cannot approve their own quiz. Content
+is immutable after submission; corrections require a new reviewed quiz. No
+pilot content was seeded (P1-I06), no translations generated, no XP introduced.
+
+Backend migration V8 and the new API must be loaded by restarting an updated
+backend before manual use. Nothing was compiled, tested or started for this
+iteration, as requested. P1-I04 remains IN_PROGRESS / NOT VERIFIED; previous
+P1-I03 verification is still pending. API details: `backend/LEARNING_API.md`.
+
+### Web Metro route loading
+
+Expo Router is configured with `asyncRoutes: { web: false }` in `app.json`.
+SDK 58 enables web route splitting by default; this checkout experienced
+unknown numeric module IDs while loading lazy route chunks. Web now includes
+routes synchronously in one graph. Native route settings retain Expo defaults.
+After changing this setting, restart Expo with `--clear` and fully reload the
+browser so it discards bundles from the previous module graph.
+Reference: https://docs.expo.dev/router/migrate/sdk-57-to-58/
+
+Quiz publication update (2026-11-03): authors now choose **Publish** or
+**Submit for review**, and can publish their existing pending quizzes directly.
+V9 records AUTHOR/REVIEWED provenance without treating the author as an
+independent reviewer. Published EvidenceClaim revisions remain mandatory.
+
+Latest quiz simplification (2026-11-03): each question now has its explanation
+and one or more titled HTTPS research links. Sources appear immediately below
+the explanation after answering. There is no EvidenceClaim selector/prerequisite
+for new quizzes. Legacy pinned questions and withdrawal behavior remain
+supported; flashcards still use reviewed EvidenceClaims. The author can publish
+directly. Invalid/incomplete forms now show a visible completion hint.
+
+Science navigation update (2026-11-03): `/science` now has an Articles heading
+and a single paginated timeline of published posts, reviewed articles and
+evidence cards (`GET /api/v1/science/feed?locale=en&page=0`), without type/topic
+filters or the original-language banner. Existing reader routes remain. Member
+Home still shows the latest blog posts. Menu access is present throughout the
+Science stack for signed-in users, with Articles, Quizzes (`/science/quizzes`)
+and Flashcards subsections. `/science/learn` remains as a compatible hub route.
+No tests or client builds were run for this change.
+
+Shared member headers (2026-11-03): `useAppHeaderOptions` supplies menu, profile
+and contextual back navigation throughout root, Science and account/editorial
+stacks. Guest/auth routes keep their existing guards. Events is a shared root
+route so signed-in users can reach its existing placeholder and header.
+No tests or client builds were run for this navigation change.

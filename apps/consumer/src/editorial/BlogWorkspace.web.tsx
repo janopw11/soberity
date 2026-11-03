@@ -12,6 +12,7 @@ import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import type { JSONContent } from '@tiptap/core';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useAuthStatus } from '../auth/AuthStatusContext';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
@@ -33,6 +34,7 @@ const emptyDocument: JSONContent = {
   content: [{ type: 'paragraph' }],
 };
 export default function BlogWorkspace() {
+  const router = useRouter();
   const { t, i18n } = useTranslation();
   const { colors } = useThemePreferences();
   const { getIdToken } = useAuthStatus();
@@ -405,6 +407,11 @@ export default function BlogWorkspace() {
             )}
           </h1>
         </div>
+        {member?.roles.length && !editing ? (
+          <button className="ew-button" disabled={busy || loading} onClick={() => router.push('/editorial-quizzes')}>
+            {t('learning.editor.title')}
+          </button>
+        ) : null}
         {author && !editing ? (
           <button
             className="ew-button ew-primary"

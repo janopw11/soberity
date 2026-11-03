@@ -17,7 +17,7 @@ import {
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
 
-import { navigationItems } from './navigation';
+import { navigationItems, scienceNavigationItems } from './navigation';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 /** Header hamburger opens the shared navigation without reducing screen width. */
@@ -61,7 +61,7 @@ export default function SideMenu() {
     href?: '/' | '/science' | '/events',
   ) => {
     const label = t(`navigation.features.${id}`);
-    const selected = pathname === href;
+    const selected = pathname === href || (id === 'science' && pathname.startsWith('/science/'));
     return (
       <Pressable
         key={id}
@@ -119,13 +119,44 @@ export default function SideMenu() {
             accessibilityViewIsModal
           >
             <ScrollView contentContainerStyle={styles.content}>
-              {navigationItems.map((entry) =>
-                item(
-                  entry.id,
-                  entry.image,
-                  'href' in entry ? entry.href : undefined,
-                ),
-              )}
+              {navigationItems.map((entry) => (
+                <View key={entry.id}>
+                  {item(entry.id, entry.image, 'href' in entry ? entry.href : undefined)}
+                  {entry.id === 'science' ? (
+                    <View style={styles.submenu}>
+                      {scienceNavigationItems.map((section) => {
+                        const id = `science-${section.id}`;
+                        const selected = section.id === 'articles'
+                          ? pathname === '/science' || /^\/science\/(post|article|evidence)\//.test(pathname)
+                          : section.id === 'quizzes'
+                            ? pathname === section.href || pathname.startsWith('/science/quiz/') || pathname === '/science/learn'
+                            : pathname === section.href;
+                        return (
+                          <Pressable
+                            key={section.id}
+                            accessibilityRole="link"
+                            accessibilityState={{ selected }}
+                            onPress={() => { close(); router.replace(section.href); }}
+                            onFocus={() => setFocused(id)}
+                            onBlur={() => setFocused(null)}
+                            style={({ pressed }) => [styles.item, styles.submenuItem, selected && styles.selected, pressed && styles.pressed, focused === id && styles.focused]}
+                          >
+                            <Image
+                              source={section.image}
+                              style={styles.iconImage}
+                              resizeMode="contain"
+                              accessibilityIgnoresInvertColors
+                              accessible={false}
+                              importantForAccessibility="no"
+                            />
+                            <Text style={styles.label}>{t(`navigation.scienceSections.${section.id}`)}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  ) : null}
+                </View>
+              ))}
             </ScrollView>
           </SafeAreaView>
         </View>
@@ -165,6 +196,16 @@ function createStyles(
       borderWidth: 2,
       borderColor: 'transparent',
     },
+    submenu: {
+      marginLeft: spacing.space32 + spacing.space12,
+      borderLeftWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      paddingLeft: spacing.space8,
+      paddingTop: spacing.space4,
+      paddingBottom: spacing.space8,
+      gap: spacing.space4,
+    },
+    submenuItem: { paddingHorizontal: spacing.space12 },
     selected: { backgroundColor: colors.surfaceAlt },
     pressed: { backgroundColor: colors.border },
     focused: { borderColor: colors.focusRing },

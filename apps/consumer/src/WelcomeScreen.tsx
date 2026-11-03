@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Image,
@@ -12,10 +13,14 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Screen, SettingsIcon } from './ui';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 import DiscoverScreen from './science/DiscoverScreen';
+import { ReadingText } from './science/readingUi';
 
 // Metro requires a literal require() to statically bundle React Native assets.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const worldMapImage = require('../assets/images/world-map-realistic.png');
+// Owner-provided preview photograph. Preserve the original and crop in the viewport.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const viennaRaveImage = require('../assets/images/schonbrunn-vienna-preview.jpeg');
 
 /** Member-only home, mounted by the authenticated route group. */
 export default function WelcomeScreen() {
@@ -24,20 +29,16 @@ export default function WelcomeScreen() {
   const { width } = useWindowDimensions();
   const imageHeight = Math.min(180, Math.max(150, width * 0.45));
   const styles = createStyles(colors, imageHeight);
+  const [eventViewportWidth, setEventViewportWidth] = useState(0);
+  const eventWidth = eventViewportWidth || Math.max(1, Math.min(800, width - spacing.space32) - 2);
+  // 704 × 435 original. Bias the crop toward the palace, below the skyline.
+  const eventPhotoHeight = Math.max(imageHeight, eventWidth * 435 / 704);
+  const eventPhotoWidth = eventPhotoHeight * 704 / 435;
 
   return (
     <Screen maxWidth={800}>
-      <View style={styles.welcomeBlock}>
-        <Text accessibilityRole="header" style={styles.welcomeTitle}>
-          {t('home.missionHeadline')}
-        </Text>
-        <Text style={styles.welcomeSubtitle}>{t('home.missionSubtitle')}</Text>
-      </View>
-
       <View style={styles.section}>
-        <Text accessibilityRole="header" style={styles.sectionTitle}>
-          {t('home.todaysSpotlight')}
-        </Text>
+        <ReadingText heading>{t('home.todaysSpotlight')}</ReadingText>
         <Pressable
           style={[styles.tile, styles.featureCard]}
           accessibilityRole="button"
@@ -72,10 +73,37 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text accessibilityRole="header" style={styles.sectionTitle}>
-          {t('home.eventsNearYou')}
-        </Text>
-        <Text style={styles.eventsEmpty}>{t('home.eventsNotAvailable')}</Text>
+        <ReadingText heading>{t('home.eventsNearYou')}</ReadingText>
+        <View style={[styles.tile, styles.featureCard]}>
+          <View
+            style={{ height: imageHeight, overflow: 'hidden' }}
+            onLayout={event => {
+              const measuredWidth = event.nativeEvent?.layout?.width;
+              if (typeof measuredWidth === 'number' && Number.isFinite(measuredWidth) && measuredWidth > 0) {
+                setEventViewportWidth(measuredWidth);
+              }
+            }}
+          >
+            <Image
+              source={viennaRaveImage}
+              accessibilityLabel={t('home.viennaRave.imageAlt')}
+              resizeMode="cover"
+              fadeDuration={0}
+              style={{
+                position: 'absolute',
+                width: eventPhotoWidth,
+                height: eventPhotoHeight,
+                left: (eventWidth - eventPhotoWidth) / 2,
+                top: -(eventPhotoHeight - imageHeight) * 0.64,
+              }}
+            />
+          </View>
+          <View style={styles.featureContent}>
+            <Text style={styles.featureCategory}>{t('home.viennaRave.preview')}</Text>
+            <Text accessibilityRole="header" style={styles.featureTitle}>{t('home.viennaRave.title')}</Text>
+            <Text style={styles.featureDescription}>{t('home.viennaRave.location')}</Text>
+          </View>
+        </View>
       </View>
 
       <DiscoverScreen compact />
@@ -88,21 +116,7 @@ function createStyles(
   imageHeight: number,
 ) {
   return StyleSheet.create({
-    welcomeBlock: {
-      gap: spacing.space4,
-      paddingTop: spacing.space8,
-    },
-    welcomeTitle: {
-      ...typography.h2,
-      color: colors.textPrimary,
-      fontWeight: '700',
-      letterSpacing: -0.45,
-    },
-    welcomeSubtitle: {
-      ...typography.body,
-      color: colors.textSecondary,
-    },
-    section: { gap: spacing.space12 },
+    section: { gap: spacing.space16 },
     tile: {
       backgroundColor: colors.surface,
       borderColor: colors.border,
@@ -147,10 +161,6 @@ function createStyles(
     },
     featureDescription: {
       ...typography.small,
-      color: colors.textSecondary,
-    },
-    eventsEmpty: {
-      ...typography.body,
       color: colors.textSecondary,
     },
   });

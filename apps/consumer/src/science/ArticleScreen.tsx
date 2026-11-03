@@ -3,7 +3,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Alert, Button, LoadingState, Screen } from '../ui';
 import EvidenceCard, { useReadingDate } from './EvidenceCard';
-import { ReadingCard, ReadingImage, ReadingText, ResearchLink, RichDocument } from './readingUi';
+import { ArticleSources, ReadingCard, ReadingImage, ReadingText, RichDocument } from './readingUi';
 import { mediaUri, ScienceError, scienceGet, type Article, type Post } from './scienceApi';
 
 type Kind = 'post' | 'article' | 'evidence';
@@ -33,16 +33,13 @@ export default function ArticleScreen({ kind }: { kind: Kind }) {
   return <Screen maxWidth={760}>
     <Button variant="tertiary" label={t('discover.back')} onPress={() => router.replace('/science')} />
     {!validId || error !== null ? <ReadingCard><Alert variant="danger" message={t(!validId || error === 404 ? 'discover.notFound' : 'discover.error')} />{validId && error !== 404 ? <Button variant="secondary" label={t('discover.retry')} onPress={() => retry(value => value + 1)} /> : null}</ReadingCard> : kind === 'evidence' ? <EvidenceCard claimId={id} /> : !data ? <LoadingState label={t('discover.loading')} /> : <>
-      <ReadingText muted>{post ? t(post.publication_route === 'REVIEWED' ? 'discover.reviewedArticle' : 'discover.authorPublication') : t('discover.reviewedArticle')}</ReadingText>
+      {!post || post.publication_route === 'REVIEWED' ? <ReadingText muted>{t('discover.reviewedArticle')}</ReadingText> : null}
       <ReadingText heading>{data.title}</ReadingText>
-      <ReadingText muted>{t('discover.published')}: {date(data.published_at)} · {t('discover.version', { count: data.version })}</ReadingText>
+      <ReadingText muted>{t('discover.published')}: {date(data.published_at)}</ReadingText>
       {post ? <>
-        <ReadingText muted>{t('discover.created')}: {date(post.created_at)} · {t('discover.modified')}: {date(post.updated_at)}</ReadingText>
-        <ReadingText muted>{t('discover.originalLanguage')}</ReadingText>
-        {post.publication_route !== 'REVIEWED' ? <ReadingCard><ReadingText>{t('discover.authorNote')}</ReadingText></ReadingCard> : null}
         {post.cover_id ? <ReadingImage uri={mediaUri(post.cover_id)} alt={post.cover_alt || post.title} cover /> : null}
         <RichDocument node={post.document} />
-        <ReadingCard><ReadingText heading>{t('discover.checkResearch')}</ReadingText><ReadingText muted>{t('discover.linkOnlyEvidence')}</ReadingText>{post.evidence.map((source, index) => <ResearchLink key={`${source.url}-${index}`} url={source.url} title={source.title} />)}{!post.evidence.length ? <ReadingText>{t('discover.evidenceUnavailable')}</ReadingText> : null}</ReadingCard>
+        <ArticleSources sources={post.evidence} />
       </> : article ? <>
         {article.locale !== (i18n.resolvedLanguage === 'pl' ? 'pl' : 'en') ? <ReadingText muted>{t('discover.languageFallback', { language: article.locale })}</ReadingText> : null}
         <ReadingText>{article.summary}</ReadingText>
@@ -50,7 +47,6 @@ export default function ArticleScreen({ kind }: { kind: Kind }) {
         <ReadingText muted>{t('discover.reviewed')}: {date(article.reviewed_at)} · {t('discover.nextReview')}: {date(article.next_review_at)}</ReadingText>
         <EvidenceCard claimId={article.claim_id} />
       </> : null}
-      <ReadingText muted>{t('discover.education')}</ReadingText>
     </>}
   </Screen>;
 }

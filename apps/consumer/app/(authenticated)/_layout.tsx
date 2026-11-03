@@ -1,52 +1,22 @@
-import { router, Stack } from 'expo-router';
-import { Image, Pressable, StyleSheet } from 'react-native';
+import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-
-import { radii, spacing } from '@soberity/design-tokens';
-
-import SideMenu from '../../src/SideMenu';
 import { AppLogo } from '../../src/ui';
-import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
+import { useAppHeaderOptions } from '../../src/navigation/useAppHeaderOptions';
 
 export default function AuthenticatedLayout() {
   const { t } = useTranslation();
-  const { colors } = useThemePreferences();
+  const headerOptions = useAppHeaderOptions();
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.textPrimary,
-        contentStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-      }}
-    >
+    <Stack screenOptions={headerOptions}>
       <Stack.Screen
         name="index"
         options={{
           title: t('common.appName'),
           headerTitle: () => <AppLogo />,
-          headerLeft: () => <SideMenu />,
-          headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('navigation.openAccount')}
-              onPress={() => router.push('/account')}
-              style={styles.accountButton}
-            >
-              <Image
-                // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
-                source={require('../../assets/images/profile-icon.png')}
-                style={styles.accountIcon}
-                resizeMode="contain"
-                accessibilityIgnoresInvertColors
-                accessible={false}
-                importantForAccessibility="no"
-              />
-            </Pressable>
-          ),
         }}
       />
+      <Stack.Screen name="editorial-quizzes" options={{ title: t('learning.editor.title') }} />
       <Stack.Screen
         name="editorial-evidence"
         options={{ title: t('editorial.evidence') }}
@@ -72,17 +42,3 @@ export default function AuthenticatedLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  accountButton: {
-    minHeight: 48,
-    minWidth: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.sm,
-  },
-  accountIcon: {
-    width: 26,
-    height: 26,
-    marginHorizontal: spacing.space8,
-  },
-});
