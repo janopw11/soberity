@@ -1,0 +1,11 @@
+[Unit]
+Description=Soberity staging PostgreSQL backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+Environment=STAGING_ENV_FILE=/etc/soberity/staging.env
+ExecStart=/bin/sh /opt/soberity/infra/staging/backup-db.sh /var/backups/soberity-staging
+TimeoutStartSec=1800
+UMask=0077

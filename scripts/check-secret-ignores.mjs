@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 // Synthetic paths only; never create or print real credentials.
 const ignored = [
+  '.aws/credentials',
+  '.codex/session.json',
+  '.backups/staging.dump',
   '.env',
   '.env.local',
   '.env.production',

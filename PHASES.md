@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — P0-I00–P0-I11 mają status DONE (12 iteracji, P0-I05 zamknięte decyzją właściciela); P0-I03A IN_PROGRESS; P0-I12 DONE (manualna weryfikacja T01–T03 potwierdzona przez właściciela 2026-11-03). Zastany status P0-I11 zachowano; bieżąca regresja i ograniczenia platform są dokumentowane w P0-I12.
+**Status globalny:** IN_PROGRESS — Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS; P0-I13 BLOCKED. 2026-11-03: właściciel dopuścił lokalny rozwój Phase 1 przed uzyskaniem hosta; zdalne prace P0-I13 odroczone (approved), bez oznaczania Phase 0 jako DONE. Następna iteracja: P1-I00.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -517,20 +517,22 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I13 — CI, EAS, staging & Phase 0 gate
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P0-I11, P0-I12  
-**Dowód:** —  
-**Blokery:** —
+**Status:** BLOCKED
+**Started:** 2026-11-03
+**Finished:** —
+**Zależności iteracji:** P0-I11, P0-I12
+**Dowód:** `docs/testing/P0-I13-results.md`, lokalne logi `docs/testing/P0-I13/`; actionlint, Compose/Caddy i EAS schema PASS; `pnpm check`, infra 10/10, Jest 71/71, Playwright 24/24, web/native exports, backend unit 3/3 oraz Gitleaks historii i źródeł PASS. Lokalny Caddy TLS + prawdziwy eksport + fixture API: 17 kontroli PASS. Nie jest to hosted CI ani zdalny staging.
+**Blokery:** właściciel potwierdził brak hosta/domeny staging oraz projektu EAS. Brak hosted CI run/build IDs, rzeczywistego HTTPS/API i uruchomionego monitoringu/offsite/restore drill. Docker read-only blokuje Maven IT, image build i prawdziwy backup/restore. P0-I03A V02/V03 nadal otwarte; Phase 0 niezamknięta.
 
 **Zakres zadań:**
 
-- [ ] `P0-I13-T01` Dodaj CI frontend/backend/secrets scanning i lockfile checks.
+- [x] `P0-I13-T01` Dodaj CI frontend/backend/secrets scanning i lockfile checks.
 - [ ] `P0-I13-T02` Skonfiguruj EAS development/preview oraz staging backend/web z HTTPS.
-- [ ] `P0-I13-T03` Uzupełnij README bootstrap, sieć emulatorów, sekrety, troubleshooting.
+- [x] `P0-I13-T03` Uzupełnij README bootstrap, sieć emulatorów, sekrety, troubleshooting.
 - [ ] `P0-I13-T04` Dodaj monitoring minimum i strategię backup/restore staging.
 - [ ] `P0-I13-T05` Wykonaj przegląd bezpieczeństwa i zamknij Phase 0.
+
+**Stan częściowy:** T02: cztery profile EAS + preview preflight i Compose/Caddy gotowe; projekt/buildy/host nieutworzone. T04: skrypty, timery i strategia gotowe, ale rzeczywisty restore/offsite i harmonogram niezweryfikowane. T05: przegląd `infra/staging/SECURITY.md` zapisany; bramka pozostaje otwarta.
 
 **Weryfikacja:**
 
@@ -544,7 +546,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - [ ] Wszystkie obowiązkowe iteracje Phase 0 mają status `DONE` oraz dowody wykonania i testów.
 - [ ] Zrealizowano regresję odpowiednią do fazy, testy bezpieczeństwa, a tam gdzie dotyczy — potwierdzono web/iOS/Android.
 - [ ] Rozwiązano krytyczne blokery, uzupełniono dokumentację, zaktualizowano statusy i `CHANGELOG.md` dla istotnych rezultatów.
-- [ ] Właściciel projektu potwierdził przejście do kolejnej fazy lub udokumentował świadome odstępstwo.
+- [x] Właściciel projektu potwierdził przejście do kolejnej fazy lub udokumentował świadome odstępstwo. 2026-11-03: zgoda na lokalny rozwój Phase 1 przed uzyskaniem hosta; ADR-004. Pozostałe checkboxy bramki pozostają otwarte; nie jest to pełny odbiór Phase 0.
 
 ---
 
@@ -552,7 +554,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Status fazy:** TODO  
 **Cel:** Źródłowa baza wiedzy, recenzja treści, Discover, fiszki, quizy i Weekly Science Drop.  
-**Zależności:** Phase 0  
+**Zależności:** lokalne fundamenty Phase 0; odroczenie zdalnego odbioru P0-I13 zatwierdzone przez właściciela 2026-11-03 (`docs/adr/004-local-phase-1-before-staging.md`). Phase 0 pozostaje otwarta.
 **Raport główny:** §3.2, §24, §25  
 **Iteracje:** 7
 
@@ -561,7 +563,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P0-I13  
+**Zależności iteracji:** P0-I13 — wyjątek zatwierdzony 2026-11-03: brak hosta/EAS i zdalnego odbioru nie blokuje lokalnej implementacji P1-I00. Własne testy migracji/constraintów V01 pozostają obowiązkowe.
 **Dowód:** —  
 **Blokery:** —
 
@@ -2156,13 +2158,13 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I12` — DONE, ukończona 2026-11-03.
-- **Status:** T01–T04, V01 i V02 zakończone; T01–T03 na podstawie pozytywnej manualnej weryfikacji potwierdzonej przez właściciela. Szczegóły: `docs/testing/phase-0-results.md`.
-- **Następny krok:** `P0-I13` — CI, EAS, staging & Phase 0 gate; wyłącznie po odrębnym poleceniu. Nie rozpoczęto.
-- **Otwarte blokery:** brak blockerów odbioru P0-I12 według potwierdzenia właściciela. Historyczne ograniczenia automatyzacji iOS i Docker read-only nie są deklarowane jako naprawione. P0-I03A i bramka Phase 0 pozostają otwarte.
-- **Wymagana akceptacja:** P0-I12 zamknięto na wyraźne polecenie właściciela. `/docs` pozostaje lokalne i ignorowane przez Git.
-- **Ostatni potwierdzony wynik testów:** 2026-11-03 właściciel: T01–T03 OK (samodzielna weryfikacja). Wcześniej agent: `pnpm check` PASS; Jest 71/71; web 22/24 i 6/6 po korekcie asercji; Android Expo Go smoke PASS. Nowych testów automatycznych przy aktualizacji statusu nie uruchamiano.
+- **Wybrany kierunek:** lokalny rozwój Phase 1 — Science & Discover MVP, przed uzyskaniem hosta; decyzja właściciela 2026-11-03, ADR-004.
+- **Następna iteracja:** `P1-I00` — Scientific content schema & source policy; status TODO, implementacji jeszcze nie rozpoczęto.
+- **Zakres następnego kroku:** ScientificSource/EvidenceClaim, poziom pewności i ograniczenia, wersjonowanie i recenzja, polityka korelacji/przyczynowości, migracje i test zakazu publikacji bez źródeł. Jedna iteracja na polecenie.
+- **Odroczone prace:** P0-I13 BLOCKED / deferred (approved): host, domena, staging Firebase/EAS, hosted CI, rzeczywisty HTTPS, monitoring/offsite/restore. P0-I03A pozostaje IN_PROGRESS, Phase 0 13/15 DONE; bramka niezamknięta.
+- **Lokalny bloker do usunięcia:** Docker overlay read-only. Testy PostgreSQL/migracji są wymagane dla P1-I00 V01; brak hosta nie uzasadnia ich pominięcia. Nie deklarujemy naprawy Dockera ani PASS niewykonanych testów.
+- **Ostatni potwierdzony wynik testów:** P0-I13 2026-11-03: check PASS; infra 10/10, Jest 71/71, Playwright 24/24, backend unit 3/3; exports i lokalny Caddy fixture smoke 17 PASS; Gitleaks PASS. Maven IT i zdalne środowiska BLOCKED/NOT VERIFIED. Przy aktualizacji kolejności wykonano tylko kontrolę dokumentacji.
+- **Akceptacja:** właściciel dopuścił rozpoczęcie lokalnej Phase 1; nie oznacza to zgody na deployment, publikację ani pominięcie obowiązkowych testów. `/docs` nadal pozostaje lokalne, poza Git.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2179,6 +2181,10 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 | 2026-11-03 | P0-I12 | BLOCKED; T04, V01, V02 wykonane; T01–T03 częściowe | Playwright config + account-flow + platform-verification; PHASES, CHANGELOG; lokalne docs/testing/phase-0-results.md i P0-I12/. Web 22/24, następnie 6/6 po korekcie asercji typu pola; wszystkie 24 scenariusze potwierdzone. pnpm check PASS; Jest 71/71; Android Expo Go smoke i sześć asercji UI PASS. | iOS system Open dialog i osascript 1002; Docker read-only (testy web użyły lokalnego Auth CLI 15.30.1); natywne konto, screen readery, duży font, realne local/remote API NOT VERIFIED. Kontynuować P0-I12, nie rozpoczynać P0-I13. |
 
 | 2026-11-03 | P0-I12 | DONE; T01–T03 zaznaczone po potwierdzeniu właściciela; wszystkie zadania i weryfikacje zamknięte | PHASES.md, CHANGELOG.md, lokalny docs/testing/phase-0-results.md; właściciel potwierdził samodzielne sprawdzenie T01–T03 z wynikiem OK i polecił zamknąć iterację. Kontrola dokumentacji; bez nowych testów automatycznych. | Brak blockerów odbioru zgłoszonych przez właściciela. Nie dopisano niepodanych urządzeń, wersji ani artefaktów. Następna P0-I13 tylko po odrębnym poleceniu; Phase 0 nadal otwarta. |
+
+| 2026-11-03 | P0-I13 | BLOCKED; T01/T03 zweryfikowane, pozostałe częściowe | .github/workflows, EAS profiles/hook, infra/staging HTTPS/monitor/backup/restore/security, staging health config, scripts i README; lokalne docs/testing/P0-I13-results.md i logi. Check, infra 10/10, Jest 71/71, web 24/24, backend unit 3/3, exports, Gitleaks, actionlint/schema PASS; Caddy TLS fixture smoke 17 PASS. | Brak hosta/domeny/projektu EAS potwierdzony przez właściciela. Docker read-only blokuje IT/image/real restore; hosted CI i zdalny smoke nieuruchomione; P0-I03A otwarte. Kontynuować P0-I13, bez przejścia do Phase 1. |
+
+| 2026-11-03 | P0-I13 / kolejność Phase 1 | Zatwierdzone odroczenie zdalnych prac; następna P1-I00 | PHASES.md, lokalny ADR-004; właściciel chce rozpocząć Phase 1 przed uzyskaniem hosta. Zmieniono zależność lokalnego startu, zachowując P0-I13 BLOCKED i Phase 0 otwartą; implementacji P1-I00 nie rozpoczęto. Kontrola dokumentacji, bez nowych testów aplikacji. | P1-I00 V01 nadal wymaga sprawnego PostgreSQL/Dockera. Brak nowego wpisu CHANGELOG: zmiana kolejności planu, bez ukończonej funkcjonalności. |
 
 # 7. Wzór raportu kończącego sesję Codex
 

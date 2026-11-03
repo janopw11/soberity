@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- P0-I13: dodano zweryfikowane lokalnie workflow CI (frontend/backend/Gitleaks), profile EAS development/preview z kontrolą konfiguracji oraz konfigurację staging HTTPS, smoke, monitoring i bezpieczne skrypty backup/restore. Uaktualniono bootstrap/README i zapisano przegląd bezpieczeństwa. Testy web 24/24, klienta 71/71 i infrastruktury 10/10 PASS; staging, zdalne buildy/CI oraz pełna bramka Phase 0 pozostają nieodebrane.
+
 - P0-I12: rozszerzono regresję web o przywracanie sesji, awarię API i ponowienie, edycję profilu, reauth, zmianę/reset hasła, usuwanie konta, deep linki i klawiaturę. Potwierdzono 24 scenariusze w przebiegu pełnym i poprawkowym oraz smoke Android Expo Go. Dodano lokalną macierz wyników z wersjami, dowodami i instrukcjami dokończenia; iterację zamknięto 2026-11-03 po potwierdzeniu przez właściciela samodzielnej, pozytywnej weryfikacji T01–T03. Historyczne ograniczenia testów agenta zachowano w raporcie.
 
 - Home: dopracowano układ zgodnie z briefem premium/minimal: kompaktowy tagline, „Today's spotlight” i karta mapy w jasnym, redakcyjnym stylu z etykietą kategorii, niższym obrazem i subtelną strzałką; uproszczono nagłówki oraz zmniejszono ikony nawigacji. Usunięto mock Vienna Coffee Rave; ponieważ brak źródła wydarzeń, sekcja pokazuje pusty stan zamiast fikcyjnego karuzelowego wpisu. Nie dodano sekcji science z placeholderami. Testów/buildów nie uruchamiano.

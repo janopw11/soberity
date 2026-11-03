@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "version": ">=21.0.2",
+    "requireCommit": true,
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development",
+      "node": "24.14.0",
+      "pnpm": "10.4.1",
+      "android": { "buildType": "apk" }
+    },
+    "development-simulator": {
+      "extends": "development",
+      "ios": { "simulator": true }
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "node": "24.14.0",
+      "pnpm": "10.4.1",
+      "env": { "EXPO_NO_DOTENV": "1" },
+      "android": { "buildType": "apk" }
+    },
+    "preview-simulator": {
+      "extends": "preview",
+      "ios": { "simulator": true }
+    }
+  }
+}

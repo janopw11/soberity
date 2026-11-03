@@ -16,7 +16,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:secrets": "node scripts/check-secret-ignores.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm check:secrets"
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm check:secrets",
+    "test:infra": "node --test scripts/*.test.mjs",
+    "check:staging": "node scripts/check-staging.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

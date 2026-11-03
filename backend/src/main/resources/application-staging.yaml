@@ -9,3 +9,16 @@ soberity:
     allowed-origins: ${SOBERITY_CORS_ALLOWED_ORIGINS}
   firebase:
     project-id: ${SOBERITY_FIREBASE_PROJECT_ID}
+
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -1,0 +1,14 @@
+[Unit]
+Description=Soberity staging HTTPS, health and authorization smoke
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/soberity/staging-monitor.env
+ExecStart=/usr/bin/node /opt/soberity/scripts/check-staging.mjs ${STAGING_ORIGIN}
+TimeoutStartSec=180
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true

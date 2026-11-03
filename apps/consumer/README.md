@@ -1,4 +1,4 @@
-# Consumer — P0-I03
+# Consumer — Expo web/iOS/Android
 
 Jeden klient Expo SDK 58, React Native 0.88, React 19.3 i Expo Router, z
 podstawowym design systemem (`@soberity/design-tokens` + `src/ui`), routingiem
@@ -59,14 +59,13 @@ potrzebnej Gradle. Uruchom AVD przed `android`.
 
 ## Host API
 
-`EXPO_PUBLIC_API_URL` pozostaje publicznym szablonem dla przyszłego klienta
-API. Obecna aplikacja go nie używa i nie uruchamia backendu.
+`EXPO_PUBLIC_API_URL` jest używany do weryfikacji sesji oraz operacji profilu i usuwania konta. Backend uruchom osobno; lokalny Compose przydziela losowy port hosta, odczytywany przez `docker compose -f infra/compose/compose.yml port backend 8080`. Wstaw ten port do konfiguracji klienta.
 
 Expo Go i emulatory nie potwierdzają dostarczenia produkcyjnej wiadomości ani
 allow-listy Firebase. Do pełnej weryfikacji potrzebny jest rzeczywisty projekt
 dev Firebase, dostarczony e-mail oraz build web/natywny z deep linkiem.
 
-| Klient lokalny      | Adres przyszłego backendu                                                    |
+| Klient lokalny      | Adres backendu (zastąp 8080 odczytanym portem)                               |
 | ------------------- | ---------------------------------------------------------------------------- |
 | Web na komputerze   | `http://localhost:8080` (backend musi dopuścić origin web przez CORS)        |
 | iOS Simulator       | `http://localhost:8080`                                                      |
@@ -77,7 +76,7 @@ dev Firebase, dostarczony e-mail oraz build web/natywny z deep linkiem.
 Port API 8080 jest niezależny od Metro. Adres LAN nie może zawierać sekretów.
 Nie umieszczaj poświadczeń w `EXPO_PUBLIC_*`. Dostęp HTTP na natywnych
 urządzeniach wymaga osobnej weryfikacji konfiguracji transportu przy
-podłączaniu API; obecny smoke test nie testuje sieci backendu.
+podłączaniu API; testy web używające fixture API nie potwierdzają rzeczywistego połączenia z backendem.
 
 Wyniki i ograniczenia: [PHASES.md](../../PHASES.md). Lokalne screenshoty i
 raporty w ignorowanym `docs/testing/` nie są wymagane do uruchomienia klona.
@@ -123,3 +122,46 @@ Sesja jest przywracana przez Firebase po restarcie i potwierdzana przez backend.
 Wylogowanie czyści stan lokalnie od razu, a późne odpowiedzi poprzedniej sesji
 są ignorowane. Testy automatyczne nie zastępują ręcznej weryfikacji prawdziwego
 maila na web i na urządzeniach.
+
+## EAS development / preview (P0-I13)
+
+`eas.json` zawiera development client i preview do dystrybucji wewnętrznej,
+oraz osobne warianty iOS Simulator. Android otrzymuje APK. Profile nie
+publikują do sklepów i nie uruchamiają EAS Update. Obecnie oba używają
+`com.soberity.app.dev`, więc zastępują się na urządzeniu. Rozdzielenie
+identyfikatorów i konfiguracja App/Universal Links wymaga własnej weryfikacji.
+
+W katalogu `apps/consumer`, po utworzeniu przez właściciela projektu EAS:
+
+```sh
+eas login
+eas init
+```
+
+Zapisz rzeczywiste `extra.eas.projectId`/owner dodane przez EAS. Nie wpisuj
+fikcyjnego ID ani tokena do repo. Ustaw publiczne zmienne Firebase i API w
+środowiskach EAS `development` oraz `preview`. Preview wymaga rzeczywistego
+staging HTTPS oraz staging Firebase; nie ustawiaj w nim localhost, wartości
+demo ani URL emulatora Auth. `.env` jest ignorowane; preview jawnie nie czyta
+lokalnego dotenv. Sekrety serwisowe i signing keys zarządzane są poza repo. Hook `eas-build-pre-install` odrzuca preview bez kompletnej konfiguracji oraz HTTP/loopback API, demo Firebase i emulator Auth; nie weryfikuje istnienia projektu zdalnego.
+
+Po przeglądzie zmian, commicie i odrębnej autoryzacji zdalnych buildów:
+
+```sh
+eas build --profile development-simulator --platform ios
+eas build --profile development --platform android
+eas build --profile preview-simulator --platform ios
+eas build --profile preview --platform android
+```
+
+Dla fizycznego iPhone'a użyj `development` lub `preview` bez `-simulator`;
+Apple wymaga odpowiedniego konta i podpisywania. Build chmurowy może zużywać
+limity/środki, dlatego samo dodanie profili go nie uruchamia. Zapisz build IDs,
+sprawdź instalację/launch oraz cały przepływ konta; bundle export nie jest
+potwierdzeniem IPA/APK. Aktualne schematy profili:
+[Expo EAS](https://docs.expo.dev/build/eas-json/),
+[monorepo](https://docs.expo.dev/build-reference/build-with-monorepos/).
+
+Wcześniejsze lokalne raporty i akceptacja właściciela P0-I12 są w
+`docs/testing/phase-0-results.md`. Staging opisuje
+[infra/staging/README.md](../../infra/staging/README.md).

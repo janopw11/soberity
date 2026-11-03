@@ -60,7 +60,7 @@ try {
     }
   }
   console.log(
-    'Tooling ready. Run pnpm check and pnpm build. No app/server exists yet.',
+    'Tooling ready. Run pnpm check and pnpm build. See README for Docker services and Firebase configuration.',
   );
 } catch (error) {
   console.error(`Bootstrap failed: ${error.message}`);

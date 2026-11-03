@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Soberity staging every minute
+
+[Timer]
+OnBootSec=60
+OnUnitActiveSec=60
+RandomizedDelaySec=5
+Unit=soberity-monitor.service
+
+[Install]
+WantedBy=timers.target

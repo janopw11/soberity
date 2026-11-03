@@ -39,6 +39,10 @@ GoogleService-Info.plist
 *.mobileprovision
 
 # Local tools and OS files
+.backups/
+.aws/
+.codex/
+.agents/
 .DS_Store
 .idea/
 .vscode/

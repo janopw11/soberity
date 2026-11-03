@@ -7,3 +7,16 @@ mvnw.cmd
 !.env.example
 !.env.*.example
 *.log
+secrets/
+.secrets/
+*service-account*.json
+*serviceAccount*.json
+*firebase-adminsdk*.json
+application_default_credentials.json
+credentials.json
+*.pem
+*.key
+*.p12
+*.p8
+*.jks
+*.keystore

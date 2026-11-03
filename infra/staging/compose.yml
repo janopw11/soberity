@@ -1,0 +1,85 @@
+name: soberity-staging
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: soberity
+      POSTGRES_USER: soberity
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    secrets:
+      - source: db-password
+        target: db-password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U soberity -d soberity']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+  backend:
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE to a reviewed image tag or digest}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: staging
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/soberity
+      SPRING_DATASOURCE_USERNAME: soberity
+      SPRING_CONFIG_IMPORT: configtree:/run/secrets/
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      SOBERITY_CORS_ALLOWED_ORIGINS: https://${STAGING_HOST:?Set STAGING_HOST}
+      SOBERITY_FIREBASE_PROJECT_ID: ${SOBERITY_FIREBASE_PROJECT_ID:?Set a staging-only Firebase project}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase.json
+    secrets:
+      - source: db-password
+        target: spring.datasource.password
+      - source: firebase-credentials
+        target: firebase.json
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    stop_grace_period: 35s
+    logging: *logging
+
+  edge:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      STAGING_HOST: ${STAGING_HOST:?Set STAGING_HOST}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${WEB_DIST_PATH:?Set WEB_DIST_PATH to the staging Expo export}:/srv:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging: *logging
+
+secrets:
+  db-password:
+    file: ${DB_PASSWORD_FILE:?Set DB_PASSWORD_FILE outside the checkout}
+  firebase-credentials:
+    file: ${FIREBASE_CREDENTIALS_FILE:?Set FIREBASE_CREDENTIALS_FILE outside the checkout}
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:

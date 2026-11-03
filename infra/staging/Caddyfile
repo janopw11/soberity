@@ -1,0 +1,42 @@
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+{$STAGING_HOST} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options DENY
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+		-Server
+	}
+
+	# No access log: action URLs contain codes. Backend ECS logs carry
+	# correlation IDs; never add Authorization headers or query strings.
+	@api path /api/* /actuator/health /actuator/health/liveness /actuator/health/readiness
+	handle @api {
+		reverse_proxy backend:8080 {
+			health_uri /actuator/health/readiness
+			health_interval 15s
+			health_timeout 3s
+		}
+	}
+
+	@private path /actuator/* /v3/api-docs* /swagger-ui* /.env* /.git/*
+	handle @private {
+		respond 404
+	}
+
+	handle {
+		root * /srv
+		# Expo Router static export emits route.html. Keep the query intact
+		# for /verify-email and /reset-password?oobCode=... .
+		try_files {path} {path}.html {path}/index.html /+not-found.html
+		header Cache-Control "no-store"
+		file_server
+	}
+}
