@@ -48,6 +48,10 @@ export default function AuthenticatedLayout() {
         }}
       />
       <Stack.Screen
+        name="editorial-evidence"
+        options={{ title: t('editorial.evidence') }}
+      />
+      <Stack.Screen
         name="editorial"
         options={{ title: t('editorial.title') }}
       />

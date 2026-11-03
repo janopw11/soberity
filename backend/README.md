@@ -42,3 +42,7 @@ P1-I01 routes, response fields, publication visibility and ETag contract are doc
 ## Editorial workflow
 
 See [EDITORIAL_API.md](EDITORIAL_API.md) for private endpoints, operator-managed AUTHOR/REVIEWER grants, audit history and the `/editorial` web workspace.
+
+## Blog workspace update
+
+The active web editor and direct/optional-review publication API are documented in [BLOG_EDITORIAL_API.md](BLOG_EDITORIAL_API.md). Start the current local JAR and migrations from the repository root with `node scripts/start-local-backend.mjs`.

@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/science/categories", "/api/v1/science/articles",
-                                "/api/v1/science/articles/*", "/api/v1/evidence/claims",
+                                "/api/v1/science/articles/*", "/api/v1/science/posts", "/api/v1/science/posts/*",
+                                "/api/v1/science/media/*", "/api/v1/evidence/claims",
                                 "/api/v1/evidence/claims/*", "/api/v1/evidence/claims/*/citations",
                                 "/api/v1/evidence/sources/*").permitAll()
                         .requestMatchers("/api/v1/editorial/**").hasRole("USER")

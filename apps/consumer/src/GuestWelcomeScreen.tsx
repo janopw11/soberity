@@ -25,6 +25,7 @@ export default function GuestWelcomeScreen() {
         {t('welcome.intro')}
       </Text>
       <View style={styles.actions}>
+        <Button label={t('discover.browse')} variant="secondary" onPress={() => router.push('/science')} />
         <Button
           label={t('welcome.signInButton')}
           onPress={() => router.push('/sign-in')}

@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Alert, Screen } from '../ui';
-import EditorialPanel from './EditorialPanel';
+import BlogWorkspace from './BlogWorkspace';
 import { useAuthStatus } from '../auth/AuthStatusContext';
 
 export default function EditorialScreen() {
@@ -13,5 +13,5 @@ export default function EditorialScreen() {
         <Alert message={t('editorial.webOnly')} />
       </Screen>
     );
-  return <EditorialPanel key={user?.uid} />;
+  return <BlogWorkspace key={user?.uid} />;
 }

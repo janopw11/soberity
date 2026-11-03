@@ -173,3 +173,29 @@ REVIEWER grants. An entry appears in Account after editorial access is
 confirmed; native clients show a web-only message. Role provisioning, workflow,
 private API and isolated full-stack browser test setup are documented in
 [EDITORIAL_API.md](../../backend/EDITORIAL_API.md).
+
+The owner-approved blog editor update uses Tiptap, source links, dynamic categories and images; authors can publish directly or request review. Automatic translations are deferred. See [BLOG_EDITORIAL_API.md](../../backend/BLOG_EDITORIAL_API.md). The previous scientific workspace remains at `/editorial-evidence`.
+
+### P1-I03 — Discover reading (implementation, not verified)
+
+`/science` is a shared public route, available to guests and members. It has
+separate catalogs for blog publications (`/api/v1/science/posts`), reviewed
+science articles and Evidence cards. Reviewed catalogs use the selected EN/PL
+locale and support topic filters and pagination. Blog content remains in its
+original language; automatic translation is deferred.
+
+Reading routes: `/science/post/{id}`, `/science/article/{id}` and
+`/science/evidence/{id}`. The member Home latest section now reads published
+blog posts rather than preview fixtures. Returning to a reading screen reloads
+the public API so archived content is not retained as a local cached result.
+The shared RN renderer reads canonical document JSON, never raw HTML; public
+images use server media IDs, external links require HTTPS. Blog author/direct
+publication and independent review have distinct labels. Structured Evidence
+cards show certainty/rationale, scope, limitations, review dates and cited
+source metadata (year/type/DOI/PMID). Plain blog source links do not imply a
+structured scientific assessment.
+
+No tests, lint, typecheck, builds, exports or runtime checks were run for this
+iteration, at the owner's explicit request. Web/iOS/Android and accessibility
+remain NOT VERIFIED. Manual entry: open `/science`, or use Science & Discover
+in the menu; publish an article in `/editorial` to populate the blog catalog.

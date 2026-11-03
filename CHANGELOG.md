@@ -1,5 +1,7 @@
 ## 2026-11-03
 
+- Panel redakcyjny: przebudowano `/editorial` na edytor blogowy Tiptap z formatowaniem, justowaniem, źródłami w stopce, tworzeniem kategorii, obrazami inline i okładką 1600×900. Uproszczono formularz i sterowanie; dodano wybór publikacji autora lub recenzji oraz uwagi recenzenta. UI EN/PL, desktop/mobile-web: 8/8 PASS na symulowanym API; klient 76/76, backend unit 13/13, check i eksporty PASS. V7 zastosowana lokalnie, odczytowy smoke API PASS; pełne nowe testy integracyjne pominięte na życzenie właściciela. Automatyczne tłumaczenia odroczone.
+
 - P1-I02: dodano panel redakcyjny web EN/PL i prywatne API z rolami autora i recenzenta. Niezależne zatwierdzanie twierdzeń i całych artykułów, wersjonowanie, publikacja/wycofanie oraz nieedytowalna historia działań; poprawiono dostępność potwierdzeń recenzji na webie. Maven 81 testów, klient 76/76, Playwright na realnym lokalnym backendzie 8/8 oraz 2/2 scenariusze artykułów PASS; check i eksporty web/iOS/Android PASS. Panel web-only, nowe testy runtime natywnego nie były wykonywane.
 
 - P1-I01: dodano publiczne API kategorii EN/PL, twierdzeń, artykułów i cytowań z filtrowaniem, paginacją i rewalidacją ETag. API ujawnia wyłącznie opublikowane treści, ukrywa artykuły zależne od wycofanej wersji twierdzenia i odmawia zapisów. Flyway V5 wymaga niezależnej recenzji wersji artykułu. Maven: 8 testów unit + 64 integracyjne PASS (14 nowych Science API); pnpm check PASS na izolowanym PostgreSQL 17.11.

@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), następna P1-I03. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -613,6 +613,8 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Dowód:** `backend/EDITORIAL_API.md`, moduł `evidence/editorial`, Flyway V6, `EditorialApiIT`, panel `/editorial` i testy klienta/przeglądarkowe; `docs/testing/P1-I02-results.md`. Maven verify 8 unit + 73 IT PASS (9 editorial IT), Jest 76/76 PASS, Playwright realny backend/Firebase emulator/PostgreSQL 8/8 + 2/2 ukierunkowane PASS, pnpm check/build i export:native PASS.
 **Blokery:** brak dla webowego zakresu P1-I02. Role rzeczywistych redaktorów nadaje operator, brak domyślnych grantów. Native runtime i VoiceOver/TalkBack NOT VERIFIED; panel jest web-only, fallback natywny przetestowany komponentowo, eksporty iOS/Android PASS. Staging/hosted CI i otwarte bramki Phase 0 bez zmian.
 
+**Korekta właściciela 2026-11-03 — blog editor:** dotychczasowy status DONE i dowody opisują pierwotny zakres. Na dodatkowe zlecenie wdrożono nowy panel Tiptap, uproszczony formularz bez języka, źródła w stopce, dynamiczne kategorie, obrazy i automatyczne daty; AUTHOR może publikować bezpośrednio lub wysłać do niezależnej recenzji. Historyczny model EvidenceClaim i stary panel `/editorial-evidence` zachowano. Automatyczne tłumaczenia odroczone za zgodą właściciela. UI 8/8 PASS (symulowane API, desktop/mobile-web, EN/PL), klient 76/76 PASS, backend 13 unit PASS, kompilacja, check i eksporty PASS. V7 zastosowana przy starcie lokalnego API; odczytowy smoke PASS. **Nowe 7 BlogApiIT: NOT VERIFIED / skipped (approved)** — właściciel zgodził się pominąć pełną integrację Docker; nie zaliczamy tych testów jako PASS. Raport: `docs/testing/P1-I02-blog-editor-results.md`, decyzja ADR-006 i `backend/BLOG_EDITORIAL_API.md`. Nie rozpoczęto P1-I03.
+
 **Zakres zadań:**
 
 - [x] `P1-I02-T01` Dodaj DRAFT→IN_REVIEW→PUBLISHED→ARCHIVED i audit trail.
@@ -628,12 +630,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I03 — Discover reading experience
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — implementacja gotowa do ręcznego odbioru; NOT VERIFIED  
+**Started:** 2026-11-03  
 **Finished:** —  
 **Zależności iteracji:** P1-I01, P1-I02  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** kod `apps/consumer/src/science/*`, wspólne trasy `app/science/*`, integracja Home i EN/PL; README klienta. T01–T04 zaimplementowane, checkboxy pozostają otwarte do weryfikacji.  
+**Blokery:** testy, check/lint/typecheck, buildy i runtime celowo nieuruchomione na wyraźne polecenie właściciela. V01/V02 i DoD NOT VERIFIED.
+
+**Implementacja 2026-11-03:** feed blogów, recenzowanych omówień i kart dowodów; paginacja, filtry tematów recenzowanej biblioteki, czytnik canonical JSON, okładki/obrazy i źródła HTTPS, rok/typ badań, pewność z uzasadnieniem i ograniczenia, daty recenzji, loading/empty/error/retry, EN/PL i wspólne RN UI. Home pobiera rzeczywiste publikacje. Rozróżnienie AUTHOR/REVIEWED; bez fikcyjnych ocen dowodów dla blogów i bez automatycznych tłumaczeń. Bez zmian backendu, publikacji danych ani startu P1-I04.
 
 **Zakres zadań:**
 
@@ -2160,15 +2164,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. Lokalny rozwój przed stagingiem zatwierdzony przez właściciela (ADR-004).
-- **Aktualna iteracja:** `P1-I02` — DONE, rozpoczęta i zakończona 2026-11-03; T01–T04 i V01 zweryfikowane.
-- **Następna iteracja:** `P1-I03` — Discover reading experience; TODO, nie rozpoczęto. Wymaga odrębnego polecenia.
-- **Wykonano:** prywatne API i panel web `/editorial`, role AUTHOR/REVIEWER z grantów operatora, niezależna recenzja claimów i całych artykułów, źródła/cytowania, nowe rewizje bez nadpisywania historii, publikacja/zastąpienie/wycofanie i append-only audit. EN/PL, oba motywy, formularze, stany i poprawki ARIA; Flyway V6 i dokumentacja API/provisioningu. Raport: `docs/testing/P1-I02-results.md`.
-- **Otwarte prace Phase 0:** P0-I03A IN_PROGRESS; P0-I13 BLOCKED/deferred (approved), host/EAS/remote CI, wdrożenie i restore nadal nieodebrane. P1-I02 nie zamyka tych bramek.
-- **Środowisko testowe:** PostgreSQL 17.11, izolowany klaster `/tmp/soberity-p1-i00/pgdata`, nowe bazy `soberity_test_p1i02` i `soberity_test_p1i02_web` na loopback:25439. Realny lokalny backend :8092 i demo Firebase Auth emulator :9099; Expo web :8091. Bez istniejących danych aplikacji i globalnych usług. Sandbox wymagał eskalacji dla lokalnych usług/testów; Docker nie naprawiany, CI domyślnie nadal Testcontainers.
-- **Ostatni potwierdzony wynik testów:** 2026-11-03: Maven 8 unit + 73 IT PASS (9 nowych editorial IT); fresh V1–V6 i upgrade V3→V6; Jest 76/76 PASS; Playwright 8/8 PASS i 2/2 powtórzone scenariusze artykułów, realne API/emulator/DB, desktop/mobile-web, EN/dark i PL/light, keyboard/ARIA. pnpm check/build/export:native i git diff --check PASS. Zrzuty przejrzano wizualnie.
-- **Pokrycie platform:** panel web-only. Native fallback ma test komponentowy i poprawne eksporty iOS/Android; nowego runtime natywnego nie testowano. iPhone 17 Pro / iOS 26.5 booted, brak podłączonego Android Emulatora; VoiceOver/TalkBack NOT VERIFIED.
-- **Akceptacja i granice:** bez deploymentu, commit/push, rzeczywistych publikacji i operacji produkcyjnych. Tylko syntetyczne publikacje/granty w izolowanych testach. Realne granty operator nadaje zgodnie z `backend/EDITORIAL_API.md`. `/docs` pozostaje lokalne, poza Git. P1-I03 nie rozpoczęto.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. P0-I03A i P0-I13 pozostają otwarte; lokalny rozwój przed stagingiem zatwierdzony (ADR-004).
+- **Aktualna praca:** `P1-I03` — Discover reading experience, rozpoczęta 2026-11-03 na polecenie właściciela. Implementacja przygotowana do ręcznego odbioru; status NOT VERIFIED, bez daty ukończenia i zaliczenia checkboxów.
+- **Wykonano w kodzie:** publiczne wspólne trasy Science dla gości i członków, feed publikacji blogowych/recenzowanych/kart dowodów, czytnik treści Tiptap JSON, obrazy i źródła, metadane badań i ograniczenia, EN/PL, stany pobierania i retry, paginacja/filtry recenzowanej biblioteki. Home używa opublikowanych wpisów zamiast demonstracyjnych newsów. Publikacje autora są jawnie odróżnione od recenzowanych.
+- **Weryfikacja:** żadnych testów, check/lint/typecheck, buildów, eksportów ani uruchomień UI/API — zgodnie z wyraźnym poleceniem właściciela. Web/iOS/Android, a11y i kontrakty runtime NOT VERIFIED. Historyczne wyniki poprzednich iteracji nie są dowodami P1-I03.
+- **Dokumentacja:** opis P1-I03 i ręcznej ścieżki w `apps/consumer/README.md`; dziennik poniżej. CHANGELOG bez nowego wpisu do czasu weryfikacji znaczącej funkcjonalności.
+- **Następny krok:** ręczny odbiór P1-I03 przez właściciela (feed → artykuł → źródła/karta dowodów). P1-I04 nie rozpoczęta. Automatyczne tłumaczenia nadal odroczone; nowe BlogApiIT z P1-I02 nadal nieuruchomione zgodnie z wcześniejszą decyzją.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2319,3 +2320,7 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-03 | P1-I01 | DONE; T01–T04 i V01 zweryfikowane | Publiczne API Science/evidence, projekcje publiczne, filtry/paginacja, ETag JSON + rewalidacja, CORS, deny-all zapisów; Flyway V5 z kategoriami i recenzowanymi wersjami artykułów. Maven 8 unit + 64 IT PASS (14 Science API IT), pnpm check i diff check PASS. Dokumentacja API, PHASES/CHANGELOG i lokalny raport P1-I01. | Izolowany PostgreSQL 17.11; migracje fresh V1–V5 i upgrade V3→V5, wycofanie i podmiana wersji/ETag potwierdzone. Skorygowano oczekiwanie testu odrzuconego tokenu: istniejący filtr daje wyłącznie dostęp anonimowy do publicznego GET; prywatne/zapis nadal 401. Bez zmian UI ani testów runtime platform; P0 nadal otwarta. Następna P1-I02 tylko po poleceniu. |
 
 | 2026-11-03 | P1-I02 | DONE; T01–T04 i V01 zweryfikowane | Prywatne API workflow, role AUTHOR/REVIEWER, Flyway V6 i immutable audit; panel web EN/PL, oba motywy, pełna karta dowodów, osobna recenzja artykułu, publikacja/wycofanie, nowe wersje; poprawki wrap/ARIA w SettingsRow i dekoracji SVG. Maven 81 testów PASS, Jest 76/76, Playwright 8/8 + 2/2 artykuły PASS na realnym lokalnym API/Firebase emulator/PostgreSQL; check/build/native exports i diff check PASS. Raport P1-I02, dokumentacja i CHANGELOG. | Role rzeczywistych redaktorów nadaje operator; brak grantów aplikacyjnych i rzeczywistych publikacji. Web-only; native runtime i czytniki natywne NOT VERIFIED. P0 otwarta; następna P1-I03 tylko po poleceniu. |
+
+| 2026-11-03 | P1-I02 — korekta blog editora | Nowy kod i UI wdrożone lokalnie; pełna integracja NOT VERIFIED / skipped (approved) | Tiptap, panel blogowy, JSON allowlist, źródła, kategorie, obrazy, wersje i audit, autor Publish / Send for review, uwagi recenzenta; V7, helper lokalnego restartu, API docs/ADR-006/BRANDING/raport. Backend 13 unit PASS, klient 76/76, UI 8/8 PASS z symulowanymi API, check/build/native exports i odczytowy smoke PASS. | Właściciel ręcznie zainstalował Tiptap po awarii automatycznego przeglądu uprawnień i zgodził się pominąć Docker integration; 7 BlogApiIT skompilowane, nieuruchomione. Bez automatycznych tłumaczeń, deploymentu i P1-I03. Historyczny DONE pierwotnego P1-I02 zachowany. |
+
+| 2026-11-03 | P1-I03 | IN_PROGRESS; implementacja T01–T04, NOT VERIFIED | `src/science/*`, `app/science/*`, root/public layouts, Home, guest entry, EN/PL i README klienta. Feed, czytnik artykułów i EvidenceCard, źródła, metadane, retry, paginacja i filtry. | Na wyraźne polecenie właściciela nie uruchomiono żadnych testów ani check/build/runtime. Checkboxy otwarte, brak Finished/DONE. CHANGELOG bez wpisu do odbioru; następny krok: ręczna weryfikacja P1-I03. |

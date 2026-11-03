@@ -782,6 +782,8 @@ Dla treści dotyczących ostrych objawów odstawienia lub potencjalnego uzależn
 5. Publikacja otrzymuje wersję, autora, recenzenta i datę ponownej oceny.
 6. Zaplanowane przeglądy (np. co 12 miesięcy) i pilne korekty po istotnych nowych dowodach; użytkownik może zgłosić błąd.
 
+**Korekta właściciela 2026-11-03 — artykuły blogowe:** autor artykułu może wybrać bezpośrednie `Publish` albo `Send for review`. Niezależna recenzja całego artykułu jest w tej ścieżce opcjonalna; API rozróżnia publikację autora od publikacji recenzowanej i nie nadaje im tej samej etykiety weryfikacji. Nadal wymagamy sprawdzalnych źródeł i rzetelnego opisania ograniczeń w treści. Model i obowiązkowa recenzja ustrukturyzowanych EvidenceClaim, wykorzystywanych jako zatwierdzone dowody w edukacji/RAG, pozostają bez zmian. Formularz artykułu zawiera tytuł, formatowaną treść, źródła w stopce, kategorię i obrazy; daty nadaje serwer. Automatyczne tłumaczenia publikacji właściciel odłożył do osobnego kroku; obecny edytor nie pyta o język i nie udaje dostępności tłumaczeń.
+
 MVP może początkowo wykorzystywać ograniczoną, ręcznie recenzowaną bibliotekę zamiast dużej, automatycznie generowanej bazy. Nie należy automatycznie publikować zdrowotnych odpowiedzi AI bez kontroli jakości.
 
 ### 24.6 Implementacja techniczna

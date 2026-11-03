@@ -65,6 +65,7 @@ function RootNavigator() {
             options={{ headerShown: false }}
           />
         </Stack.Protected>
+        <Stack.Screen name="science" options={{ headerShown: false }} />
         <Stack.Screen
           name="+not-found"
           options={{ title: t('notFound.title') }}

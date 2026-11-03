@@ -1,5 +1,7 @@
 # Editorial workflow (P1-I02)
 
+**2026-11-03 update:** the active workspace uses the new [blog editor](BLOG_EDITORIAL_API.md), with owner-approved direct author publication and optional review. The API below remains the legacy structured scientific workflow; its UI is `/editorial-evidence`.
+
 The private web workspace is `/editorial` in the existing Expo application.
 After signing in, editors can also open it from Account. The consumer's eight
 main navigation entries remain unchanged. The workspace uses the existing
