@@ -13,19 +13,26 @@ wrócić na start.
 
 ## Komendy z katalogu głównego
 
-| Komenda po `pnpm --filter @soberity/consumer` | Działanie                                                                      |
-| --------------------------------------------- | ------------------------------------------------------------------------------ |
-| `web`                                         | Metro i przeglądarka                                                           |
-| `ios`                                         | prebuild, CocoaPods, build i uruchomienie development client w Xcode Simulator |
-| `android`                                     | prebuild, Gradle, build i uruchomienie development client na Androidzie        |
-| `start`                                       | Metro dla wcześniej zainstalowanego development client                         |
-| `build`                                       | statyczny eksport web do `apps/consumer/dist`                                  |
-| `export:native`                               | bundlowanie JS/assets iOS i Android do `dist/native`; nie tworzy IPA/APK       |
-| `test:web`                                    | Playwright Chromium desktop i mobilny viewport; własny serwer na 8091          |
-| `test:unit`                                   | Jest (`jest-expo` + Testing Library) dla komponentów UI i `AuthStatusContext`  |
+| Komenda po `pnpm --filter @soberity/consumer` | Działanie                                                                         |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `web`                                         | Metro i przeglądarka                                                              |
+| `ios`                                         | prebuild, CocoaPods, build i uruchomienie development client w Xcode Simulator    |
+| `android`                                     | prebuild, Gradle, build i uruchomienie development client na Androidzie           |
+| `start`                                       | Metro dla wcześniej zainstalowanego development client                            |
+| `build`                                       | statyczny eksport web do `apps/consumer/dist`                                     |
+| `export:native`                               | bundlowanie JS/assets iOS i Android do `dist/native`; nie tworzy IPA/APK          |
+| `test:web`                                    | Firebase Auth emulator + Playwright Chromium desktop i mobile-web; serwer na 8091 |
+| `test:unit`                                   | Jest (`jest-expo` + Testing Library) dla komponentów UI i `AuthStatusContext`     |
 
-Najpierw `pnpm install --frozen-lockfile`. Testy web wymagają pobrania przeglądarki:
-`pnpm --filter @soberity/consumer exec playwright install chromium`.
+Najpierw `pnpm install --frozen-lockfile`. Testy web wymagają Docker Desktop i
+pobranej przeglądarki: `pnpm --filter @soberity/consumer exec playwright install chromium`.
+`pnpm --filter @soberity/consumer test:web` uruchamia lokalny emulator Firebase
+Auth z projektem `demo-soberity` (bez połączenia z prawdziwym Firebase), a po
+teście zatrzymuje go, jeśli uruchomił go sam skrypt. Testy używają stałych,
+wyłącznie demonstracyjnych wartości klienta Firebase. API profilu jest
+kontrolowanym fixture Playwright; backendowe migracje, weryfikacja tokenu i ACL
+pozostają pokryte integracyjnymi testami Spring/Testcontainers. Nie jest
+wymagany plik `.env`, konto dev ani dostarczenie prawdziwej wiadomości e-mail.
 Port Metro domyślnie 8081; gdy zajęty, podaj np. `start --port 8082`.
 Nie uruchamiaj dwóch serwerów testowych na tym samym porcie.
 

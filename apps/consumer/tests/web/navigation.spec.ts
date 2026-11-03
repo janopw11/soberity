@@ -7,7 +7,7 @@ test('welcome routes explain unavailable features and return home', async ({
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Welcome to Soberity', exact: true }),
+    page.getByRole('heading', { name: /More to life\.\s*Together\./ }),
   ).toBeVisible();
 
   for (const [, route, title] of [
@@ -24,13 +24,13 @@ test('welcome routes explain unavailable features and return home', async ({
     ).toBeVisible();
     await page.getByRole('link', { name: 'Back to welcome' }).click();
     await expect(
-      page.getByRole('heading', { name: 'Welcome to Soberity', exact: true }),
+      page.getByRole('heading', { name: /More to life\.\s*Together\./ }),
     ).toBeVisible();
   }
 
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Welcome to Soberity', exact: true }),
+    page.getByRole('heading', { name: /More to life\.\s*Together\./ }),
   ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath('welcome.png'),
@@ -59,7 +59,7 @@ test('direct route survives reload and unknown route offers recovery', async ({
   ).toBeVisible();
   await page.getByRole('link', { name: 'Back to welcome' }).click();
   await expect(
-    page.getByRole('heading', { name: 'Welcome to Soberity', exact: true }),
+    page.getByRole('heading', { name: /More to life\.\s*Together\./ }),
   ).toBeVisible();
 });
 
@@ -71,7 +71,7 @@ test('authenticated and verification-pending routes are guarded for guests', asy
     await page.goto(route);
     await expect(page).toHaveURL(/\/$/);
     await expect(
-      page.getByRole('heading', { name: 'Welcome to Soberity', exact: true }),
+      page.getByRole('heading', { name: /More to life\.\s*Together\./ }),
     ).toBeVisible();
     await expect(page.getByText('Your account', { exact: true })).toHaveCount(
       0,

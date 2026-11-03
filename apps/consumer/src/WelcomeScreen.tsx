@@ -14,6 +14,10 @@ import { useThemePreferences } from './preferences/ThemePreferencesContext';
 import { ArticleIllustration } from './news/ArticleIllustration';
 import { previewArticles } from './news/previewArticles';
 
+// Metro requires a literal require() to statically bundle React Native assets.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const worldMapImage = require('../assets/images/world-map-realistic.png');
+
 /** Member-only home, mounted by the authenticated route group. */
 export default function WelcomeScreen() {
   const { t, i18n } = useTranslation();
@@ -50,7 +54,7 @@ export default function WelcomeScreen() {
           testID="home-for-you-today"
         >
           <Image
-            source={require('../assets/images/world-map-realistic.png')}
+            source={worldMapImage}
             style={styles.cardImage}
             resizeMode="cover"
             fadeDuration={0}

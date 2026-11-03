@@ -469,24 +469,26 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P0-I11 — Automated test coverage & E2E web
 
-**Status:** TODO  
-**Started:** —  
-**Finished:** —  
-**Zależności iteracji:** P0-I06–P0-I10  
-**Dowód:** —  
-**Blokery:** —
+**Status:** IN_PROGRESS
+**Started:** 2026-11-03
+**Finished:** —
+**Zależności iteracji:** P0-I06–P0-I10
+**Dowód:** `docs/testing/P0-I11-results.md` (lokalny raport, `/docs` ignorowane przez Git); Jest 71/71, `pnpm check` PASS, Maven verify 37/37. Pełny Playwright: 17 PASS / 1 FAIL; desktop E2E oraz mobile Home/navigation PASS.
+**Blokery:** Mobilny E2E signup→verify→login→profile→logout→reset wymaga przejścia po zaktualizowanej nawigacji SPA. Ponowne uruchomienie zablokowane przez lokalny Docker overlay read-only.
+
+**Wytyczna Home:** istniejącą implementację Home traktuj jako aktualny, zaakceptowany kierunek. W P0-I11 dostosuj testy, fixtures i asercje do obecnego interfejsu oraz przepływów. Nie zmieniaj działającej implementacji wyłącznie po to, aby spełnić oczekiwania starych testów; wszelkie zmiany produktowe wymagają osobnego polecenia właściciela.
 
 **Zakres zadań:**
 
-- [ ] `P0-I11-T01` Uzupełnij testy jednostkowe formularzy, hooków i walidacji.
-- [ ] `P0-I11-T02` Uzupełnij integracyjne testy Firebase security, Flyway, profilu i uprawnień.
-- [ ] `P0-I11-T03` Dodaj web E2E: signup→verify→login→profile→logout→reset.
-- [ ] `P0-I11-T04` Przygotuj fixtures i bezpieczne testowe środowisko bez kluczy w repo.
+- [x] `P0-I11-T01` Uzupełnij testy jednostkowe formularzy, hooków i walidacji.
+- [x] `P0-I11-T02` Zweryfikuj integracyjne testy Firebase security, Flyway, profilu i uprawnień (istniejące testy Testcontainers).
+- [ ] `P0-I11-T03` Dodaj web E2E: signup→verify→login→profile→logout→reset (desktop PASS; mobile-web wymaga potwierdzenia po zmianie selektorów na nawigację SPA).
+- [x] `P0-I11-T04` Przygotuj fixtures i bezpieczne testowe środowisko bez kluczy w repo.
 
 **Weryfikacja:**
 
-- [ ] `P0-I11-V01` Uruchom frontend lint/typecheck/test i backend test.
-- [ ] `P0-I11-V02` Zapisz komendy, raport i ograniczenia E2E w docs/testing.
+- [x] `P0-I11-V01` Uruchom frontend lint/typecheck/test i backend test.
+- [x] `P0-I11-V02` Zapisz komendy, raport i ograniczenia E2E w docs/testing.
 
 **Definition of Done:** Krytyczne ścieżki mają powtarzalne testy, testy przechodzą. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2151,14 +2153,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. N
 # 5. Aktualny punkt pracy
 
 - **Aktualna faza:** Phase 0
-- **Aktualna iteracja:** `P0-I03A` — korekta strony głównej na wyraźne polecenie właściciela 2026-11-02: powitanie i mock news feed. Bez rozpoczęcia Phase 1.
-- **Status:** Korekta Home wdrożona i zweryfikowana na web oraz render iOS; P0-I03A pozostaje IN_PROGRESS (pełne V02/V03 nadal otwarte). Nie zamknięto P0-I11 ani bramki Phase 0.
-- **Następny krok:** na osobne polecenie powrót do `P0-I11`; dla Home: Android runtime oraz VoiceOver/TalkBack i duży font pozostają NOT VERIFIED.
+- **Aktualna iteracja:** `P0-I11` — automatyczne pokrycie testami i E2E web.
+- **Status:** P0-I11 IN_PROGRESS: T01, T02, T04, V01 i V02 wykonane. Jest 71/71, `pnpm check` i Maven verify PASS. Pełny Playwright 17/18; desktop E2E i mobile Home/navigation PASS, mobile account flow wymaga ponowienia.
+- **Następny krok:** odzyskać lokalny Firebase emulator Docker (obecny overlay read-only), ponowić web E2E po aktualizacji nawigacji SPA i zamknąć P0-I11 po PASS. Home natywne/a11y pozostają poza tym zadaniem.
 
 - **Otwarte blokery:** instalacja NDK 27.1.12297006 nie została ukończona (pobrano 136 MiB, po zatrzymaniu usunięto jej niekompletny katalog). Android build/eksport, runtime natywny, VoiceOver/TalkBack i duży font NOT VERIFIED; zaległa korekta menu P0-I03 do sprawdzenia. Bramka Phase 0 otwarta.
 - **Wymagana akceptacja:** motywy i układ v4 zaakceptowano 2026-11-01. Logo/font i przyszłe istotne zmiany poza tym zakresem wymagają odrębnej decyzji. `/docs` pozostaje lokalne i ignorowane przez Git na polecenie właściciela.
 - **Korekta P0-I03 (2026-10-31, aktualna):** menu ☰ ma osiem głównych pozycji według listy właściciela, emoji, bez grup i podpisów Planowane. Check PASS, Playwright 10/10 PASS. Natywne runtime NOT VERIFIED; następny krok P0-I03: sprawdzić osiem pozycji, otwieranie/zamykanie i a11y na iOS/Android. P0-I04 nie rozpoczęto.
-- **Ostatni potwierdzony wynik testów:** Dotyczy poprzedniej wersji Home; późniejsza korekta dostępu i opisów NOT VERIFIED (właściciel zakazał uruchamiania testów). Home 2026-11-02: `pnpm check` PASS; Jest 14 suites / 66 testów PASS; Playwright 16/16 desktop/mobile-web, po korekcie dekoracyjnego SVG 8/8 Home EN/PL × oba motywy PASS; eksporty web/iOS/Android PASS; render PL/Śliwka w Expo Go, iPhone 17 Pro / iOS 26.5 PASS. Android runtime, duży font i pełny screen-reader NOT VERIFIED.
+- **Ostatni potwierdzony wynik testów:** P0-I11 2026-11-03: Jest 14 suites / 71 PASS; `pnpm check` PASS; `mvn -f backend/pom.xml verify -B` PASS (3 unit + 34 IT); Playwright desktop E2E i mobile Home/navigation PASS, mobilny account flow FAIL przy odświeżeniu profilu (17/18 łącznie). Następny przebieg po naprawie Docker emulatora; patrz `docs/testing/P0-I11-results.md`.
 
 
 
@@ -2293,3 +2295,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-03 | P0-I03A — mocniejszy akcent nagłówków Home | Zmieniono wizualny akcent na życzenie właściciela; NOT VERIFIED | Tytuły sekcji oraz krótkie linie po lewej używają `primary`; dłuższe linie po prawej pozostają w `border`. Testów/buildów nie uruchamiano. | Render obu motywów NOT VERIFIED. P0-I03A IN_PROGRESS. |
 
 | 2026-11-03 | P0-I03A — dopracowanie Home według briefu premium | Zmieniono Home i nagłówek nawigacji; NOT VERIFIED | Dodano kompaktowy tagline, „Today's spotlight” i kartę World Map z kategorią, obrazem 150–180 px oraz treścią w neutralnym panelu; uproszczono nagłówki/news cards i zmniejszono menu/profil icons. Usunięto mock eventu; event data/API brak, więc pokazany jest pusty stan. Nie dodano nowego Science placeholdera. Testów/buildów nie uruchamiano. | Karuzela wydarzeń, działające trasy mapy/eventów, runtime/a11y i debug overlay pozostają poza dostępnym kodem lub NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I11 — test coverage & E2E web | IN_PROGRESS; T01, T02, T04, V01, V02 PASS; T03 częściowo zweryfikowane | Asercje dopasowane do publicznego welcome i authenticated Home; walidacja logowania/resetu; emulatorowy Playwright account journey i bezpieczne API fixtures. Jest 71/71, `pnpm check` PASS, Maven verify 37/37. Pełny web run 17/18: desktop E2E PASS, mobile Home/navigation PASS. Raport `docs/testing/P0-I11-results.md`. | Mobile E2E utknął w stanie session-loading po profilu. Zmieniono test na SPA navigation; ponowienie zablokowane przez Docker overlay read-only. Nie oznaczać DONE do PASS. |

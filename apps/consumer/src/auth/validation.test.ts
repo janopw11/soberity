@@ -6,7 +6,9 @@ import {
   hasFieldErrors,
   validateDisplayName,
   validateEmail,
+  validateNewPassword,
   validatePassword,
+  validateSignIn,
   validateSignUp,
 } from './validation';
 
@@ -74,5 +76,47 @@ describe('validateSignUp', () => {
     });
 
     expect(hasFieldErrors(errors)).toBe(false);
+  });
+});
+
+describe('validateSignIn', () => {
+  it('validates email and requires a password', () => {
+    expect(validateSignIn({ email: 'not-an-email', password: '' })).toEqual({
+      email: 'invalidEmail',
+      password: 'required',
+    });
+  });
+
+  it('accepts a valid email and non-empty password', () => {
+    expect(
+      validateSignIn({ email: 'jane@example.com', password: 'x' }),
+    ).toEqual({ email: undefined, password: undefined });
+  });
+});
+
+describe('validateNewPassword', () => {
+  it('requires a password and matching confirmation', () => {
+    expect(validateNewPassword({ password: '', confirmPassword: '' })).toEqual({
+      password: 'required',
+      confirmPassword: 'required',
+    });
+  });
+
+  it('checks minimum length and confirmation match', () => {
+    expect(
+      validateNewPassword({ password: 'short', confirmPassword: 'other' }),
+    ).toEqual({
+      password: 'passwordTooShort',
+      confirmPassword: 'passwordMismatch',
+    });
+  });
+
+  it('accepts a valid matching password', () => {
+    expect(
+      validateNewPassword({
+        password: 'Soberity-2026!',
+        confirmPassword: 'Soberity-2026!',
+      }),
+    ).toEqual({ password: undefined, confirmPassword: undefined });
   });
 });
