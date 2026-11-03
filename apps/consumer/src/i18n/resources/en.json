@@ -227,6 +227,17 @@
         "summary": "Looking past a striking title to the methods, the population and the unanswered questions."
       }
     },
-    "readTime": "{{count}} min read"
+    "readTime": "{{count}} min read",
+    "missionHeadline": "Explore a clearer life.",
+    "missionSubtitle": "Discover the science. Connect with people.",
+    "todaysSpotlight": "Today's spotlight",
+    "interactiveDiscovery": "Interactive discovery",
+    "eventsNearYou": "Events near you",
+    "eventsNotAvailable": "Event listings will appear here when available.",
+    "worldMapStatsTitle": "Explore the world map",
+    "worldMapStats": "Check out stats about alcohol consumption around the world.",
+    "openSection": "Explore",
+    "previewOnlyHint": "This preview is not interactive yet.",
+    "goToNews": "Go to news"
   }
 }

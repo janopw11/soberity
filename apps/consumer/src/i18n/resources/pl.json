@@ -227,6 +227,17 @@
         "summary": "Zaglądamy do metod, badanej populacji i pytań, które pozostają bez odpowiedzi."
       }
     },
-    "readTime": "{{count}} min czytania"
+    "readTime": "{{count}} min czytania",
+    "missionHeadline": "Odkrywaj życie z jasnym umysłem.",
+    "missionSubtitle": "Odkrywaj naukę. Łącz się z ludźmi.",
+    "todaysSpotlight": "Dzisiejszy wybór",
+    "interactiveDiscovery": "Interaktywne odkrywanie",
+    "eventsNearYou": "Wydarzenia w pobliżu",
+    "eventsNotAvailable": "Lista wydarzeń pojawi się tutaj, gdy będzie dostępna.",
+    "worldMapStatsTitle": "Odkryj mapę świata",
+    "worldMapStats": "Sprawdź statystyki dotyczące spożycia alkoholu na świecie.",
+    "openSection": "Odkryj",
+    "previewOnlyHint": "Ten podgląd nie jest jeszcze interaktywny.",
+    "goToNews": "Przejdź do wiadomości"
   }
 }

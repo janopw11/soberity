@@ -1,3 +1,52 @@
+## 2026-11-03
+
+- Home: dopracowano układ zgodnie z briefem premium/minimal: kompaktowy tagline, „Today's spotlight” i karta mapy w jasnym, redakcyjnym stylu z etykietą kategorii, niższym obrazem i subtelną strzałką; uproszczono nagłówki oraz zmniejszono ikony nawigacji. Usunięto mock Vienna Coffee Rave; ponieważ brak źródła wydarzeń, sekcja pokazuje pusty stan zamiast fikcyjnego karuzelowego wpisu. Nie dodano sekcji science z placeholderami. Testów/buildów nie uruchamiano.
+
+- Home: wzmocniono akcent nagłówków sekcji: tytuły oraz krótkie linie po lewej są w `primary`, a długie linie po prawej pozostają neutralne. Testów/buildów nie uruchamiano.
+
+- Home: zastąpiono kropki przy nagłówkach krótkimi liniami `border`, pasującymi do separatorów po prawej stronie tytułów. Testów/buildów nie uruchamiano.
+
+- Home: usunięto numerację z nagłówków rozdziałowych i zastąpiono ją małą fioletową kropką; tytuły i linie prowadzące pozostają bez zmian. Testów/buildów nie uruchamiano.
+
+- Home: zastąpiono chipy sekcji stylem redakcyjnych rozdziałów: numer 01–03, wyraźniejszy tytuł i cienka linia prowadząca. Kolory i kontrast pochodzą z tokenów obu motywów. Testów/buildów nie uruchamiano.
+
+- Home: wystylizowano etykiety „Feature for today”, „Nearest events” i „Latest news” jako spójne, kompaktowe chipy z delikatnym obramowaniem, tłem `surfaceAlt` i fioletowym punktem akcentowym. Zachowano nagłówki dostępności oraz tokeny motywu. Testów/buildów nie uruchamiano.
+
+- Home: podmieniono grafikę Coffee Rave na nową wersję właściciela, przyciętą do 880×453 px wokół filiżanki. Karta nadal pokazuje pełną filiżankę w górnym panelu z treścią poniżej. Testów/buildów nie uruchamiano.
+
+- Home: zastąpiono ilustrację World Map nową, realistyczną grafiką mapy; przygotowano kadr 1020×525 px skupiony na mapie i podpięto go do górnego panelu karty. Panel treści bez zmian. Testów/buildów nie uruchamiano.
+
+- Home: usunięto powitanie z nazwą użytkownika i dodano nad kartą mapy nagłówek „Feature for today” / „Propozycja na dziś”. Testów/buildów nie uruchamiano.
+
+- Home: przycięto grafikę karty World Map tak, aby globus i pinezka zajmowały większość górnego panelu; podmieniono źródło na `world-map-earth.png` (1672×941). Panel tekstowy pozostał oddzielony poniżej. Testów/buildów nie uruchamiano.
+
+- Home: dodano grafikę mapy świata jako górny panel kafla „Explore the world map”, z oddzielnym panelem tytułu/opisu/akcji według wzorca Coffee Rave. Asset: `world-map-preview.png` (1280×720). Testów/buildów nie uruchamiano.
+
+- Home: po kolejnej korekcie Vienna Coffee Rave ma widoczny kadr ilustracji 16:9 z filiżanką w górnym panelu i osobny czytelny panel tekstu/akcji poniżej. Wysokość obrazu jest jawna, a layout nie nakłada treści na filiżankę. Testów/buildów nie uruchamiano.
+
+- Home: poprawiono kafel Vienna Coffee Rave po zgłoszeniu błędnego dopasowania: obraz jest tłem zwartego banera 200 px, treść leży na nim, a tokenowy gradient zwiększa kontrast. Usunięto rozciąganie flex kafla. Testów/buildów nie uruchamiano.
+
+- Home: dodano dostarczoną przez właściciela grafikę Coffee Rave (1280×720 PNG) jako tło kafla Vienna Coffee Rave; obraz jest przyciemniony pod treścią. Testów/buildów nie uruchamiano.
+
+- Home: nagłówek „Dla Ciebie na dziś” zastąpiono spersonalizowanym powitaniem i wprowadzeniem do rekomendacji; nazwa pochodzi z profilu Firebase z fallbackiem na prefiks e-maila. Dodano tłumaczenia EN/PL. Testów/buildów nie uruchamiano.
+
+- Home: usunięto nagłówek powitalny z nazwą użytkownika oraz niepotrzebne pobieranie nazwy profilu na tym ekranie. Testów/buildów nie uruchamiano.
+
+- Home: kafle mapy świata i Vienna Coffee Rave otrzymały etykietę akcji oraz chevron, by sygnalizować docelową klikalność. Są semantycznie opisane jako niedostępne przyciski, bez akcji do nieistniejących ekranów. Testów/buildów nie uruchamiano.
+
+- Home: usunięto ikony i etykiety „Sample/Przykład” z kafli. Tło zachęty do mapy świata ma uproszczony motyw mapy, a wydarzenie otrzymało dekorację przedstawiającą grupę ludzi. Testów/buildów nie uruchamiano na polecenie właściciela.
+
+- Home: kafel „Dla Ciebie na dziś” pokazuje przykładową zachętę do sprawdzenia statystyk na mapie świata, a „Najbliższe wydarzenia” — Vienna Coffee Rave. Oba wpisy są oznaczone jako przykładowe; tekst jest zlokalizowany EN/PL. Testów/buildów nie uruchamiano na prośbę właściciela.
+
+- Home: dodano subtelne, abstrakcyjne dekoracje SVG w kaflach „Dla Ciebie na dziś” i „Najbliższe wydarzenia”, inspirowane załączonym ekranem. Kolory pobierane z aktywnego motywu; tekst pozostaje na osobnej warstwie. Testów i buildów nie uruchamiano na polecenie właściciela.
+
+- Zmieniono kolejność kafli: „Dla Ciebie na dziś” znajduje się teraz nad „Najbliższe wydarzenia”. Testów nie uruchamiano.
+- Dopracowano typografię Home w ramach fontu systemowego: mocniejszy nagłówek imienia i tytuły kart, delikatne odstępy liter oraz czytelniejszy rytm metadanych. Bez zmiany fontu marki w pozostałych ekranach. Testów/buildów nie uruchamiano.
+- Dalsze odświeżenie Home pod inspirację: powitanie ma czytelny układ „Welcome,” + imię; kafel pierwszego artykułu jest wizualnie wyróżniony, metadane mają lekką etykietę kategorii, a panele wydarzeń/rekomendacji używają miękkich pól ikon. Testów/buildów nie uruchamiano.
+- Korekta układu Home: „Najbliższe wydarzenia” i „Dla Ciebie na dziś” są przed wiadomościami; widoczne są dwa wpisy i wyłączony przycisk demonstracyjny „Go to news” / „Przejdź do wiadomości”. Testów/buildów nie uruchamiano.
+- Odświeżono wizualnie Home według nowej inspiracji: powitanie ma osobną hierarchię dwóch linii, każda wiadomość jest własnym zaokrąglonym kaflem z wyróżnionym pierwszym wpisem, a wydarzenia i rekomendacje mają większe, miękkie powierzchnie. Użyto wyłącznie zatwierdzonych tokenów. Testów/buildów nie uruchamiano.
+- Na prośbę właściciela zmieniono Home na powitanie z imieniem profilu oraz kafle: najnowsze wiadomości, najbliższe wydarzenia i rekomendacje na dziś. Dwie sekcje pokazują komunikat o planowanej dostępności, bez sugerowania działającego katalogu. Testów i buildów nie uruchamiano na bieżące polecenie.
+
 # Changelog
 
 ## 2026-11-02

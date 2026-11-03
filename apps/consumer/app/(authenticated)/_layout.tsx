@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
   },
   accountIcon: {
-    width: 32,
-    height: 32,
+    width: 26,
+    height: 26,
     marginHorizontal: spacing.space8,
   },
 });

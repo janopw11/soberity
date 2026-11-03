@@ -2241,3 +2241,55 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-02 | P0-I03A — Home na polecenie właściciela | Wdrożono powitanie i mock news feed; status nadrzędnej iteracji bez zmiany | WelcomeScreen, src/news, EN/PL, testy home/navigation, ignore artefaktów testowych. 16/16 web PASS; po usunięciu web warning SVG Home 8/8 PASS; Jest 66/66; check i eksporty web/iOS/Android PASS; iOS Expo Go render PL/Śliwka PASS (iPhone 17 Pro / iOS 26.5). Raport lokalny docs/testing/home-news-2026-11-02.md; CHANGELOG zaktualizowany. | Brak emulatora Android (`adb devices` puste); runtime Android i screen-reader/duży font NOT VERIFIED. Właściciel 2026-11-02 zatwierdził pozostawienie interfejsu gościa bez menu i aktualizację testów. P0-I11 niezamknięte; powrót na osobne polecenie. |
 
 | 2026-11-02 | P0-I03A — korekta Home po uwagach właściciela | Zmieniono kod; NOT VERIFIED na wyraźne polecenie bez testów | WelcomeScreen tylko w grupie authenticated, osobny GuestWelcomeScreen w public; usunięto opis powitania, akcje auth i opis pod wiadomościami. BRANDING zaktualizowany. | Nie uruchomiono testów ani buildów. Wcześniejsze wyniki dotyczą poprzedniej wersji; home.spec.ts i oczekiwania nagłówka w navigation.spec.ts wymagają dostosowania przy kolejnym zleceniu testów. Brak nowych checkboxów DONE; P0-I03A nadal IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — Home: kafle i powitanie z imieniem | Zmieniono kod; NOT VERIFIED | `WelcomeScreen`, profile GET z fallbackami, sekcje news/events/for you, EN/PL, `docs/BRANDING.md`, CHANGELOG. Testy/build nie uruchamiane zgodnie z obowiązującą zasadą. | Kontrole web/natywne i accessibility pozostają NOT VERIFIED; wcześniejszy `home.spec.ts` odnosi się do starej wersji. Iteracja P0-I03A nadal otwarta. |
+
+| 2026-11-03 | P0-I03A — nowocześniejszy Home według inspiracji | Zmieniono hierarchię powitania i kafli; NOT VERIFIED | `WelcomeScreen`, EN/PL greeting. Osobne karty wpisów, wyróżnienie najnowszego, większe zaokrąglenia i delikatne tła kafli. Tylko zatwierdzone tokeny. Testów/buildów nie uruchamiano. | Weryfikacja web/iOS/Android i dostępności pozostaje NOT VERIFIED. P0-I03A nadal IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — kolejność sekcji Home i przycisk news | Zmieniono kod; NOT VERIFIED | Przeniesiono wydarzenia i rekomendacje przed news, ograniczono listę do 2 wpisów, dodano zlokalizowany wyłączony przycisk przejścia do news. Bez testów/buildów (polecenie użytkownika). | NOT VERIFIED; P0-I03A pozostaje IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — dopracowanie nowoczesnego Home | Zmieniono kod; NOT VERIFIED | WelcomeScreen: hierarchia greeting/name, wyróżniony news tile, category pill, ikony w miękkich polach; tylko istniejące tokeny. Testy/build nie uruchamiane. | Weryfikacja wyglądu i dostępności pozostaje otwarta; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — styl typografii Home | Zmieniono kod; NOT VERIFIED | Dopracowano wagę, tracking i line-height nagłówków/tekstów Home w obrębie fontu systemowego. Bez nowego fontu marki. Testów/buildów nie uruchamiano. | Weryfikacja wizualna i a11y pozostają otwarte; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — kolejność kafli Home | Zmieniono kolejność na prośbę właściciela; NOT VERIFIED | `WelcomeScreen`: „Dla Ciebie na dziś” nad „Najbliższe wydarzenia”. Testów nie uruchamiano. | P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — dekoracyjne tła kafli Home | Zmieniono wygląd kafli; NOT VERIFIED | `WelcomeScreen`: dwa subtelne, abstrakcyjne wzory SVG z łukami i pierścieniami dla rekomendacji oraz wydarzeń; istniejące kolory motywu, treść nad grafiką. Testów/buildów nie uruchamiano na polecenie właściciela. | Weryfikacja web/natywna i a11y pozostają NOT VERIFIED. P0-I03A IN_PROGRESS; P0-I11 nie rozpoczęto w tej sesji. |
+
+| 2026-11-03 | P0-I03A — przykładowe treści kafli Home | Zmieniono zawartość kafli; NOT VERIFIED | „Dla Ciebie na dziś” prezentuje zaproszenie do sprawdzenia statystyk na mapie świata, „Najbliższe wydarzenia” prezentuje Vienna Coffee Rave. Oba oznaczone „Przykład/Sample”; EN/PL. Testów/buildów nie uruchamiano. | Wpisy są statycznymi mockami, bez nawigacji ani pobierania danych. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — uproszczenie i ilustracje kafli Home | Zmieniono wygląd kafli; NOT VERIFIED | Usunięto ikony i etykiety „Sample/Przykład”; dekoracja mapy świata dla rekomendacji oraz sylwetki osób dla Vienna Coffee Rave. Testów/buildów nie uruchamiano. | Mocki pozostają statyczne, bez nawigacji/danych live. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — wskazanie klikalności kafli Home | Zmieniono affordance; NOT VERIFIED | Dwa kafle dostały etykietę „Odkryj/Explore” i chevron oraz opis dostępności dla czytnika ekranu. Aktualnie disabled, bez nawigacji do nieistniejących tras. Testów/buildów nie uruchamiano. | Przyszłe trasy mapy i eventów nie są podpięte; wizualna weryfikacja NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — usunięcie powitania z Home | Zmieniono Home; NOT VERIFIED | Usunięto nagłówek z powitaniem i nazwą użytkownika oraz pobieranie profilu używane wyłącznie przez ten nagłówek. Testów/buildów nie uruchamiano. | Pozostała treść Home bez zmian; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — spersonalizowany nagłówek rekomendacji | Zmieniono Home; NOT VERIFIED | Nagłówek sekcji zawiera „Welcome {username}, here is your daily recommendation” i lokalizację EN/PL; nazwa z Firebase displayName lub prefiksu e-maila. Testów/buildów nie uruchamiano. | Tłumaczenia i układ wymagają weryfikacji wizualnej; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — grafika kafla Coffee Rave | Dodano asset właściciela; NOT VERIFIED | Dodano `apps/consumer/assets/images/vienna-coffee-rave.png` (1280×720 PNG) i użyto go jako przyciemnionego tła kafla Vienna Coffee Rave; obraz dekoracyjny ukryty przed czytnikami ekranu. Testów/buildów nie uruchamiano. | Weryfikacja renderu na web/iOS/Android pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — korekta kadru kafla Coffee Rave | Skorygowano layout po uwadze właściciela; NOT VERIFIED | Kafel ma zwartą wysokość 200 px; obraz wypełnia tylko kafel, a treść jest nałożona na subtelny tokenowy gradient. Usunięto flex rozciągający kafel do wysokości sekcji. Testów/buildów nie uruchamiano. | Render pozostaje do wizualnego potwierdzenia; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — kadr filiżanki i czytelność Vienna Coffee Rave | Zmieniono układ po informacji zwrotnej; NOT VERIFIED | Obraz 16:9 zajmuje jawny górny panel 180 px, pokazując centralną filiżankę; tytuł, opis i akcja są w oddzielnym panelu 120 px. Usunięto gradient nakładany na całą grafikę. Testów/buildów nie uruchamiano. | Render nadal wymaga potwierdzenia właściciela; P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — grafika kafla World Map | Dodano asset właściciela; NOT VERIFIED | Dodano `apps/consumer/assets/images/world-map-preview.png` (1280×720 PNG); górny kadr ma tę samą wysokość i panel tekstu/akcji co karta Coffee Rave. Testów/buildów nie uruchamiano. | Render web/natywny pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — przycięcie grafiki World Map | Podmieniono kadr na życzenie właściciela; NOT VERIFIED | Nowy `world-map-earth.png` (1672×941) skupia kadr na planecie i pinezce; karta używa go w tym samym górnym panelu co wcześniej, panel treści pozostaje oddzielny. Testów/buildów nie uruchamiano. | Render web/natywny pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — etykieta sekcji World Map | Zmieniono Home na polecenie właściciela; NOT VERIFIED | Usunięto powitanie z nazwą użytkownika; nad kartą mapy dodano nagłówek „Feature for today” / „Propozycja na dziś” w EN/PL. Testów/buildów nie uruchamiano. | Render pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — realistyczna grafika World Map | Podmieniono grafikę na życzenie właściciela; NOT VERIFIED | Nowy asset `world-map-realistic.png` (1020×525 PNG) jest kadrowany pod górny panel karty i eksponuje mapę świata. Testów/buildów nie uruchamiano. | Render pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — nowa grafika Coffee Rave | Podmieniono grafikę na życzenie właściciela; NOT VERIFIED | `vienna-coffee-rave-cup.png` (880×453 PNG) pokazuje filiżankę jako główny motyw w górnym panelu karty. Testów/buildów nie uruchamiano. | Render pozostaje NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — styl etykiet sekcji Home | Wystylizowano nagłówki; NOT VERIFIED | „Feature for today”, „Nearest events”, „Latest news” są kompaktowymi chipami z tłem/ramką z tokenów i fioletowym znacznikiem; semantyka nagłówków zachowana. Testów/buildów nie uruchamiano. | Render wizualny i oba motywy wymagają potwierdzenia. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — nagłówki Home w stylu rozdziałów | Zmieniono styl po uwadze właściciela; NOT VERIFIED | Zastąpiono chipy nagłówkami z numeracją 01–03, mocniejszym tytułem i cienką linią; semantic headings i tokeny motywu zachowane. Testów/buildów nie uruchamiano. | Weryfikacja wizualna obu motywów NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — kropki zamiast numeracji sekcji Home | Zmieniono detale stylu na życzenie właściciela; NOT VERIFIED | Usunięto 01–03; zachowano tytuły i linie, a numer zastąpiono małym akcentowym punktem. Testów/buildów nie uruchamiano. | Render obu motywów NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — linie po obu stronach nagłówków Home | Dopasowano detal do uwagi właściciela; NOT VERIFIED | Usunięto punkty i dodano krótki poziomy separator z lewej strony tytułu, stylistycznie zgodny z linią po prawej. Testów/buildów nie uruchamiano. | Render obu motywów NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — mocniejszy akcent nagłówków Home | Zmieniono wizualny akcent na życzenie właściciela; NOT VERIFIED | Tytuły sekcji oraz krótkie linie po lewej używają `primary`; dłuższe linie po prawej pozostają w `border`. Testów/buildów nie uruchamiano. | Render obu motywów NOT VERIFIED. P0-I03A IN_PROGRESS. |
+
+| 2026-11-03 | P0-I03A — dopracowanie Home według briefu premium | Zmieniono Home i nagłówek nawigacji; NOT VERIFIED | Dodano kompaktowy tagline, „Today's spotlight” i kartę World Map z kategorią, obrazem 150–180 px oraz treścią w neutralnym panelu; uproszczono nagłówki/news cards i zmniejszono menu/profil icons. Usunięto mock eventu; event data/API brak, więc pokazany jest pusty stan. Nie dodano nowego Science placeholdera. Testów/buildów nie uruchamiano. | Karuzela wydarzeń, działające trasy mapy/eventów, runtime/a11y i debug overlay pozostają poza dostępnym kodem lub NOT VERIFIED. P0-I03A IN_PROGRESS. |

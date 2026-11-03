@@ -153,7 +153,7 @@ function createStyles(
       alignItems: 'center',
       justifyContent: 'center',
     },
-    menuIcon: { width: 36, height: 36 },
+    menuIcon: { width: 28, height: 28 },
     content: { padding: spacing.space8, gap: spacing.space16 },
     item: {
       minHeight: 48,
