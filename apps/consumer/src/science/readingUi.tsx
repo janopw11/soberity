@@ -15,20 +15,23 @@ export function ReadingCard({ children }: PropsWithChildren) {
   return <View style={{ gap: spacing.space12, padding: spacing.space16, backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radii.lg }}>{children}</View>;
 }
 /** Real web anchor (including modifier-click/new tab) and shared native navigation. */
-export function PublicationCard({ href, title, children }: PropsWithChildren<{ href: Href; title: string }>) {
+export function PublicationCard({ href, title, children, variant = 'card' }: PropsWithChildren<{ href: Href; title: string; variant?: 'card' | 'list' }>) {
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
   return (
     <View style={{
-      width: '100%',
+      width: variant === 'list' ? 800 : '100%',
+      maxWidth: '100%',
+      minWidth: 0,
+      alignSelf: 'center',
       overflow: 'hidden',
-      borderRadius: radii.xl,
-      borderWidth: 2,
+      borderRadius: variant === 'list' ? radii.md : radii.xl,
+      borderWidth: variant === 'list' ? 1 : 2,
       borderStyle: 'solid',
-      borderColor: focused ? colors.focusRing : colors.primary,
-      backgroundColor: pressed || hovered ? colors.surfaceAlt : colors.surface,
+      borderColor: focused ? colors.focusRing : variant === 'list' && !hovered && !pressed ? colors.border : colors.primary,
+      backgroundColor: pressed || hovered ? colors.surfaceAlt : variant === 'list' ? colors.listSurface : colors.surface,
       ...(focused && Platform.OS === 'web' ? { outlineColor: colors.focusRing, outlineWidth: 2, outlineStyle: 'solid' as const, outlineOffset: 2 } : {}),
     }}>
       <Link href={href} asChild>
@@ -41,7 +44,7 @@ export function PublicationCard({ href, title, children }: PropsWithChildren<{ h
           onHoverOut={() => setHovered(false)}
           onPressIn={() => setPressed(true)}
           onPressOut={() => setPressed(false)}
-          style={{ width: '100%', minHeight: 48, flexDirection: 'column', alignItems: 'stretch' }}
+          style={{ width: '100%', minHeight: 48, flexDirection: variant === 'list' ? 'row' : 'column', alignItems: 'stretch', ...(variant === 'list' ? { gap: spacing.space16, padding: spacing.space12 } : {}) }}
         >
           {children}
         </Pressable>

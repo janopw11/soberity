@@ -6,7 +6,7 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Alert, Button, LoadingState, Screen, SettingsIcon } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
-import { documentText, mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
+import { mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
 import { ChapterHeading } from '../ChapterHeading';
 
@@ -54,18 +54,22 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
         const claim = 'claim_text' in item ? item : null;
         const title = claim ? claim.claim_text : (item as Article | Post).title;
         const target = post ? 'post' : claim ? 'evidence' : 'article';
-        const summary = post ? documentText(post.document) : (item as Article | Claim).summary;
-        return <PublicationCard key={`${type}:${item.id}`} href={`/science/${target}/${item.id}`} title={title}>
+        const category = 'category_code' in item ? (categories.find(value => value.code === item.category_code)?.label ?? item.category_code) : null;
+        return <PublicationCard key={`${type}:${item.id}`} href={`/science/${target}/${item.id}`} title={title} variant="list">
           {post?.cover_id ? (
-            <View style={styles.thumbnail}>
+            <View style={styles.listThumbnail}>
               <ReadingImage uri={mediaUri(post.cover_id)} alt={post.cover_alt || title} cover thumbnail />
             </View>
           ) : null}
-          <View style={styles.cardContent}>
+          <View style={styles.listContent}>
             {!post || post.publication_route === 'REVIEWED' ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t(claim ? 'discover.evidence' : 'discover.reviewedArticle')}</Text> : null}
             <Text accessibilityRole="header" style={[styles.cardTitle, { color: colors.primary }]}>{title}</Text>
-            <Text style={[styles.cardMeta, { color: colors.textMuted }]}>{date(item.published_at)}{'category_code' in item ? ` · ${categories.find(value => value.code === item.category_code)?.label ?? item.category_code}` : ''}</Text>
-            <Text numberOfLines={compact ? 2 : 3} style={[styles.cardSummary, { color: colors.textSecondary }]}>{summary}</Text>
+            <View style={styles.listMeta}>
+              {category ? <View style={[styles.categoryPill, { backgroundColor: colors.primary }]}>
+                <Text style={[styles.cardMeta, { color: colors.onPrimary }]}>{category}</Text>
+              </View> : null}
+              <Text style={[styles.cardMeta, { color: colors.textMuted }]}>{date(post ? post.created_at : item.published_at)}</Text>
+            </View>
             {claim ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t('discover.certainty')}: {t(`discover.levels.${claim.evidence_level}`, { defaultValue: t('discover.notProvided') })}</Text> : null}
           </View>
         </PublicationCard>;
@@ -150,13 +154,14 @@ function PageArrow({ direction, disabled, onPress }: {
 }
 
 const styles = StyleSheet.create({
-  thumbnail: { width: '100%', height: 144, overflow: 'hidden' },
-  cardContent: { minWidth: 0, gap: spacing.space8, padding: spacing.space16 },
+  listThumbnail: { width: '24%', maxWidth: 80, height: 80, flexShrink: 0, overflow: 'hidden', borderRadius: radii.sm, alignSelf: 'flex-start' },
+  listContent: { flex: 1, minWidth: 0, gap: spacing.space4, justifyContent: 'center' },
+  listMeta: { alignItems: 'flex-start', gap: spacing.space4 },
+  categoryPill: { maxWidth: '100%', borderRadius: radii.pill, paddingVertical: spacing.space4 / 2, paddingHorizontal: spacing.space8 },
   cardTitle: { ...typography.bodyStrong },
   cardMeta: { ...typography.caption },
-  cardSummary: { ...typography.small },
   fullPage: { flexGrow: 1 },
-  feed: { flexGrow: 1, gap: spacing.space24 },
+  feed: { width: '100%', minWidth: 0, flexGrow: 1, gap: spacing.space24 },
   pagination: {
     alignSelf: 'center',
     maxWidth: '100%',
