@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 DONE (3/7), P1-I03 i P1-I04 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/7), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -73,7 +73,7 @@ Blockers: opis lub —
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
-| Phase 1 | Science & Discover MVP | 7 | 3/7 | IN_PROGRESS |
+| Phase 1 | Science & Discover MVP | 7 | 4/7 | IN_PROGRESS |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
@@ -669,12 +669,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Korekta UI 2026-11-04 — menu i kategorie (NOT VERIFIED):** Science & Discover domyślnie zwinięte, rozwijane kliknięciem; wyśrodkowane oceaniczne etykiety kart kategorii z subtelnymi ikonami mózgu, osób, pytajnika i piłki w prawym dolnym rogu. Kategoria w parametrach trasy pozwala strzałce obok menu wrócić do siatki, bez przycisku Wszystkie kategorie; tytuł kategorii wyśrodkowany. Usunięto Wróć do nauki z fiszek. Na wyraźne polecenie właściciela bez testów, buildów, lint/typecheck ani dodatkowej weryfikacji web/iOS/Android. Status IN_PROGRESS, checkboxy i Finished bez zmian; odbiór wykonuje właściciel. CHANGELOG bez nowego wpisu do czasu weryfikacji.
 
-**Status:** IN_PROGRESS — implementacja do ręcznego odbioru; NOT VERIFIED  
+**Status:** DONE — zamknięte na podstawie odbioru i polecenia właściciela 2026-11-04  
 **Started:** 2026-11-03  
-**Finished:** —  
+**Finished:** 2026-11-04  
 **Zależności iteracji:** P1-I02, P1-I03  
-**Dowód:** kod `src/learning/*`, trasy Science/editorial-quizzes, backend `evidence/learning/*`, migracja V8 i `backend/LEARNING_API.md`. T01–T04 zaimplementowane, checkboxy otwarte do weryfikacji.  
-**Blokery:** P1-I03 nadal NOT VERIFIED. Historycznie 2026-11-03 właściciel zlecił P1-I04 bez testów; nie uruchomiono testów, check/lint/typecheck, kompilacji/buildów, eksportów, API ani UI. Migracja V8 nie została zastosowana w tej sesji.
+**Dowód:** właściciel 2026-11-04 uznał fiszki i quizy za zakończone i polecił zaznaczyć wszystkie punkty T01–T04 oraz V01–V02. Zapis odbioru w dzienniku poniżej; wcześniejsze dowody API/komponentów/web zachowano historycznie. Nie uruchamiano nowych testów ani dodatkowej weryfikacji. Właściciel nie podał nowej macierzy urządzeń/platform; nie przypisano agentowi nowych wyników PASS.
+**Blokery:** brak zgłoszonych blokerów zamknięcia P1-I04; P1-I03 pozostaje osobną otwartą iteracją. Historyczne ograniczenia weryfikacji opisane poniżej dotyczą wcześniejszych sesji i nie są nadpisywane.
+
+**Odbiór końcowy 2026-11-04:** zamknięto pełną checklistę na wyraźne polecenie właściciela („Flashcard and quizies is finished for now, mark this as finished (all bullets)”). Aktualny zakres obejmuje automatyczny zapis quizów, opcjonalny zapis fiszek, kategorie i miniatury, interaktywny quiz, wyjaśnienia/źródła, wynik i powtórki. Wcześniejsze wzmianki NOT VERIFIED i brak Finished/DONE poniżej są historią kolejnych wdrożeń, a nie bieżącym statusem. Nie rozpoczęto następnej iteracji.
 
 **Implementacja 2026-11-03:** fiszki z recenzowanych EvidenceClaim (teza → wyjaśnienie/źródła/ograniczenia, powtórki), quizy TRUE_FALSE/SINGLE_CHOICE/MULTIPLE_CHOICE, serwerowa ocena dokładnego zbioru odpowiedzi, wyjaśnienia i źródła po odpowiedzi. Niemutowalne quizy przypięte do wersji dowodów, przygotowanie AUTHOR i niezależna publikacja REVIEWER w nowym panelu web. Wycofanie/zastąpienie dowodu ukrywa zależny quiz. Opcjonalny zapis na koncie z jawnym włączeniem, wznowieniem, kasowaniem i czyszczeniem przy usunięciu konta; anonimowo bez zapisu. Brak danych zdrowotnych, kar, timerów i XP. Wspólne RN UI web/iOS/Android, EN/PL, stany empty/loading/error/retry, wejścia z Discover i konta/panelu. Nie dodano treści pilotażowych ani Myth Battle (P1-I06), nie rozpoczęto P1-I05.
 
@@ -688,15 +690,15 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Zakres zadań:**
 
-- [ ] `P1-I04-T01` Zaprojektuj pytania, odpowiedzi, wyjaśnienia i relacje do EvidenceClaim.
-- [ ] `P1-I04-T02` Dodaj quizy prawda/fałsz i wielokrotnego wyboru.
-- [ ] `P1-I04-T03` Zapisuj postęp bez zapisywania danych zdrowotnych.
-- [ ] `P1-I04-T04` Unikaj kar za błędną odpowiedź i stosuj czytelne wyjaśnienia.
+- [x] `P1-I04-T01` Zaprojektuj pytania, odpowiedzi, wyjaśnienia i relacje do EvidenceClaim.
+- [x] `P1-I04-T02` Dodaj quizy prawda/fałsz i wielokrotnego wyboru.
+- [x] `P1-I04-T03` Zapisuj postęp bez zapisywania danych zdrowotnych.
+- [x] `P1-I04-T04` Unikaj kar za błędną odpowiedź i stosuj czytelne wyjaśnienia.
 
 **Weryfikacja:**
 
-- [ ] `P1-I04-V01` Test poprawności odpowiedzi i źródeł.
-- [ ] `P1-I04-V02` Test zapisu postępu i powtórek.
+- [x] `P1-I04-V01` Test poprawności odpowiedzi i źródeł.
+- [x] `P1-I04-V02` Test zapisu postępu i powtórek.
 
 **Definition of Done:** Działający quiz z uzasadnieniem i klikanym źródłem. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
@@ -2188,19 +2190,11 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Bieżące rozszerzenie (2026-11-04):** `P1-I04` — zapis ukończeń i kolorowe wyniki quizów wdrożone, testy API/komponentów/web PASS, lokalny backend z V10 działa (200/UP). Kolejny krok: native i pełne V01/V02; bez startu następnej iteracji.
-
-- **Bieżąca korekta (2026-11-04):** `P1-I04` — lista Quizzes dopasowana do Articles: nagłówek/empty/wspólna paginacja i usunięcie redundantnych elementów. Komponenty 6/6, web EN/PL light/dark mobile/desktop 8/8 PASS; native runtime oraz pełne V01/V02 nadal otwarte. Bez startu kolejnej iteracji.
-
-- **Bieżące rozszerzenie (2026-11-04):** `P1-I03` — wyszukiwarka tytułów i select kategorii Articles wdrożone; backend 13 unit + 23 IT, UI 3/3 i smoke EN/PL mobile/desktop 4/4 PASS. Lokalny API uruchomiony z nowym kodem. Następny krok: odbiór Articles na iOS/Android i dark, potem pozostałe V01/V02 tej iteracji; bez startu kolejnej iteracji.
-
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 3/7 DONE. P0-I03A i P0-I13 pozostają otwarte; P1-I03 wciąż NOT VERIFIED.
-- **Bieżąca korekta UI (2026-11-04):** `P0-I03A` — Ocean zastępuje ciemną Śliwkę na polecenie właściciela. Tokeny i specyfikacja zaktualizowane; web EN/PL desktop/mobile oraz kontrast zweryfikowane, natywny runtime i pełny odbiór V02/V03 nadal NOT VERIFIED. Następny krok: ręczny odbiór nowej palety i pozostałych kontroli P0-I03A; bez rozpoczęcia nowej iteracji.
-- **Otwarta praca funkcjonalna:** `P1-I04` — Flashcards & quizzes, rozpoczęta 2026-11-03 na wyraźne polecenie właściciela mimo niezweryfikowanego P1-I03. Implementacja do ręcznego odbioru; bez Finished/DONE i zaliczenia checkboxów.
-- **Wykonano w kodzie:** fiszki z recenzowanych EvidenceClaim, trzy typy pytań, serwerowa ocena odpowiedzi/wyjaśnienia, dowody przypięte do wersji, panel przygotowania i niezależnej recenzji quizów, optional opt-in postępu i wznowienie/usuwanie, ochrona usuniętych kont i limit odpowiedzi. RN UI EN/PL i tokeny obu motywów; wejścia `/science/learn`, `/science/flashcards`, `/science/quiz/{id}`, `/editorial-quizzes`.
-- **Weryfikacja:** żadnych testów, check/lint/typecheck, kompilacji/buildów/eksportów ani runtime — zgodnie z poleceniem właściciela. Migracja V8 zapisana, nieuruchomiona; web/iOS/Android, a11y i kontrakty NOT VERIFIED. Historyczne wyniki poprzednich iteracji nie są dowodami P1-I04.
-- **Dokumentacja:** `backend/LEARNING_API.md`, README backendu/klienta i dziennik. CHANGELOG bez nowego wpisu do czasu weryfikacji znaczącej funkcjonalności.
-- **Następny krok:** uruchomienie zaktualizowanego backendu z V8 i ręczny odbiór P1-I04 przez właściciela. P1-I05 nie rozpoczęta, seed/Myth Battle pozostają P1-I06. Automatyczne tłumaczenia nadal odroczone. P1-I03 i nowe BlogApiIT z P1-I02 pozostają niezweryfikowane zgodnie z poprzednimi decyzjami.
+- **Ostatnio ukończono (2026-11-04):** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela; wszystkie T01–T04 i V01–V02 zaznaczone. Bez nowych testów agenta ani deklarowania niepodanych wyników platformowych.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 4/7 DONE. P1-I03 nadal IN_PROGRESS; P0-I03A i P0-I13 pozostają otwarte. Bramka Phase 1 nie została zamknięta.
+- **Otwarta praca:** `P1-I03` — biblioteka/Articles i jej pozostały odbiór. Zamknięcie P1-I04 nie zmienia statusu tej zależności.
+- **Dokumentacja:** końcowy zakres P1-I04 podsumowano w CHANGELOG.md pod 2026-11-04; wcześniejsze wyniki i ograniczenia zachowano w sekcji iteracji i dzienniku.
+- **Następny krok:** oczekiwanie na polecenie właściciela. `P1-I05` — Weekly Science Drop & publishing cadence pozostaje TODO; nie rozpoczęto nowej iteracji ani fazy. Treści pilotażowe/Myth Battle pozostają w P1-I06, automatyczne tłumaczenia odroczone.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2551,3 +2545,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P1-I04 — uporządkowanie karty quizu z obrazem | IN_PROGRESS / NOT VERIFIED | QuizCard: obraz jako osobny górny panel cover 144 px, spójna powierzchnia treści poniżej, usunięte scrim i przypadkowe białe podkłady tytułu/akcji/wyniku. Oceaniczny tytuł i kolory wyników zachowane; cieńsza ramka/radius lg. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; web/iOS/Android NOT VERIFIED. CHANGELOG odroczony do odbioru. Kolejny krok: ręczny odbiór P1-I04. |
 
 | 2026-11-04 | P1-I04 — miniatura quizu zamiast pytajnika | IN_PROGRESS / NOT VERIFIED | QuizCard: przesłany obraz w kafelku 56 × 56 obok tytułu, zamiast ikony; brak/błąd zdjęcia pokazuje pytajnik. Usunięto oddzielny górny cover. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony do odbioru. Kolejny krok: ręczny odbiór P1-I04. |
+
+| 2026-11-04 | P1-I04 — odbiór i zamknięcie | DONE; T01–T04, V01–V02 zaznaczone | Właściciel uznał fiszki i quizy za zakończone na teraz i wyraźnie polecił zaznaczyć wszystkie punkty. PHASES: status, Finished 2026-11-04, checklista, licznik Phase 1 4/7 i aktualny punkt pracy; CHANGELOG: końcowy zakres. Bez nowych testów lub dodatkowej weryfikacji agenta; historyczne ograniczenia i wyniki zachowane. | Brak zgłoszonych blokerów odbioru P1-I04. Nie podano nowej macierzy platform i nie zadeklarowano nowych PASS. P1-I03 i bramka fazy nadal otwarte; P1-I05 TODO, wyłącznie na kolejne polecenie. |

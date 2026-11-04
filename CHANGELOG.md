@@ -1,5 +1,7 @@
 ## 2026-11-04
 
+- P1-I04 — Flashcards & quizzes: zamknięto pełną checklistę na podstawie odbioru i polecenia właściciela. Fiszki z recenzowanymi wyjaśnieniami i źródłami, quizy trzech typów, automatyczny zapis i wznowienie quizów, wyniki i powtórki. Dopracowano kategorie, miniatury kart, interaktywny przebieg z paskiem postępu i źródłami oraz ekran wyniku; usunięto błąd payloadu Finish. Bez nowych testów agenta przy zamknięciu; wcześniejsze dowody i ograniczenia platformowe zachowano w PHASES.md.
+
 - Quizy: dodano zapis ukończonych wyników zalogowanego użytkownika w PostgreSQL (V10), prywatne API, serwerową ocenę, idempotentne ponowienia i możliwość powtórek. Karty pokazują ostatni procent: blue bez ukończenia, red <40%, orange 40–79%, green >=80%. Kasowanie danych/konta usuwa wyniki. Backend 13 unit + 27 IT, klient 12/12 i web EN/PL light/dark mobile/desktop 8/8 PASS; native NOT VERIFIED. Backend lokalny zrestartowany, V10 zastosowana, health 200/UP.
 
 - Quizzes: nagłówek z ikoną i oceanicznym tytułem jak Articles, bez powtórzonego tytułu/opisu i Back to Discover. Pusta lista pokazuje tylko stylowane No quizzes / Brak quizów. Karty quizów mają styl listy Articles: błękitne tło, cienka zaokrąglona ramka, kwadratowy Start Quiz po lewej oraz tytuł/liczbę pytań po prawej. Wspólna paginacja Articles/Quizzes zachowuje stany i liczbę stron. Testy komponentów 6/6, typecheck/lint i web EN/PL × light/dark × mobile/desktop 8/8 PASS; runtime iOS/Android NOT VERIFIED.
