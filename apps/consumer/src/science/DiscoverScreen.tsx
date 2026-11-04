@@ -35,7 +35,7 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
   useEffect(() => {
     const controller = new AbortController();
     setData(null); setError(false);
-    const path = compact ? `/api/v1/science/posts?page=${page}` : `/api/v1/science/feed?page=${page}&locale=${locale}`;
+    const path = compact ? `/api/v1/science/posts?page=${page}` : `/api/v1/science/feed?page=${page}&size=3&locale=${locale}`;
     const timeout = setTimeout(() => { setError(true); controller.abort(); }, 20000);
     void (compact
       ? scienceGet<Page<Post>>(path, controller.signal).then(value => ({ ...value, items: value.items.map(content => ({ type: 'POST' as const, content })) }))
@@ -55,15 +55,21 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
         const target = post ? 'post' : claim ? 'evidence' : 'article';
         const summary = post ? documentText(post.document) : (item as Article | Claim).summary;
         return <PublicationCard key={`${type}:${item.id}`} href={`/science/${target}/${item.id}`} title={title}>
-          {post?.cover_id ? <ReadingImage uri={mediaUri(post.cover_id)} alt={post.cover_alt || title} cover /> : null}
-          {!post || post.publication_route === 'REVIEWED' ? <ReadingText muted>{t(claim ? 'discover.evidence' : 'discover.reviewedArticle')}</ReadingText> : null}
-          <ReadingText heading>{title}</ReadingText>
-          <ReadingText muted>{date(item.published_at)}{'category_code' in item ? ` · ${categories.find(value => value.code === item.category_code)?.label ?? item.category_code}` : ''}</ReadingText>
-          <ReadingText>{summary.length > 260 ? `${summary.slice(0, 260)}…` : summary}</ReadingText>
-          {claim ? <ReadingText>{t('discover.certainty')}: {t(`discover.levels.${claim.evidence_level}`, { defaultValue: t('discover.notProvided') })}</ReadingText> : null}
+          {post?.cover_id ? (
+            <View style={styles.thumbnail}>
+              <ReadingImage uri={mediaUri(post.cover_id)} alt={post.cover_alt || title} cover thumbnail />
+            </View>
+          ) : null}
+          <View style={styles.cardContent}>
+            {!post || post.publication_route === 'REVIEWED' ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t(claim ? 'discover.evidence' : 'discover.reviewedArticle')}</Text> : null}
+            <Text accessibilityRole="header" style={[styles.cardTitle, { color: colors.primary }]}>{title}</Text>
+            <Text style={[styles.cardMeta, { color: colors.textMuted }]}>{date(item.published_at)}{'category_code' in item ? ` · ${categories.find(value => value.code === item.category_code)?.label ?? item.category_code}` : ''}</Text>
+            <Text numberOfLines={compact ? 2 : 3} style={[styles.cardSummary, { color: colors.textSecondary }]}>{summary}</Text>
+            {claim ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t('discover.certainty')}: {t(`discover.levels.${claim.evidence_level}`, { defaultValue: t('discover.notProvided') })}</Text> : null}
+          </View>
         </PublicationCard>;
       })}
-      {!compact ? <View style={{ gap: spacing.space8 }}><ReadingText muted>{t('discover.page', { page: data.page + 1, count: data.total })}</ReadingText><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space8 }}><Button variant="secondary" label={t('discover.previous')} disabled={page === 0} onPress={() => setPage(value => value - 1)} /><Button variant="secondary" label={t('discover.next')} disabled={(page + 1) * data.size >= data.total} onPress={() => setPage(value => value + 1)} /></View></View> : null}
+
     </>}
     {compact ? (
       <Pressable
@@ -77,40 +83,110 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
         style={({ pressed }) => [
           styles.browse,
           {
-            backgroundColor: pressed || browseHovered ? colors.primary : colors.surfaceAlt,
-            borderColor: browseFocused ? colors.focusRing : colors.primary,
+            backgroundColor: colors.surfaceAlt,
+            opacity: pressed ? 0.8 : 1,
+            borderColor: browseFocused ? colors.focusRing : browseHovered ? colors.border : 'transparent',
           },
-          browseFocused && styles.browseFocused,
         ]}
       >
-        {({ pressed }) => (
-          <>
-            <Text style={[styles.browseLabel, { color: pressed || browseHovered ? colors.onPrimary : colors.primary }]}>
+        <>
+            <Text style={[styles.browseLabel, { color: colors.primary }]}>
               {t('discover.browse')}
             </Text>
             <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-              <SettingsIcon name="chevron" size={20} color={pressed || browseHovered ? colors.onPrimary : colors.primary} />
+              <SettingsIcon name="chevron" size={20} color={colors.primary} />
             </View>
-          </>
-        )}
+        </>
       </Pressable>
     ) : null}
   </>;
-  return compact ? <View style={{ gap: spacing.space16 }}>{content}</View> : <Screen maxWidth={800}>{content}</Screen>;
+  return compact ? <View style={{ gap: spacing.space16 }}>{content}</View> : (
+    <Screen maxWidth={800} contentStyle={styles.fullPage}>
+      <View style={styles.feed}>{content}</View>
+      {!error && data && data.items.length > 0 ? (
+        <View style={[styles.pagination, { backgroundColor: colors.surfaceAlt }]}>
+          <PageArrow direction="previous" disabled={data.page === 0} onPress={() => setPage(Math.max(0, data.page - 1))} />
+          <Text accessibilityLiveRegion="polite" style={[styles.pageLabel, { color: colors.textSecondary }]}>
+            {t('discover.page', { page: data.page + 1, pages: Math.max(1, Math.ceil(data.total / Math.max(1, data.size))), count: data.total })}
+          </Text>
+          <PageArrow direction="next" disabled={(data.page + 1) * data.size >= data.total} onPress={() => setPage(data.page + 1)} />
+        </View>
+      ) : null}
+    </Screen>
+  );
+}
+
+function PageArrow({ direction, disabled, onPress }: {
+  direction: 'previous' | 'next';
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t(`discover.${direction}`)}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [styles.pageArrow, {
+        backgroundColor: !disabled && (pressed || hovered) ? colors.surface : 'transparent',
+        borderColor: focused ? colors.focusRing : 'transparent',
+      }]}
+    >
+      <View style={direction === 'previous' ? styles.arrowLeft : undefined} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <SettingsIcon name="chevron" size={20} color={disabled ? colors.textMuted : colors.primary} />
+      </View>
+    </Pressable>
+  );
 }
 
 const styles = StyleSheet.create({
-  browse: {
-    minHeight: 56,
+  thumbnail: { width: '100%', height: 144, overflow: 'hidden' },
+  cardContent: { minWidth: 0, gap: spacing.space8, padding: spacing.space16 },
+  cardTitle: { ...typography.bodyStrong },
+  cardMeta: { ...typography.caption },
+  cardSummary: { ...typography.small },
+  fullPage: { flexGrow: 1 },
+  feed: { flexGrow: 1, gap: spacing.space24 },
+  pagination: {
+    alignSelf: 'center',
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.space16,
-    paddingVertical: spacing.space16,
-    paddingHorizontal: spacing.space24,
-    borderRadius: radii.lg,
-    borderWidth: 1,
+    borderRadius: radii.pill,
+    padding: spacing.space4,
+    gap: spacing.space4,
   },
-  browseFocused: { borderWidth: 2, borderStyle: 'dashed' },
+  pageArrow: {
+    width: 48,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.pill,
+    borderWidth: 2,
+  },
+  arrowLeft: { transform: [{ rotate: '180deg' }] },
+  pageLabel: { ...typography.small, flexShrink: 1, textAlign: 'center' },
+  browse: {
+    minHeight: 48,
+    alignSelf: 'center',
+    maxWidth: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.space8,
+    paddingVertical: spacing.space12,
+    paddingHorizontal: spacing.space24,
+    borderRadius: radii.pill,
+    borderWidth: 2,
+  },
   browseLabel: { ...typography.bodyStrong, flexShrink: 1 },
 });

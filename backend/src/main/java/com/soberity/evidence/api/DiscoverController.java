@@ -11,7 +11,8 @@ public class DiscoverController {
     public DiscoverController(DiscoverReader reader) {this.reader=reader;}
     @GetMapping("/api/v1/science/feed")
     public ResponseEntity<DiscoverReader.Page> feed(@RequestParam(defaultValue="en") String locale,
-            @RequestParam(defaultValue="0") int page) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(reader.feed(locale,page));
+            @RequestParam(defaultValue="0") int page,
+            @RequestParam(defaultValue="20") int size) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(reader.feed(locale,page,size));
     }
 }

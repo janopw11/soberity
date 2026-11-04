@@ -64,7 +64,22 @@ export default function SideMenu() {
     href?: '/' | '/science' | '/events',
   ) => {
     const label = t(`navigation.features.${id}`);
-    const selected = pathname === href || (id === 'science' && pathname.startsWith('/science/'));
+    if (id === 'science') {
+      return (
+        <View key={id} style={styles.item}>
+          <Image
+            source={image}
+            style={styles.iconImage}
+            resizeMode="contain"
+            accessibilityIgnoresInvertColors
+            accessible={false}
+            importantForAccessibility="no"
+          />
+          <Text accessibilityRole="header" style={styles.label}>{label}</Text>
+        </View>
+      );
+    }
+    const selected = pathname === href;
     return (
       <Pressable
         key={id}

@@ -19,30 +19,34 @@ export function PublicationCard({ href, title, children }: PropsWithChildren<{ h
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
   return (
-    <Link href={href} asChild>
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel={title}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onHoverIn={() => setHovered(true)}
-        onHoverOut={() => setHovered(false)}
-        style={({ pressed }) => ({
-          width: '100%',
-          minHeight: 48,
-          gap: spacing.space12,
-          padding: spacing.space16,
-          borderRadius: radii.lg,
-          borderWidth: 1,
-          borderColor: focused ? colors.focusRing : hovered ? colors.primary : colors.border,
-          backgroundColor: pressed ? colors.surfaceAlt : colors.surface,
-          ...(focused && Platform.OS === 'web' ? { outlineColor: colors.focusRing, outlineWidth: 2, outlineStyle: 'solid' as const, outlineOffset: 2 } : {}),
-        })}
-      >
-        {children}
-      </Pressable>
-    </Link>
+    <View style={{
+      width: '100%',
+      overflow: 'hidden',
+      borderRadius: radii.xl,
+      borderWidth: 2,
+      borderStyle: 'solid',
+      borderColor: focused ? colors.focusRing : colors.primary,
+      backgroundColor: pressed || hovered ? colors.surfaceAlt : colors.surface,
+      ...(focused && Platform.OS === 'web' ? { outlineColor: colors.focusRing, outlineWidth: 2, outlineStyle: 'solid' as const, outlineOffset: 2 } : {}),
+    }}>
+      <Link href={href} asChild>
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={title}
+          onFocus={() => setFocused(true)}
+          onBlur={() => { setFocused(false); setPressed(false); }}
+          onHoverIn={() => setHovered(true)}
+          onHoverOut={() => setHovered(false)}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          style={{ width: '100%', minHeight: 48, flexDirection: 'column', alignItems: 'stretch' }}
+        >
+          {children}
+        </Pressable>
+      </Link>
+    </View>
   );
 }
 
@@ -79,12 +83,12 @@ export function ArticleSources({ sources }: { sources: { title: string; url: str
   );
 }
 
-export function ReadingImage({ uri, alt, cover = false }: { uri: string; alt: string; cover?: boolean }) {
+export function ReadingImage({ uri, alt, cover = false, thumbnail = false }: { uri: string; alt: string; cover?: boolean; thumbnail?: boolean }) {
   // A different image starts with fresh loading/error/dimension state.
-  return <SizedReadingImage key={uri} uri={uri} alt={alt} cover={cover} />;
+  return <SizedReadingImage key={uri} uri={uri} alt={alt} cover={cover} thumbnail={thumbnail} />;
 }
 
-function SizedReadingImage({ uri, alt, cover }: { uri: string; alt: string; cover: boolean }) {
+function SizedReadingImage({ uri, alt, cover, thumbnail }: { uri: string; alt: string; cover: boolean; thumbnail: boolean }) {
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
   const [ratio, setRatio] = useState(16 / 9);
@@ -112,7 +116,9 @@ function SizedReadingImage({ uri, alt, cover }: { uri: string; alt: string; cove
       accessibilityLabel={alt}
       accessible
       resizeMode={cover ? 'cover' : 'contain'}
-      style={{ width: '100%', aspectRatio: cover ? 16 / 9 : ratio, borderRadius: radii.md, backgroundColor: colors.surfaceAlt }}
+      style={thumbnail
+        ? { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: colors.surfaceAlt }
+        : { width: '100%', aspectRatio: cover ? 16 / 9 : ratio, borderRadius: radii.md, backgroundColor: colors.surfaceAlt }}
       onError={() => setFailed(true)}
     />
   );

@@ -37,10 +37,13 @@ public class DiscoverReader {
         WHERE r.status='PUBLISHED' AND c.locale=?
         """;
     public Page feed(String locale,int page) {
-        if((!"en".equals(locale) && !"pl".equals(locale)) || page<0 || page>1000000)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid Discover language or page.");
+        return feed(locale,page,20);
+    }
+    public Page feed(String locale,int page,int size) {
+        if((!"en".equals(locale) && !"pl".equals(locale)) || page<0 || page>1000000 || size<1 || size>100)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid Discover language, page or size.");
         long total=jdbc.queryForObject("SELECT count(*) FROM ("+TIMELINE+") entries",Long.class,locale,locale);
-        var rows=jdbc.queryForList("SELECT * FROM ("+TIMELINE+") entries ORDER BY published_at DESC,id,type LIMIT 20 OFFSET ?",locale,locale,(long)page*20);
+        var rows=jdbc.queryForList("SELECT * FROM ("+TIMELINE+") entries ORDER BY published_at DESC,id,type LIMIT ? OFFSET ?",locale,locale,size,(long)page*size);
         var items=new ArrayList<Item>();
         for(var row:rows) {
             String type=row.get("type").toString();
@@ -53,6 +56,6 @@ public class DiscoverReader {
             };
             items.add(new Item(type,content));
         }
-        return new Page(items,page,20,total);
+        return new Page(items,page,size,total);
     }
 }

@@ -12,7 +12,6 @@ export const navigationItems = [
     id: 'science',
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
     image: require('../assets/images/science-icon-ocean.png') as number,
-    href: '/science',
   },
   {
     id: 'events',
