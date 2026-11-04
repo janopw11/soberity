@@ -14,7 +14,7 @@ import { SettingsIcon } from '../ui/SettingsIcon';
 import { mediaUri } from '../science/scienceApi';
 import type { QuizSummary } from './learningApi';
 
-/** One accessible action for the entire quiz card; background is presentation only. */
+/** One accessible action with a thumbnail or fallback icon beside the title. */
 export function QuizCard({
   quiz,
   onStart,
@@ -77,47 +77,40 @@ export function QuizCard({
         },
       ]}
     >
-      {image ? (
-        <>
-          <Image
-            source={{ uri: mediaUri(quiz.cover_id!) }}
-            resizeMode="cover"
-            style={StyleSheet.absoluteFill}
-            accessible={false}
-            onError={() => setImageFailed(true)}
-          />
-          <View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: colors.eventImageScrim },
-            ]}
-          />
-        </>
-      ) : null}
       <View style={styles.content}>
         <View style={styles.headingRow}>
           <View style={[styles.iconTile, { backgroundColor: colors.surfaceAlt }]} accessible={false}>
-            <SettingsIcon name="question" size={28} color={colors.primary} />
+            {image ? (
+              <Image
+                key={quiz.cover_id}
+                source={{ uri: mediaUri(quiz.cover_id!) }}
+                resizeMode="cover"
+                style={styles.thumbnail}
+                accessible={false}
+                onError={() => setImageFailed(true)}
+              />
+            ) : (
+              <SettingsIcon name="question" size={28} color={colors.primary} />
+            )}
           </View>
           <View style={styles.headingCopy}>
         <Text
           accessibilityRole="header"
-          style={[styles.title, { color: titleColor }, image && { backgroundColor: colors.surface, padding: spacing.space8, borderRadius: radii.sm }]}
+          style={[styles.title, { color: titleColor }]}
         >
           {quiz.title}
         </Text>
         <Text
           style={[
             styles.count,
-            { color: image ? colors.eventImageText : colors.textMuted },
+            { color: colors.textMuted },
           ]}
         >
           {t('learning.questionCount', { count: quiz.question_count })}
         </Text>
           </View>
         </View>
-        <View style={[styles.footer, { borderTopColor: image ? colors.eventImageText : colors.border }, image && { backgroundColor: colors.surface, borderRadius: radii.sm, paddingHorizontal: spacing.space8 }]}>
+        <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <View style={styles.action} accessible={false}>
             <Text style={[styles.actionLabel, { color: colors.primary }]}>
               {t(result ? 'learning.retakeQuizShort' : 'learning.startQuizShort')}
@@ -125,12 +118,7 @@ export function QuizCard({
             <SettingsIcon name="chevron" size={18} color={colors.primary} />
           </View>
         {result ? (
-          <Text style={[styles.score, { color: accent }, image && {
-            backgroundColor: surface,
-            paddingHorizontal: spacing.space8,
-            paddingVertical: spacing.space4 / 2,
-            borderRadius: radii.sm,
-          }]}>
+          <Text style={[styles.score, { color: accent }]}>
             {t('learning.resultPercentage', { percentage: result.percentage })}
           </Text>
         ) : null}
@@ -146,14 +134,15 @@ const styles = StyleSheet.create({
     minWidth: 0,
     alignSelf: 'center',
     minHeight: 144,
-    borderWidth: 2,
-    borderRadius: radii.md,
+    borderWidth: 1,
+    borderRadius: radii.lg,
     overflow: 'hidden',
     justifyContent: 'center',
   },
+  thumbnail: { width: '100%', height: '100%' },
   content: { padding: spacing.space16, gap: spacing.space16 },
   headingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.space16 },
-  iconTile: { width: 56, height: 56, flexShrink: 0, borderRadius: radii.lg, alignItems: 'center', justifyContent: 'center' },
+  iconTile: { width: 56, height: 56, flexShrink: 0, borderRadius: radii.lg, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
   headingCopy: { flex: 1, minWidth: 0, gap: spacing.space8 },
   footer: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.space12, borderTopWidth: StyleSheet.hairlineWidth, paddingTop: spacing.space12 },
   action: { flexDirection: 'row', alignItems: 'center', gap: spacing.space4, flexShrink: 1 },
