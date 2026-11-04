@@ -211,6 +211,23 @@ class SciencePublicApiIT extends AbstractIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void discoverFiltersReviewedArticlesAndClaimsWithTheirPublicationGuards() throws Exception {
+        var f=fixture("pl","PUBLISHED");
+        UUID articleId=article(f,"PUBLISHED");
+        mvc.perform(get("/api/v1/science/feed").param("locale","pl").param("category",f.category).param("q","SYNTHETIC TITLE"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1))
+            .andExpect(jsonPath("$.items[0].content.id").value(articleId.toString()));
+        mvc.perform(get("/api/v1/science/feed").param("locale","pl").param("category",f.category).param("q","synthetic CLAIM"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1))
+            .andExpect(jsonPath("$.items[0].type").value("CLAIM"));
+        mvc.perform(get("/api/v1/science/feed").param("locale","en").param("category",f.category))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        jdbc.update("UPDATE claim_revision SET status='ARCHIVED' WHERE id=?",f.revision);
+        mvc.perform(get("/api/v1/science/feed").param("locale","pl").param("category",f.category).param("q","synthetic"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+    }
+
     private Fixture fixture(String locale, String state) {
         UUID claim=UUID.randomUUID(), revision=UUID.randomUUID(), source=UUID.randomUUID();
         String category="fixture-"+UUID.randomUUID().toString().replace("-","");

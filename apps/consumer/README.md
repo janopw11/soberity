@@ -265,3 +265,7 @@ and contextual back navigation throughout root, Science and account/editorial
 stacks. Guest/auth routes keep their existing guards. Events is a shared root
 route so signed-in users can reach its existing placeholder and header.
 No tests or client builds were run for this navigation change.
+
+### Articles search (P1-I03)
+
+Science → Articles searches a case-insensitive title substring and filters by category through `/api/v1/science/feed?q=...&category=...`, before pagination. Typing uses a 500 ms debounce; changing either filter resets to page 0. Empty search/all categories restores the full feed. Search controls appear only on Articles, not Home. Restart the local backend after updating its code; no new migration is needed.

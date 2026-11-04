@@ -22,16 +22,17 @@ public class DiscoverReader {
     public record Item(String type, Map<String,Object> content) { }
     public record Page(List<Item> items,int page,int size,long total) { }
     private static final String TIMELINE="""
-        SELECT 'POST' AS type,p.id,v.published_at
+        SELECT 'POST' AS type,p.id,v.published_at,v.title,ARRAY[v.category_code] AS categories
         FROM editorial_post p JOIN editorial_post_version v ON v.post_id=p.id
         WHERE v.status='PUBLISHED'
         UNION ALL
-        SELECT 'ARTICLE' AS type,a.article_id AS id,a.published_at
+        SELECT 'ARTICLE' AS type,a.article_id AS id,a.published_at,a.title,ARRAY[a.category_code] AS categories
         FROM science_article a JOIN claim_revision r ON r.id=a.revision_id
         JOIN evidence_claim c ON c.id=r.claim_id
         WHERE a.status='PUBLISHED' AND r.status='PUBLISHED' AND c.locale=?
         UNION ALL
-        SELECT 'CLAIM' AS type,c.id,r.published_at
+        SELECT 'CLAIM' AS type,c.id,r.published_at,r.claim_text AS title,
+            ARRAY(SELECT cc.category_code FROM science_claim_category cc WHERE cc.claim_id=c.id) AS categories
         FROM evidence_claim c JOIN claim_revision r ON r.claim_id=c.id
         JOIN scientific_review sr ON sr.revision_id=r.id AND sr.decision='APPROVED'
         WHERE r.status='PUBLISHED' AND c.locale=?
@@ -40,10 +41,30 @@ public class DiscoverReader {
         return feed(locale,page,20);
     }
     public Page feed(String locale,int page,int size) {
+        return feed(locale,page,size,null,null);
+    }
+    public Page feed(String locale,int page,int size,String query,String category) {
+        String search=query==null ? "" : query.strip();
+        String categoryFilter=category==null || category.isBlank() ? null : category;
+        if(search.length()>200 || (categoryFilter!=null && !categoryFilter.matches("[a-z][a-z0-9-]{0,39}")))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid Discover search or category.");
         if((!"en".equals(locale) && !"pl".equals(locale)) || page<0 || page>1000000 || size<1 || size>100)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid Discover language, page or size.");
-        long total=jdbc.queryForObject("SELECT count(*) FROM ("+TIMELINE+") entries",Long.class,locale,locale);
-        var rows=jdbc.queryForList("SELECT * FROM ("+TIMELINE+") entries ORDER BY published_at DESC,id,type LIMIT ? OFFSET ?",locale,locale,size,(long)page*size);
+        String filtered=" FROM ("+TIMELINE+") entries WHERE 1=1";
+        var args=new ArrayList<Object>(List.of(locale,locale));
+        if(!search.isEmpty()) {
+            // Literal substring matching: SQL wildcards in user input have no special meaning.
+            filtered+=" AND strpos(lower(title),lower(?))>0";
+            args.add(search);
+        }
+        if(categoryFilter!=null) {
+            filtered+=" AND ?=ANY(categories)";
+            args.add(categoryFilter);
+        }
+        long total=jdbc.queryForObject("SELECT count(*)"+filtered,Long.class,args.toArray());
+        args.add(size);
+        args.add((long)page*size);
+        var rows=jdbc.queryForList("SELECT type,id,published_at"+filtered+" ORDER BY published_at DESC,id,type LIMIT ? OFFSET ?",args.toArray());
         var items=new ArrayList<Item>();
         for(var row:rows) {
             String type=row.get("type").toString();

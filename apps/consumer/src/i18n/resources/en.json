@@ -513,6 +513,12 @@
     "editArticle": "Edit article"
   },
   "discover": {
+    "searchTitle": "Search titles",
+    "searchPlaceholder": "Enter part of a title…",
+    "categoryFilter": "Category",
+    "allCategories": "All",
+    "noMatchesTitle": "No matching publications",
+    "noMatches": "Try a different title or category.",
     "title": "Science & Discover",
     "intro": "Read the research, explore the context, and check the evidence for yourself.",
     "latest": "Latest publications",
@@ -522,7 +528,6 @@
       "claims": "Evidence cards"
     },
     "category": "Topic",
-    "allCategories": "All topics",
     "localeLibrary": "This library shows reviewed content in your selected language.",
     "loading": "Loading publications…",
     "loadingEvidence": "Loading evidence and sources…",

@@ -37,6 +37,34 @@ class BlogApiIT extends AbstractIntegrationTest {
         return json.readTree(mvc.perform(post("/api/v1/editorial/posts").header("Authorization","Bearer "+author).contentType("application/json").content(json.writeValueAsString(body)))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
     }
+    @Test void discoverSearchFiltersBeforePaginationAndSearchesOnlyPublishedTitles() throws Exception {
+        String author=user("AUTHOR"), prefix="Search-"+UUID.randomUUID();
+        for(int i=0;i<3;i++) {
+            var body=draft("PUBLISH");body.put("title",prefix+" MiXeD title "+i);create(author,body);
+        }
+        var hidden=draft("DRAFT");hidden.put("title",prefix+" MiXeD hidden");create(author,hidden);
+        var bodyOnly=draft("PUBLISH");bodyOnly.put("title","Body-only fixture");
+        bodyOnly.put("document",Map.of("type","doc","content",List.of(Map.of("type","paragraph","content",List.of(Map.of("type","text","text",prefix+" MiXeD"))))));
+        create(author,bodyOnly);
+        for(int page=0;page<3;page++) {
+            mvc.perform(get("/api/v1/science/feed").param("q","  "+prefix.toLowerCase()+" mixed  ")
+                    .param("category","sleep").param("size","1").param("page",""+page))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(3))
+                .andExpect(jsonPath("$.items.length()").value(1)).andExpect(jsonPath("$.page").value(page))
+                .andExpect(jsonPath("$.items[0].type").value("POST"));
+        }
+        mvc.perform(get("/api/v1/science/feed").param("q",prefix).param("category","unknown-category"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/science/feed").param("q",prefix).param("category","sleep").param("size","1").param("page","3"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(3)).andExpect(jsonPath("$.items.length()").value(0));
+        var literal=draft("PUBLISH");literal.put("title",prefix+" 100%_literal");create(author,literal);
+        mvc.perform(get("/api/v1/science/feed").param("q",prefix+" 100%_literal"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(get("/api/v1/science/feed").param("q","' OR 1=1 --"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/science/feed").param("q","x".repeat(201))).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/science/feed").param("category","' OR 1=1")).andExpect(status().isBadRequest());
+    }
     @Test void authorCanPublishDirectlyAndPublicProjectionDoesNotClaimReview() throws Exception {
         String author=user("AUTHOR");var post=create(author,draft("PUBLISH"));String id=post.get("id").asText();
         mvc.perform(get("/api/v1/science/posts/"+id)).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("PUBLISHED"))

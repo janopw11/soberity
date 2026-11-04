@@ -16,6 +16,7 @@ The private editorial workflow and roles are documented in [EDITORIAL_API.md](ED
 | `/api/v1/evidence/claims/{id}`           | Current published claim revision                                              |
 | `/api/v1/evidence/claims/{id}/citations` | Array of bibliography fields plus `relation`, `notes` for that exact revision |
 | `/api/v1/evidence/sources/{id}`          | Bibliography, only when cited by at least one published revision              |
+| `/api/v1/science/feed`                   | Mixed timeline page; `locale`, `page`, `size`, `q`, `category`               |
 | `/api/v1/science/articles`               | Page; `locale`, `category`, `page`, `size`                                    |
 | `/api/v1/science/articles/{id}`          | Current published version of a stable article UUID                            |
 
@@ -84,3 +85,7 @@ Errors retain Spring Security's no-store default. There is no process-local
 cache with stale publication status. Database reads for pages and citations
 share a read-only REPEATABLE_READ snapshot. CORS allows `If-None-Match` and
 exposes `ETag` only to the existing configured origins.
+
+## Discover title search and category filter (P1-I03)
+
+`GET /api/v1/science/feed?locale=en&page=0&size=3&q=sleep&category=sleep` combines optional filters before count and pagination across posts, reviewed articles and evidence claims. `q` is a case-insensitive literal substring of the title (claim_text for claims), trimmed, maximum 200 characters; no body search, stemming, regex, or SQL wildcard interpretation. Empty/whitespace q disables title filtering. Category uses exact code (same 40-character syntax as the catalog); unknown valid codes return zero results, empty category disables filtering. Claims match any assigned category. Values are bound parameters. Existing locale and publication/withdrawal guards remain in effect; count and page share a repeatable-read snapshot. Existing feed defaults and response fields are unchanged. No database migration required.

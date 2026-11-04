@@ -9,6 +9,8 @@ type LanguageSelectProps<T extends string> = {
   options: readonly LanguageOption<T>[];
   onChange: (value: T) => void;
   testID?: string;
+  fullWidth?: boolean;
+  compact?: boolean;
 };
 
 /** Native `<select>` on web; see LanguageSelect.tsx for the native fallback. */
@@ -18,6 +20,8 @@ export function LanguageSelect<T extends string>({
   options,
   onChange,
   testID,
+  fullWidth = false,
+  compact = false,
 }: LanguageSelectProps<T>) {
   const { colors } = useThemePreferences();
 
@@ -28,13 +32,14 @@ export function LanguageSelect<T extends string>({
       value={value}
       onChange={(event) => onChange(event.target.value as T)}
       style={{
-        minHeight: 44,
+        ...(fullWidth ? { width: '100%', minWidth: 0 } : {}),
+        minHeight: compact ? 38 : 44,
         padding: `0 ${spacing.space8}px`,
         borderRadius: radii.sm,
         border: 'none',
         backgroundColor: 'transparent',
         color: colors.textPrimary,
-        fontSize: typography.body.fontSize,
+        fontSize: compact ? typography.small.fontSize : typography.body.fontSize,
         fontFamily: 'inherit',
         cursor: 'pointer',
       }}

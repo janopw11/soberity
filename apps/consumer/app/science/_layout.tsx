@@ -1,4 +1,7 @@
 import { Stack } from 'expo-router';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { spacing, typography } from '@soberity/design-tokens';
+import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
 import { useTranslation } from 'react-i18next';
 import { useAppHeaderOptions } from '../../src/navigation/useAppHeaderOptions';
 
@@ -10,7 +13,7 @@ export default function ScienceLayout() {
       title: t('science.title'),
       ...headerOptions,
     }}>
-      <Stack.Screen name="index" />
+      <Stack.Screen name="index" options={{ title: t('discover.articles'), headerTitle: () => <ArticlesTitle /> }} />
       <Stack.Screen name="quizzes" options={{ title: t('learning.quizzes') }} />
       <Stack.Screen name="learn" options={{ title: t('learning.title') }} />
       <Stack.Screen name="flashcards" options={{ title: t('learning.flashcards') }} />
@@ -21,3 +24,26 @@ export default function ScienceLayout() {
     </Stack>
   );
 }
+
+function ArticlesTitle() {
+  const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  return (
+    <View style={styles.title}>
+      <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
+        source={require('../../assets/images/articles-icon-ocean.png')}
+        style={styles.icon}
+        resizeMode="contain"
+        accessible={false}
+        importantForAccessibility="no"
+      />
+      <Text accessibilityRole="header" style={[styles.label, { color: colors.primary }]}>{t('discover.articles')}</Text>
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  title: { flexDirection: 'row', alignItems: 'center', gap: spacing.space8 },
+  icon: { width: 32, height: 32 },
+  label: { ...typography.h3, flexShrink: 1 },
+});

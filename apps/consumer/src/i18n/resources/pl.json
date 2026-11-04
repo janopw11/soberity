@@ -513,6 +513,12 @@
     "editArticle": "Edytuj artykuł"
   },
   "discover": {
+    "searchTitle": "Szukaj w tytułach",
+    "searchPlaceholder": "Wpisz fragment tytułu…",
+    "categoryFilter": "Kategoria",
+    "allCategories": "Wszystkie",
+    "noMatchesTitle": "Brak pasujących publikacji",
+    "noMatches": "Spróbuj innego tytułu lub kategorii.",
     "title": "Science & Discover",
     "intro": "Czytaj badania, poznawaj kontekst i samodzielnie sprawdzaj dowody.",
     "latest": "Najnowsze publikacje",
@@ -522,7 +528,6 @@
       "claims": "Karty dowodów"
     },
     "category": "Temat",
-    "allCategories": "Wszystkie tematy",
     "localeLibrary": "Ta biblioteka pokazuje recenzowane materiały w wybranym języku.",
     "loading": "Wczytywanie publikacji…",
     "loadingEvidence": "Wczytywanie dowodów i źródeł…",

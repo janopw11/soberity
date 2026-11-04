@@ -1,5 +1,7 @@
 ## 2026-11-04
 
+- Articles: dodano wyszukiwanie fragmentu tytułu bez rozróżniania wielkości liter oraz dropdown kategorii EN/PL rozwijany pod polem jako nakładka nad kartami, bez modala i przesuwania listy. Oceaniczny tekst, wyróżnienie wybranej opcji i widoczny scrollbar ułatwiają wybór; bez dodatkowego przycisku „Więcej kategorii”. Filtry łączą się po stronie API przed paginacją; formularz ma debounce 500 ms i reset strony. Nagłówek Articles jest oceaniczny z ikoną, bez powtórzonego chapter; wyszukiwanie i select są w jednym, kompaktowym rzędzie (web: pola 40 px, mniejsze etykiety i tekst). Backend 13 unit + 23 IT, testy komponentu 4/4 i web smoke EN/PL mobile/desktop 4/4 PASS. Runtime iOS/Android i ciemny motyw formularza pozostają NOT VERIFIED.
+
 - Jasny motyw Ocean: białe tło, jasnoniebieskie powierzchnie, granatowy tekst i oceaniczno-niebieskie akcje zastępują fiolet. Zapisany wybór `light` zachowany. Kontrast obu motywów 2/2, typecheck klienta/tokenów i lint tokenów PASS; render web/iOS/Android nowej jasnej palety NOT VERIFIED.
 
 - Ciemny motyw: zastąpiono Śliwkę paletą Ocean inspirowaną zdjęciem właściciela — głęboki granat, niebieskie powierzchnie, cyjanowe akcje i chłodny jasny tekst. Wspólne tokeny obejmują istniejące ekrany; jasny motyw i zapisany wybór zachowane. Kontrast obu motywów 2/2, typecheck, web EN/PL desktop/mobile i klawiatura 2/2 PASS; nowy runtime iOS/Android NOT VERIFIED.

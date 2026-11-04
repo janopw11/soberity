@@ -3,12 +3,15 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { radii, spacing, typography } from '@soberity/design-tokens';
-import { Alert, Button, LoadingState, Screen, SettingsIcon } from '../ui';
+import { Alert, Button, LoadingState, Screen, SettingsIcon, TextField } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
 import { mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
 import { ChapterHeading } from '../ChapterHeading';
+import CategorySelect from './CategorySelect';
+
+const SEARCH_DEBOUNCE_MS = 500;
 
 type Item = Post | Article | Claim;
 type FeedItem = { type: 'POST' | 'ARTICLE' | 'CLAIM'; content: Item };
@@ -20,7 +23,17 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
   const [browseFocused, setBrowseFocused] = useState(false);
   const [browseHovered, setBrowseHovered] = useState(false);
   const locale = i18n.resolvedLanguage === 'pl' ? 'pl' : 'en';
-  const [page, setPage] = useState(0);
+  const [searchInput, setSearchInput] = useState('');
+  const [filters, setFilters] = useState({ query: '', category: '', page: 0 });
+  const { query, category, page } = filters;
+  const setPage = (nextPage: number) => setFilters(previous => ({ ...previous, page: nextPage }));
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const nextQuery = searchInput.trim();
+      setFilters(previous => previous.query === nextQuery ? previous : { ...previous, query: nextQuery, page: 0 });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
   const [attempt, retry] = useState(0);
   useFocusEffect(useCallback(() => { retry(value => value + 1); }, []));
   const [categories, setCategories] = useState<Category[]>([]);
@@ -36,7 +49,8 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
   useEffect(() => {
     const controller = new AbortController();
     setData(null); setError(false);
-    const path = compact ? `/api/v1/science/posts?page=${page}` : `/api/v1/science/feed?page=${page}&size=3&locale=${locale}`;
+    const path = compact ? `/api/v1/science/posts?page=${page}`
+      : `/api/v1/science/feed?page=${page}&size=3&locale=${locale}&q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`;
     const timeout = setTimeout(() => { setError(true); controller.abort(); }, 20000);
     void (compact
       ? scienceGet<Page<Post>>(path, controller.signal).then(value => ({ ...value, items: value.items.map(content => ({ type: 'POST' as const, content })) }))
@@ -45,10 +59,35 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
       .catch(() => { if (!controller.signal.aborted) setError(true); })
       .finally(() => clearTimeout(timeout));
     return () => { clearTimeout(timeout); controller.abort(); };
-  }, [compact, locale, page, attempt]);
+  }, [compact, locale, page, query, category, attempt]);
   const content = <>
-    <ChapterHeading>{t(compact ? 'discover.latest' : 'discover.articles')}</ChapterHeading>
-    {error ? <ReadingCard><Alert variant="danger" message={t('discover.error')} /><Button label={t('discover.retry')} variant="secondary" onPress={() => retry(value => value + 1)} /></ReadingCard> : !data ? <LoadingState label={t('discover.loading')} /> : data.items.length === 0 ? <ReadingCard><ReadingText heading>{t('discover.emptyTitle')}</ReadingText><ReadingText muted>{t('discover.empty')}</ReadingText>{page > 0 ? <Button variant="secondary" label={t('discover.firstPage')} onPress={() => setPage(0)} /> : null}</ReadingCard> : <>
+    {compact ? <ChapterHeading>{t('discover.latest')}</ChapterHeading> : null}
+    {!compact ? <View style={styles.filters}>
+      <View style={styles.searchField}>
+        <TextField
+          compact
+          label={t('discover.searchTitle')}
+          placeholder={t('discover.searchPlaceholder')}
+          value={searchInput}
+          onChangeText={setSearchInput}
+          maxLength={200}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="search"
+          accentLabel
+        />
+      </View>
+      <View style={styles.categoryFilter}>
+        <Text style={[styles.filterLabel, { color: colors.primary }]}>{t('discover.categoryFilter')}</Text>
+        <CategorySelect
+          label={t('discover.categoryFilter')}
+          value={category}
+          options={[{ value: '', label: t('discover.allCategories') }, ...categories.map(item => ({ value: item.code, label: item.label }))]}
+          onChange={value => setFilters(previous => ({ ...previous, category: value, query: searchInput.trim(), page: 0 }))}
+        />
+      </View>
+    </View> : null}
+    {error ? <ReadingCard><Alert variant="danger" message={t('discover.error')} /><Button label={t('discover.retry')} variant="secondary" onPress={() => retry(value => value + 1)} /></ReadingCard> : !data ? <LoadingState label={t('discover.loading')} /> : data.items.length === 0 ? <ReadingCard><ReadingText heading>{t(!compact && (query || category) ? 'discover.noMatchesTitle' : 'discover.emptyTitle')}</ReadingText><ReadingText muted>{t(!compact && (query || category) ? 'discover.noMatches' : 'discover.empty')}</ReadingText>{page > 0 ? <Button variant="secondary" label={t('discover.firstPage')} onPress={() => setPage(0)} /> : null}</ReadingCard> : <>
       {(compact ? data.items.slice(0, 3) : data.items).map(({ type, content: item }) => {
         const post = 'document' in item ? item : null;
         const claim = 'claim_text' in item ? item : null;
@@ -154,6 +193,10 @@ function PageArrow({ direction, disabled, onPress }: {
 }
 
 const styles = StyleSheet.create({
+  filters: { zIndex: 20, flexDirection: 'row', gap: spacing.space8, alignItems: 'flex-start' },
+  searchField: { flex: 3, minWidth: 0 },
+  categoryFilter: { zIndex: 20, flex: 2, minWidth: 0, gap: spacing.space4 },
+  filterLabel: { ...typography.caption },
   listThumbnail: { width: '24%', maxWidth: 80, height: 80, flexShrink: 0, overflow: 'hidden', borderRadius: radii.sm, alignSelf: 'flex-start' },
   listContent: { flex: 1, minWidth: 0, gap: spacing.space4, justifyContent: 'center' },
   listMeta: { alignItems: 'flex-start', gap: spacing.space4 },

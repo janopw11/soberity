@@ -16,6 +16,8 @@ type LanguageSelectProps<T extends string> = {
   options: readonly LanguageOption<T>[];
   onChange: (value: T) => void;
   testID?: string;
+  fullWidth?: boolean;
+  compact?: boolean;
 };
 
 /** Native fallback for `<select>`: a button that opens a list in a dialog. Web uses LanguageSelect.web.tsx. */
@@ -25,6 +27,8 @@ export function LanguageSelect<T extends string>({
   options,
   onChange,
   testID,
+  fullWidth = false,
+  compact = false,
 }: LanguageSelectProps<T>) {
   const { colors } = useThemePreferences();
   const styles = createStyles(colors);
@@ -40,9 +44,9 @@ export function LanguageSelect<T extends string>({
         accessibilityValue={{ text: current?.label }}
         onPress={() => setOpen(true)}
         testID={testID}
-        style={({ pressed }) => [styles.trigger, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.trigger, fullWidth && { width: '100%' }, compact && { minHeight: 46 }, pressed && styles.pressed]}
       >
-        <Text style={styles.triggerText}>{current?.label ?? ''}</Text>
+        <Text style={[styles.triggerText, compact && typography.small, fullWidth && { flex: 1, minWidth: 0 }]}>{current?.label ?? ''}</Text>
         <SettingsIcon name="chevronDown" color={colors.textMuted} size={18} />
       </Pressable>
       <Dialog

@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -14,6 +15,8 @@ import { SettingsIcon } from './SettingsIcon';
 
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
+  /** Smaller visual treatment for filter bars; other forms keep their defaults. */
+  compact?: boolean;
   helperText?: string;
   errorText?: string | undefined;
   /** Adds a show/hide toggle for password-style fields. */
@@ -32,6 +35,7 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
 /** Labelled text input with helper/error state and an optional password reveal toggle. */
 export function TextField({
   label,
+  compact = false,
   helperText,
   errorText,
   secureToggle = false,
@@ -55,10 +59,10 @@ export function TextField({
 
   return (
     <View
-      style={grouped ? styles.groupedContainer : styles.container}
+      style={[grouped ? styles.groupedContainer : styles.container, compact && styles.compactContainer]}
       testID={testID}
     >
-      <Text style={[styles.label, accentLabel && { color: colors.primary }]}>
+      <Text style={[styles.label, compact && styles.compactLabel, accentLabel && { color: colors.primary }]}>
         {label}
       </Text>
       <View
@@ -66,6 +70,7 @@ export function TextField({
           grouped ? styles.groupedInputRow : styles.inputRow,
           isFocused &&
             (grouped ? styles.groupedInputRowFocused : styles.inputRowFocused),
+          compact && styles.compactRow,
           hasError && !grouped && styles.inputRowError,
         ]}
       >
@@ -82,7 +87,7 @@ export function TextField({
             setIsFocused(false);
             onBlur?.(event);
           }}
-          style={styles.input}
+          style={[styles.input, compact && styles.compactInput]}
           placeholderTextColor={colors.textMuted}
         />
         {accessory}
@@ -120,6 +125,20 @@ function createStyles(
 ) {
   return StyleSheet.create({
     container: { gap: spacing.space8 },
+    compactContainer: { gap: spacing.space4 },
+    compactLabel: { ...typography.caption },
+    compactRow: {
+      minHeight: Platform.OS === 'web' ? 40 : 48,
+      borderWidth: 1,
+      borderRadius: radii.sm,
+      paddingHorizontal: spacing.space8,
+    },
+    compactInput: {
+      ...typography.small,
+      minWidth: 0,
+      minHeight: Platform.OS === 'web' ? 38 : 46,
+      paddingVertical: 0,
+    },
     label: {
       fontSize: typography.label.fontSize,
       lineHeight: typography.label.lineHeight,
