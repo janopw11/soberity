@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Image,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -10,14 +9,12 @@ import {
 } from 'react-native';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 
-import { Screen, SettingsIcon } from './ui';
+import { Screen } from './ui';
+import { DailySpotlight } from './DailySpotlight';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 import DiscoverScreen from './science/DiscoverScreen';
 import { ReadingText } from './science/readingUi';
 
-// Metro requires a literal require() to statically bundle React Native assets.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const worldMapImage = require('../assets/images/world-map-realistic.png');
 // Owner-provided preview photograph. Preserve the original and crop in the viewport.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const viennaRaveImage = require('../assets/images/schonbrunn-vienna-preview.jpeg');
@@ -39,37 +36,7 @@ export default function WelcomeScreen() {
     <Screen maxWidth={800}>
       <View style={styles.section}>
         <ReadingText heading>{t('home.todaysSpotlight')}</ReadingText>
-        <Pressable
-          style={[styles.tile, styles.featureCard]}
-          accessibilityRole="button"
-          accessibilityLabel={`${t('home.worldMapStatsTitle')}. ${t('home.openSection')}`}
-          accessibilityHint={t('home.previewOnlyHint')}
-          accessibilityState={{ disabled: true }}
-          testID="home-for-you-today"
-        >
-          <Image
-            source={worldMapImage}
-            style={styles.cardImage}
-            resizeMode="cover"
-            fadeDuration={0}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-          <View style={styles.featureContent} pointerEvents="none">
-            <Text style={styles.featureCategory}>
-              {t('home.interactiveDiscovery')}
-            </Text>
-            <View style={styles.featureTitleRow}>
-              <Text accessibilityRole="header" style={styles.featureTitle}>
-                {t('home.worldMapStatsTitle')}
-              </Text>
-              <SettingsIcon name="chevron" color={colors.textMuted} size={20} />
-            </View>
-            <Text style={styles.featureDescription}>
-              {t('home.worldMapStats')}
-            </Text>
-          </View>
-        </Pressable>
+        <DailySpotlight />
       </View>
 
       <View style={styles.section}>

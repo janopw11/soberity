@@ -27,7 +27,7 @@ export default function SideMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors } = useThemePreferences();
+  const { colors, theme } = useThemePreferences();
   // Modal content on iOS does not reliably receive the safe-area top inset.
   const insets = useSafeAreaInsets();
   const styles = createStyles(colors);
@@ -44,8 +44,11 @@ export default function SideMenu() {
       style={styles.toggle}
     >
       <Image
-        // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
-        source={require('../assets/images/menu-icon.png')}
+        source={theme === 'dark'
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
+          ? require('../assets/images/menu-icon-ocean-dark.png')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
+          : require('../assets/images/menu-icon-ocean-light.png')}
         style={styles.menuIcon}
         resizeMode="contain"
         accessibilityIgnoresInvertColors
@@ -121,7 +124,7 @@ export default function SideMenu() {
             <ScrollView contentContainerStyle={styles.content}>
               {navigationItems.map((entry) => (
                 <View key={entry.id}>
-                  {item(entry.id, entry.image, 'href' in entry ? entry.href : undefined)}
+                  {item(entry.id, theme === 'dark' && 'imageDark' in entry ? entry.imageDark : entry.image, 'href' in entry ? entry.href : undefined)}
                   {entry.id === 'science' ? (
                     <View style={styles.submenu}>
                       {scienceNavigationItems.map((section) => {
@@ -142,7 +145,7 @@ export default function SideMenu() {
                             style={({ pressed }) => [styles.item, styles.submenuItem, selected && styles.selected, pressed && styles.pressed, focused === id && styles.focused]}
                           >
                             <Image
-                              source={section.image}
+                              source={theme === 'dark' && 'imageDark' in section ? section.imageDark : section.image}
                               style={styles.iconImage}
                               resizeMode="contain"
                               accessibilityIgnoresInvertColors

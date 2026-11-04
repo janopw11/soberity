@@ -236,6 +236,26 @@
     "readTime": "{{count}} min czytania",
     "missionHeadline": "Odkrywaj życie z jasnym umysłem.",
     "missionSubtitle": "Odkrywaj naukę. Łącz się z ludźmi.",
+    "spotlight": {
+      "brain": {
+        "title": "Brain Lab",
+        "description": "Poznaj związek alkoholu z pamięcią, koncentracją i mózgiem."
+      },
+      "myths": {
+        "title": "Myth Buster",
+        "description": "Sprawdź popularne mity o alkoholu i poznaj dowody."
+      },
+      "map": {
+        "title": "World Map",
+        "description": "Odkrywaj wzorce spożycia alkoholu na świecie."
+      },
+      "community": {
+        "title": "Soberity",
+        "description": "Poznaj społeczność odkrywającą życie i doświadczenia bez alkoholu."
+      },
+      "previewHint": "Otwórz podgląd funkcji.",
+      "unavailable": "Ta funkcja pojawi się wkrótce. Na razie karta prezentuje jej podgląd."
+    },
     "todaysSpotlight": "Dzisiejszy wybór",
     "interactiveDiscovery": "Interaktywne odkrywanie",
     "eventsNearYou": "Wydarzenia w pobliżu",

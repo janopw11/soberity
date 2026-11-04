@@ -39,7 +39,7 @@ function HeaderProfile() {
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
-  const { colors } = useThemePreferences();
+  const { colors, theme } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   return (
     <Pressable
@@ -51,8 +51,11 @@ function HeaderProfile() {
       style={[styles.iconButton, { borderColor: focused ? colors.focusRing : 'transparent' }]}
     >
       <Image
-        // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
-        source={require('../../assets/images/profile-icon.png')}
+        source={theme === 'dark'
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+          ? require('../../assets/images/profile-icon-ocean-dark.png')
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
+          : require('../../assets/images/profile-icon-ocean-light.png')}
         style={styles.accountIcon}
         resizeMode="contain"
         accessibilityIgnoresInvertColors

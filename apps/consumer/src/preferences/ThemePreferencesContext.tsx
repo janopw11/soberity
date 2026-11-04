@@ -53,7 +53,7 @@ function isSupportedLanguage(value: string | null): value is SupportedLanguage {
 export function ThemePreferencesProvider({ children }: PropsWithChildren) {
   // The module singleton is used on purpose: useTranslation().i18n gets a new identity on every
   // language change, which would re-run the effects and callbacks below in a loop.
-  const [theme, setThemeState] = useState<ColorScheme>('dark');
+  const [theme, setThemeState] = useState<ColorScheme>('light');
   const [language, setLanguageState] = useState<SupportedLanguage>(
     resolveDeviceLanguage,
   );

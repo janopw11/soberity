@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
-import { spacing } from '@soberity/design-tokens';
-import { Alert, Button, LoadingState, Screen } from '../ui';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { radii, spacing, typography } from '@soberity/design-tokens';
+import { Alert, Button, LoadingState, Screen, SettingsIcon } from '../ui';
+import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
 import { documentText, mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
@@ -14,6 +15,9 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const date = useReadingDate();
+  const { colors } = useThemePreferences();
+  const [browseFocused, setBrowseFocused] = useState(false);
+  const [browseHovered, setBrowseHovered] = useState(false);
   const locale = i18n.resolvedLanguage === 'pl' ? 'pl' : 'en';
   const [page, setPage] = useState(0);
   const [attempt, retry] = useState(0);
@@ -61,7 +65,52 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
       })}
       {!compact ? <View style={{ gap: spacing.space8 }}><ReadingText muted>{t('discover.page', { page: data.page + 1, count: data.total })}</ReadingText><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space8 }}><Button variant="secondary" label={t('discover.previous')} disabled={page === 0} onPress={() => setPage(value => value - 1)} /><Button variant="secondary" label={t('discover.next')} disabled={(page + 1) * data.size >= data.total} onPress={() => setPage(value => value + 1)} /></View></View> : null}
     </>}
-    {compact ? <Button variant="tertiary" label={t('discover.browse')} onPress={() => router.push('/science')} /> : null}
+    {compact ? (
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={t('discover.browse')}
+        onPress={() => router.push('/science')}
+        onFocus={() => setBrowseFocused(true)}
+        onBlur={() => setBrowseFocused(false)}
+        onHoverIn={() => setBrowseHovered(true)}
+        onHoverOut={() => setBrowseHovered(false)}
+        style={({ pressed }) => [
+          styles.browse,
+          {
+            backgroundColor: pressed || browseHovered ? colors.primary : colors.surfaceAlt,
+            borderColor: browseFocused ? colors.focusRing : colors.primary,
+          },
+          browseFocused && styles.browseFocused,
+        ]}
+      >
+        {({ pressed }) => (
+          <>
+            <Text style={[styles.browseLabel, { color: pressed || browseHovered ? colors.onPrimary : colors.primary }]}>
+              {t('discover.browse')}
+            </Text>
+            <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+              <SettingsIcon name="chevron" size={20} color={pressed || browseHovered ? colors.onPrimary : colors.primary} />
+            </View>
+          </>
+        )}
+      </Pressable>
+    ) : null}
   </>;
   return compact ? <View style={{ gap: spacing.space16 }}>{content}</View> : <Screen maxWidth={800}>{content}</Screen>;
 }
+
+const styles = StyleSheet.create({
+  browse: {
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.space16,
+    paddingVertical: spacing.space16,
+    paddingHorizontal: spacing.space24,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+  },
+  browseFocused: { borderWidth: 2, borderStyle: 'dashed' },
+  browseLabel: { ...typography.bodyStrong, flexShrink: 1 },
+});

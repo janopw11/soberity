@@ -236,6 +236,26 @@
     "readTime": "{{count}} min read",
     "missionHeadline": "Explore a clearer life.",
     "missionSubtitle": "Discover the science. Connect with people.",
+    "spotlight": {
+      "brain": {
+        "title": "Brain Lab",
+        "description": "Discover how alcohol relates to memory, focus and the brain."
+      },
+      "myths": {
+        "title": "Myth Buster",
+        "description": "Challenge common alcohol myths and explore the evidence."
+      },
+      "map": {
+        "title": "World Map",
+        "description": "Explore alcohol consumption patterns around the world."
+      },
+      "community": {
+        "title": "Soberity",
+        "description": "Meet a community discovering life and experiences without alcohol."
+      },
+      "previewHint": "Open the feature preview.",
+      "unavailable": "This feature is coming soon. For now, this card shows a preview."
+    },
     "todaysSpotlight": "Today's spotlight",
     "interactiveDiscovery": "Interactive discovery",
     "eventsNearYou": "Events near you",

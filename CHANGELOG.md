@@ -1,3 +1,9 @@
+## 2026-11-04
+
+- Jasny motyw Ocean: białe tło, jasnoniebieskie powierzchnie, granatowy tekst i oceaniczno-niebieskie akcje zastępują fiolet. Zapisany wybór `light` zachowany. Kontrast obu motywów 2/2, typecheck klienta/tokenów i lint tokenów PASS; render web/iOS/Android nowej jasnej palety NOT VERIFIED.
+
+- Ciemny motyw: zastąpiono Śliwkę paletą Ocean inspirowaną zdjęciem właściciela — głęboki granat, niebieskie powierzchnie, cyjanowe akcje i chłodny jasny tekst. Wspólne tokeny obejmują istniejące ekrany; jasny motyw i zapisany wybór zachowane. Kontrast obu motywów 2/2, typecheck, web EN/PL desktop/mobile i klawiatura 2/2 PASS; nowy runtime iOS/Android NOT VERIFIED.
+
 ## 2026-11-03
 
 - Panel redakcyjny: przebudowano `/editorial` na edytor blogowy Tiptap z formatowaniem, justowaniem, źródłami w stopce, tworzeniem kategorii, obrazami inline i okładką 1600×900. Uproszczono formularz i sterowanie; dodano wybór publikacji autora lub recenzji oraz uwagi recenzenta. UI EN/PL, desktop/mobile-web: 8/8 PASS na symulowanym API; klient 76/76, backend unit 13/13, check i eksporty PASS. V7 zastosowana lokalnie, odczytowy smoke API PASS; pełne nowe testy integracyjne pominięte na życzenie właściciela. Automatyczne tłumaczenia odroczone.

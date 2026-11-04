@@ -1,6 +1,6 @@
 /**
  * Soberity design tokens — single source of truth for color, type, spacing
- * and radius values, per `docs/BRANDING.md` (plum-soft and violet themes).
+ * and radius values, per `docs/BRANDING.md` (ocean dark and light themes).
  * Consumed by apps/consumer (and later by other clients) instead of
  * hardcoded hex/pixel values.
  */
@@ -16,46 +16,46 @@ export const brand = {
   slate: '#6B7280',
 } as const;
 
-/** Semantic color tokens — light theme (violet). */
+/** Semantic color tokens — light theme (ocean). */
 const lightColors = {
-  background: '#FAF9FD',
-  backdrop: 'rgba(36, 33, 54, 0.4)',
+  background: '#FFFFFF',
+  backdrop: 'rgba(2, 19, 34, 0.4)',
   surface: '#FFFFFF',
-  surfaceAlt: '#EDE7F6',
-  textPrimary: '#242136',
-  textSecondary: '#4B425D',
-  textMuted: '#5D6470',
-  primary: '#6D3CC3',
-  primaryPressed: '#5B2AA8',
+  surfaceAlt: '#EAF6FC',
+  textPrimary: '#08243A',
+  textSecondary: '#35566C',
+  textMuted: '#4E6878',
+  primary: '#006C9C',
+  primaryPressed: '#00547D',
   onPrimary: '#FFFFFF',
-  border: '#D9D0E6',
-  focusRing: '#5B2AA8',
+  border: '#7C9FB3',
+  focusRing: '#00547D',
   success: '#176B48',
   warning: '#865500',
   danger: '#B42318',
   onDanger: '#FFFFFF',
-  info: '#2256A5',
+  info: '#006C9C',
 } as const;
 
-/** Semantic color tokens — dark theme (plum-soft). */
+/** Semantic color tokens — dark theme (ocean). */
 const darkColors = {
-  background: '#2B2339',
-  backdrop: 'rgba(20, 17, 28, 0.72)',
-  surface: '#342A44',
-  surfaceAlt: '#3E3350',
-  textPrimary: '#F1ECF8',
-  textSecondary: '#D0C2E0',
-  textMuted: '#B9A7CB',
-  primary: '#C1A4F6',
-  primaryPressed: '#D8C0FF',
-  onPrimary: '#14111C',
-  border: '#5B4A6C',
-  focusRing: '#D8C0FF',
+  background: '#020D1F',
+  backdrop: 'rgba(1, 7, 18, 0.78)',
+  surface: '#061A33',
+  surfaceAlt: '#0A2847',
+  textPrimary: '#EDF8FF',
+  textSecondary: '#BDD9ED',
+  textMuted: '#90B5D0',
+  primary: '#20C4F4',
+  primaryPressed: '#79E2FF',
+  onPrimary: '#021322',
+  border: '#477899',
+  focusRing: '#79E2FF',
   success: '#79D6A5',
   warning: '#F2C66D',
   danger: '#FF8A8A',
   onDanger: '#331B21',
-  info: '#9BC4FF',
+  info: '#72CFFF',
 } as const;
 
 export const themes = {

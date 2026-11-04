@@ -4,11 +4,11 @@ import { Image, StyleSheet } from 'react-native';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
-const LOGO_LIGHT = require('../../assets/images/soberity-logo.png');
+const LOGO_LIGHT = require('../../assets/images/soberity-logo-light.png');
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
 const LOGO_DARK = require('../../assets/images/soberity-logo-dark.png');
 
-/** Soberity wordmark with the brain mark; the dark theme uses a light wordmark. */
+/** Owner-provided Soberity logo variants selected by the active theme. */
 export function AppLogo() {
   const { t } = useTranslation();
   const { theme } = useThemePreferences();
