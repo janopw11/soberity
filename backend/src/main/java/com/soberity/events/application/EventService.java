@@ -20,13 +20,19 @@ public class EventService {
     private final JdbcTemplate jdbc;
     private final EventAccess access;
     private final OrganizerService organizers;
-    public EventService(JdbcTemplate jdbc,EventAccess access,OrganizerService organizers) { this.jdbc=jdbc;this.access=access;this.organizers=organizers; }
+    private final tools.jackson.databind.json.JsonMapper json;
+    public EventService(JdbcTemplate jdbc,EventAccess access,OrganizerService organizers,tools.jackson.databind.json.JsonMapper json) { this.jdbc=jdbc;this.access=access;this.organizers=organizers;this.json=json; }
     public UUID venue(VerifiedToken actor,UUID organizerId,VenueInput input) {
         access.member(actor,organizerId);organizers.lock(organizerId);
         if(input==null) throw bad("Venue required.");coordinates(input.latitude(),input.longitude());
         UUID id=UUID.randomUUID();
         jdbc.update("INSERT INTO events_venue(id,organizer_id,name,address,city,region,country_code,latitude,longitude) VALUES (?,?,?,?,?,?,?,?,?)",id,organizerId,text(input.name(),200),text(input.address(),500),text(input.city(),150),optional(input.region(),150),country(input.countryCode()),input.latitude(),input.longitude());
         audit(actor,organizerId,null,"VENUE_CREATED");return id;
+    }
+    public Map<String,Object> venueDetail(VerifiedToken actor,UUID organizerId,UUID id) {
+        access.member(actor,organizerId);
+        var rows=jdbc.queryForList("SELECT * FROM events_venue WHERE id=? AND organizer_id=?",id,organizerId);
+        if(rows.isEmpty()) throw notFound();return rows.getFirst();
     }
     public Map<String,Object> venues(VerifiedToken actor,UUID organizerId,int page) {
         access.member(actor,organizerId);page(page);
@@ -35,6 +41,15 @@ public class EventService {
     }
     public UUID save(VerifiedToken actor,UUID organizerId,UUID id,EventInput input) {
         access.member(actor,organizerId);organizers.lock(organizerId);validate(organizerId,input);
+        String document=null;
+        if(input.descriptionDocument()!=null && !input.descriptionDocument().isNull()) {
+            try {
+                var checked=com.soberity.evidence.blog.BlogDocument.check(input.descriptionDocument());
+                if(!checked.images().isEmpty() || checked.text().isBlank() || checked.text().length()>30000) throw bad("Event description must contain text without embedded images.");
+                document=json.writeValueAsString(checked.document());
+                if(document.length()>200000) throw bad("Event description is too large.");
+            } catch(IllegalArgumentException e) {throw bad("Invalid rich event description.");}
+        }
         int revision=1;Map<String,Object> existing=null;
         if(id==null) {
             id=UUID.randomUUID();
@@ -51,12 +66,12 @@ public class EventService {
             INSERT INTO events_revision(event_id,organizer_id,revision,author_ref,title,description,locale,track,category_code,
             alcohol_policy,alcohol_rules,alcohol_sold,alcohol_served,alcohol_permitted,alcohol_free_participation,
             beverage_notes,venue_id,starts_at,ends_at,timezone,price_kind,price_minor,currency,accessibility,
-            accessibility_notes,availability,entry_rules,external_ticket_url,source_url,source_reference,content_rights_attested,cover_id)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            accessibility_notes,availability,entry_rules,external_ticket_url,source_url,source_reference,content_rights_attested,cover_id,description_document,organizer_url)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?::jsonb,?)
             """,id,organizerId,revision,access.ref(actor),text(input.title(),300),text(input.description(),30000),input.locale(),input.track().name(),input.category().name(),
             input.alcoholPolicy().name(),text(input.alcoholRules(),10000),controls==null?null:controls.alcoholSold(),controls==null?null:controls.alcoholServed(),controls==null?null:controls.alcoholPermitted(),controls==null?null:controls.explicitAlcoholFreeParticipation(),
             text(input.beverageNotes(),5000),input.venueId(),Timestamp.from(input.startsAt().toInstant()),Timestamp.from(input.endsAt().toInstant()),input.timezone(),input.priceKind().name(),input.priceMinor(),input.currency(),input.accessibility().name(),
-            optional(input.accessibilityNotes(),5000),input.availability()==null?"UNKNOWN":input.availability().name(),text(input.entryRules(),5000),url(input.externalTicketUrl(),false),url(input.sourceUrl(),true),text(input.sourceReference(),10000),Boolean.TRUE.equals(input.contentRightsAttested()),input.coverId());
+            optional(input.accessibilityNotes(),5000),input.availability()==null?"UNKNOWN":input.availability().name(),text(input.entryRules(),5000),url(input.externalTicketUrl(),false),url(input.sourceUrl(),true),text(input.sourceReference(),10000),Boolean.TRUE.equals(input.contentRightsAttested()),input.coverId(),document,url(input.organizerUrl(),false));
         if(existing!=null) {
             String status=Set.of("PUBLISHED","APPROVED","IN_REVIEW").contains(existing.get("status"))?"IN_REVIEW":"DRAFT";
             jdbc.update("UPDATE sober_event SET current_revision=?,status=?,version=version+1,updated_at=clock_timestamp() WHERE id=?",revision,status,id);
@@ -160,7 +175,11 @@ public class EventService {
     private UUID organizerFor(UUID id) { return (UUID)lockless(id).get("organizer_id"); }
     private Map<String,Object> lockless(UUID id) { var rows=jdbc.queryForList("SELECT * FROM sober_event WHERE id=?",id);if(rows.isEmpty())throw notFound();return rows.getFirst(); }
     private Map<String,Object> lock(UUID id) { var rows=jdbc.queryForList("SELECT * FROM sober_event WHERE id=? FOR UPDATE",id);if(rows.isEmpty())throw notFound();return rows.getFirst(); }
-    private Map<String,Object> revision(Map<String,Object> event) { return jdbc.queryForMap("SELECT * FROM events_revision WHERE event_id=? AND revision=?",event.get("id"),event.get("current_revision")); }
+    private Map<String,Object> revision(Map<String,Object> event) {
+        var content=jdbc.queryForMap("SELECT * FROM events_revision WHERE event_id=? AND revision=?",event.get("id"),event.get("current_revision"));
+        if(content.get("description_document")!=null) content.put("description_document",json.readTree(content.get("description_document").toString()));
+        return content;
+    }
     private void transition(Map<String,Object> event,Status to,Actor actor) { if(!EventPolicy.allowsTransition(Status.valueOf(event.get("status").toString()),to,actor)) throw conflict("Invalid event transition."); }
     private void expected(VersionRequest request,Map<String,Object> event) { if(request==null)throw bad("Expected version required.");version(request.expectedVersion(),event.get("version")); }
     private void update(Map<String,Object> event,Status status) { jdbc.update("UPDATE sober_event SET status=?,version=version+1,updated_at=clock_timestamp() WHERE id=?",status.name(),event.get("id")); }

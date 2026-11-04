@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I03 IN_PROGRESS (szczegóły/linki/kalendarz, NOT VERIFIED), P2-I00–P2-I02 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I04 IN_PROGRESS (ręczny panel wydarzeń, częściowy / NOT VERIFIED), P2-I00–P2-I03 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -846,12 +846,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I04 — Organizer identity & moderation portal
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — częściowy zakres panelu na polecenie właściciela; NOT VERIFIED  
+**Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00, P2-I01  
-**Dowód:** —  
-**Blokery:** —
+**Zależności iteracji:** P2-I00/P2-I01 pozostają NOT VERIFIED; właściciel zlecił ręczne dodawanie eventów z panelu podobnego do artykułów.  
+**Dowód:** `apps/consumer/src/events/EventEditorScreen.web.tsx`, `eventEditorApi.ts`, route `editorial-events`, wejście Profil, EN/PL; V18, EventInputs/Service/Catalog, member-only venue GET, formatowanie w EventDetailScreen; `backend/EVENT_EDITOR.md`.  
+**Blokery:** V17/V18 i backend wymagają aktywacji. Bez testów/buildów/typecheck, API/UI/migracji/restartów na polecenie właściciela. Publiczny profil organizatora i UI moderacji nie są wykonane w tym zawężonym zadaniu; istniejące API moderacji pozostaje. Checkboxy otwarte.
+
+**Implementacja 2026-11-04:** webowy panel Profil → Panel wydarzeń z własnymi organizatorami i biblioteką wydarzeń, tworzeniem/edycją szkiców, opisem Tiptap, zdjęciem/alt i HTTPS URL organizatora. Metadane katalogowe i zasady w osobnych grupach; bez fikcyjnych wartości. Wysłanie do weryfikacji zgodnie z aktualnym ACL/niezależną moderacją. V18 zapisuje dokument opisu i organizer_url w niezmiennych rewizjach; serwer waliduje treść istniejącym BlogDocument, publiczny reader RichDocument z fallbackiem plain. Paginacja50, expectedVersion, prywatne preview i revoke object URL, exact owned venue lookup. Część T02/T04 przygotowana; T01/T03 i pełny DoD niezaliczone. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
@@ -2181,12 +2183,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Bieżąca iteracja (2026-11-04):** `P2-I03` — Event detail, external checkout & links, IN_PROGRESS / NOT VERIFIED. Szczegóły, linki, ICS i wymagania SEO przygotowane; T01–T04/V01/V02 otwarte. P2-I00–P2-I02 nadal niezweryfikowane.
-- **Priorytet właściciela:** Myth Battle P1-I06 PARKED/TODO; lokalny rozwój Sober Events zatwierdzony. Otwarte bramki Phase 0/1 pozostają niezaliczone (ADR-010).
-- **Aktywna faza:** Phase 2 — IN_PROGRESS, 0/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE.
-- **Następny krok:** aktywacja backendu/V17 i odbiór przepływu lista→szczegóły→zewnętrzny link/kalendarz według `backend/EVENT_DETAIL.md` przez właściciela. P2-I04 (portal organizatora/moderacji) wymaga osobnego polecenia.
-- **Weryfikacja:** bez testów/buildów/typecheck, migracji/restartów i wywołań API/przeglądarki/symulatorów. Eksport ICS nie deklaruje zapisu do kalendarza; SEO produkcyjne i universal links wymagają finalnego hostingu/origin.
-- **Dokumentacja:** `backend/EVENT_DETAIL.md`, EVENTS_API/README, branding i tracker. CHANGELOG odroczony do rzeczywistego odbioru.
+- **Bieżąca iteracja (2026-11-04):** `P2-I04` — częściowy panel ręcznego dodawania/edycji eventów, IN_PROGRESS / NOT VERIFIED. Tiptap, zdjęcie i URL organizatora, własna biblioteka i wysłanie do recenzji przygotowane; pełny portal moderacji/publiczny profil organizatora pozostają niewykonane.
+- **Priorytet właściciela:** Myth Battle PARKED; rozwój Events. Poprzednie P2-I00–P2-I03 i bramki Phase 0/1 nie są automatycznie zaliczone.
+- **Aktywna faza:** Phase 2 — IN_PROGRESS, 0/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal13/15 DONE.
+- **Następny krok:** aktywacja V17/V18 i backendu, odbiór panelu przez właściciela według `backend/EVENT_EDITOR.md`. Reszta P2-I04 wymaga dalszego polecenia; P2-I05 nierozpoczęte.
+- **Weryfikacja:** bez testów/buildów/typecheck, migracji/restartów i wywołań API/UI. Zapis szkicu wymaga rzeczywistych pól istniejącego modelu, publikacja nadal przez niezależną moderację.
+- **Dokumentacja:** EVENT_EDITOR.md, EVENTS_API/README, branding i tracker. CHANGELOG odroczony do odbioru.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2603,3 +2605,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P2-I03 — szczegóły, checkout zewnętrzny i linki | IN_PROGRESS / NOT VERIFIED | Szczegóły /events/{UUID}, całe karty jako link, publiczny organizator, stany anulowania/zakończenia, HTTPS i domena przed wyjściem, rewalidacja celu, eksport ICS z UTC/escaping/folding, istniejący native scheme, runtime metadata i minimum SEO w EVENT_DETAIL.md. Korekta pill Articles: mniejsza gwiazdka i tło przy zachowaniu target48×44. | Zgodnie z poleceniem bez testów/buildów/weryfikacji/API/UI/migracji/restartów. T01–T04/V01/V02 otwarte; zależności niezaliczone. Produkcyjne SEO/universal links i natywny import wymagają odbioru. CHANGELOG odroczony; P2-I04 nierozpoczęte. |
 
 | 2026-11-04 | Articles — oznaczenie tygodnia bez zmiany wymiarów karty | NOT VERIFIED | Usunięto dodatkowy marginTop i paddingTop zależne od gwiazdki w PublicationCard. Badge pozostaje absolutną nakładką przy górnym prawym obrysie, lekko nad treścią; wspólny padding kart12, target i popover zachowane. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. Status P2-I03 bez zmian; CHANGELOG odroczony do odbioru. |
+
+| 2026-11-04 | Ręczny panel Events — częściowy P2-I04 | IN_PROGRESS / NOT VERIFIED | Na polecenie właściciela Profil → Panel wydarzeń, własne organizacje/biblioteka50, Tiptap, obraz/alt, organizer URL, metadane i zasady, zapis/edycja/submission z ACL, V18 rich JSON+URL i rich reader, prywatne owned venue GET. | Bez testów/buildów/weryfikacji/migracji/restartów. Publiczny profil i moderacja UI pozostają niewykonane; V17/V18 do aktywacji, pełny DoD niezaliczony. CHANGELOG odroczony. |

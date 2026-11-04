@@ -18,7 +18,8 @@ import static com.soberity.events.application.EventValidation.*;
 @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
 public class EventCatalog {
     private final JdbcTemplate jdbc;
-    public EventCatalog(JdbcTemplate jdbc) { this.jdbc=jdbc; }
+    private final tools.jackson.databind.json.JsonMapper json;
+    public EventCatalog(JdbcTemplate jdbc,tools.jackson.databind.json.JsonMapper json) { this.jdbc=jdbc;this.json=json; }
     public enum Sort { START_ASC, START_DESC, PRICE_ASC }
     public record Search(String q,String city,String country,String region,Sort sort,Track track,Category category,AlcoholPolicy alcoholPolicy,
         PriceKind priceKind,String currency,Long maxPriceMinor,Accessibility accessibility,Availability availability,
@@ -26,7 +27,7 @@ public class EventCatalog {
     private static final String FIELDS="""
         e.id,e.status,e.published_at,o.id AS organizer_id,o.name AS organizer_name,
         r.title,r.description,r.locale,r.track,r.category_code,r.alcohol_policy,r.alcohol_rules,
-        r.beverage_notes,r.starts_at,r.ends_at,r.timezone,r.price_kind,r.price_minor,r.currency,
+        r.organizer_url,r.beverage_notes,r.starts_at,r.ends_at,r.timezone,r.price_kind,r.price_minor,r.currency,
         r.accessibility,r.accessibility_notes,r.availability,r.entry_rules,r.external_ticket_url,r.cover_id,
         v.name AS venue_name,v.address,v.city,v.region,v.country_code,v.latitude,v.longitude,
         m.alt_text AS cover_alt_text
@@ -92,8 +93,9 @@ public class EventCatalog {
         return Map.of("items",items,"page",page,"size",size,"total",total);
     }
     public Map<String,Object> detail(UUID id) {
-        var rows=jdbc.queryForList("SELECT "+FIELDS+JOIN+" WHERE e.id=? AND "+detailGate(),id);
-        if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event unavailable.");return rows.getFirst();
+        var rows=jdbc.queryForList("SELECT "+FIELDS+",r.description_document "+JOIN+" WHERE e.id=? AND "+detailGate(),id);
+        if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event unavailable.");
+        var result=rows.getFirst();if(result.get("description_document")!=null)result.put("description_document",json.readTree(result.get("description_document").toString()));return result;
     }
     public List<Map<String,Object>> categories() { return jdbc.queryForList("SELECT code,track,label_en,label_pl FROM events_category ORDER BY track,code"); }
     public boolean publicMedia(UUID id) { return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 "+JOIN+" WHERE r.cover_id=? AND "+detailGate()+")",Boolean.class,id)); }

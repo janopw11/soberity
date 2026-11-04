@@ -26,6 +26,8 @@ public class EventOrganizerController {
     public void submitOrganization(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestBody VerificationRequest input) {organizers.submit(actor,id,input);}
     @PostMapping("/organizations/{id}/venues") @ResponseStatus(HttpStatus.CREATED)
     public Map<String,UUID> venue(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestBody VenueInput input) {return Map.of("id",events.venue(actor,id,input));}
+    @GetMapping("/organizations/{id}/venues/{venueId}")
+    public Map<String,Object> venueDetail(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@PathVariable UUID venueId) {return events.venueDetail(actor,id,venueId);}
     @GetMapping("/organizations/{id}/venues") public Map<String,Object> venues(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestParam(defaultValue="0") int page) {return events.venues(actor,id,page);}
     @PostMapping(value="/organizations/{id}/media",consumes=MediaType.MULTIPART_FORM_DATA_VALUE) @ResponseStatus(HttpStatus.CREATED)
     public Map<String,UUID> upload(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestParam MultipartFile file,@RequestParam String altText) throws IOException {

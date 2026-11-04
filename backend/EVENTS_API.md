@@ -165,3 +165,12 @@ UTF-8 ICS attachment, no-store; cancelled/ended410, unavailable404.
 See [EVENT_DETAIL.md](EVENT_DETAIL.md) for app routes, external links, calendar
 import limitations and minimum production SEO requirements. NOT VERIFIED;
 no migration beyond V17, no build/restart performed.
+
+### Manual event editor — V18 (pending, NOT VERIFIED)
+
+Organizer event input accepts optional `descriptionDocument` (allowlisted Tiptap
+JSON, no inline images) and `organizerUrl` (HTTPS). Stored per immutable revision;
+public details return `description_document` and `organizer_url`; legacy records
+fall back to plain description/organization website. Private owned venue lookup:
+`GET /api/v1/organizer/organizations/{id}/venues/{venueId}`. Web entry and scope
+are documented in [EVENT_EDITOR.md](EVENT_EDITOR.md). No migration/restart run.

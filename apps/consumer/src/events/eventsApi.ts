@@ -41,6 +41,7 @@ export function dateBoundary(value: string, exclusiveEnd = false): string | unde
 export const CATEGORY_CODES = ['SOBER_PARTY', 'SOBER_RAVE', 'DANCE', 'LIVE_MUSIC', 'COFFEE_MEETUP', 'SPORT', 'OUTDOORS', 'WORKSHOP', 'CULTURE', 'OTHER'] as const;
 
 export type EventDetail = DiscoveryEvent & {
+  description_document?: import('../science/scienceApi').DocumentNode | null; organizer_url?: string | null;
   status: 'PUBLISHED' | 'CANCELLED'; description: string; alcohol_rules: string; beverage_notes: string;
   entry_rules: string; accessibility_notes: string | null; address: string;
   organizer_id: string; external_ticket_url: string | null;

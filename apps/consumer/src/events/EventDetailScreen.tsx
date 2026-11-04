@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Alert, Button, Dialog, LoadingState, Screen, SettingsIcon } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
-import { ReadingCard, ReadingText } from '../science/readingUi';
+import { ReadingCard, ReadingText, RichDocument } from '../science/readingUi';
 import { downloadCalendar } from './calendarDownload';
 import { EventMetadata } from './EventMetadata';
 import { EventRequestError, eventImageUri, eventsGet, organizerGet, safeEventLink, validEventId, type EventDetail, type PublicOrganizer } from './eventsApi';
@@ -61,7 +61,7 @@ function Detail({ id }: { id: string | null }) {
   };
   const active = Boolean(event && event.status === 'PUBLISHED' && new Date(event.ends_at).getTime() > now);
   const ticketUrl = safeEventLink(event?.external_ticket_url);
-  const organizerUrl = safeEventLink(organizer?.website);
+  const organizerUrl = safeEventLink(event?.organizer_url ?? organizer?.website);
   const destination = target === 'tickets' ? ticketUrl : target === 'organizer' ? organizerUrl : null;
   const perform = async (kind: 'calendar' | 'tickets' | 'organizer') => {
     if (!id || busy) return;
@@ -80,7 +80,7 @@ function Detail({ id }: { id: string | null }) {
           url = safeEventLink(current.external_ticket_url);
           if (current.availability === 'SOLD_OUT' || url !== ticketUrl) {setEvent(current);setTarget(null);throw new Error('Ticket link changed');}
         } else {
-          const host = await organizerGet(current.organizer_id, controller.signal);url = safeEventLink(host.website);
+          const host = await organizerGet(current.organizer_id, controller.signal);url = safeEventLink(current.organizer_url ?? host.website);
           if (url !== organizerUrl) {setOrganizer(host);setTarget(null);throw new Error('Organizer link changed');}
         }
         if (!url || controller.signal.aborted) throw new Error('Invalid link');
@@ -119,7 +119,7 @@ function Detail({ id }: { id: string | null }) {
       <Text style={[styles.price, {color: colors.primary}]}>{price}</Text>
       {event.availability !== 'UNKNOWN' ? <ReadingText muted>{t(`events.availability.${event.availability}`)}</ReadingText> : null}
     </View>
-    <Section title={t('events.detail.about')}><ReadingText>{event.description}</ReadingText></Section>
+    <Section title={t('events.detail.about')}><>{event.description_document ? <RichDocument node={event.description_document} /> : <ReadingText>{event.description}</ReadingText>}</></Section>
     <Section title={t('events.detail.soberRules')}>
       {event.alcohol_policy === 'SOBER_FRIENDLY' ? <ReadingText muted>{t('events.friendlyHint')}</ReadingText> : null}
       <ReadingText>{event.alcohol_rules}</ReadingText><ReadingText muted>{event.beverage_notes}</ReadingText>

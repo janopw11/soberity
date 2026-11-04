@@ -18,7 +18,7 @@ public final class EventInputs {
         String beverageNotes,OffsetDateTime startsAt,OffsetDateTime endsAt,String timezone,
         PriceKind priceKind,Long priceMinor,String currency,Accessibility accessibility,String accessibilityNotes,
         Availability availability,String entryRules,String externalTicketUrl,String sourceUrl,String sourceReference,
-        Boolean contentRightsAttested,UUID coverId) { }
+        Boolean contentRightsAttested,UUID coverId,tools.jackson.databind.JsonNode descriptionDocument,String organizerUrl) { }
     public record VersionRequest(Integer expectedVersion) { }
     public record Checks(Boolean sourceVerified,Boolean contentRightsVerified,Boolean alcoholControlsVerified,Boolean beverageAbvVerified) {
         public boolean complete() { return Boolean.TRUE.equals(sourceVerified) && Boolean.TRUE.equals(contentRightsVerified) && Boolean.TRUE.equals(alcoholControlsVerified) && Boolean.TRUE.equals(beverageAbvVerified); }

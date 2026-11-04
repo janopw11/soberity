@@ -102,3 +102,8 @@ P2-I03 adds `/events/{uuid}` details, external organizer/ticket links and public
 ICS export. [EVENT_DETAIL.md](EVENT_DETAIL.md) records boundaries, native import
 limitations and production SEO prerequisites. All runtime checks remain NOT
 VERIFIED; no test/build/migration/restart performed.
+
+Manual Events web panel: Profile → Events panel (`/editorial-events`), Tiptap,
+photo and organizer URL, own-event library/editing/submission. Pending V18 stores
+rich descriptions alongside V17's event model. See [EVENT_EDITOR.md](EVENT_EDITOR.md).
+Scoped P2-I04 work, NOT VERIFIED; no tests/build/migration/restart performed.
