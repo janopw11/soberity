@@ -162,13 +162,7 @@ function LearningCatalog({ quizzesOnly }: { quizzesOnly: boolean }) {
             )}
           </>
         )}
-        {!quizzesOnly ? (
-          <Button
-            variant="tertiary"
-            label={t('discover.back')}
-            onPress={() => router.push('/science')}
-          />
-        ) : null}
+
       </View>
       {(!quizzesOnly || category !== null) &&
       !error &&

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Alert, Button, LoadingState, Screen } from '../ui';
 import EvidenceCard, { useReadingDate } from './EvidenceCard';
@@ -9,7 +9,6 @@ import { mediaUri, ScienceError, scienceGet, type Article, type Post } from './s
 type Kind = 'post' | 'article' | 'evidence';
 export default function ArticleScreen({ kind }: { kind: Kind }) {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const { t, i18n } = useTranslation();
   const date = useReadingDate();
   const [data, setData] = useState<Post | Article | null>(null);
@@ -31,7 +30,6 @@ export default function ArticleScreen({ kind }: { kind: Kind }) {
   const post = data && 'document' in data ? data : null;
   const article = data && 'body' in data ? data : null;
   return <Screen maxWidth={760}>
-    <Button variant="tertiary" label={t('discover.back')} onPress={() => router.replace('/science')} />
     {!validId || error !== null ? <ReadingCard><Alert variant="danger" message={t(!validId || error === 404 ? 'discover.notFound' : 'discover.error')} />{validId && error !== 404 ? <Button variant="secondary" label={t('discover.retry')} onPress={() => retry(value => value + 1)} /> : null}</ReadingCard> : kind === 'evidence' ? <EvidenceCard claimId={id} /> : !data ? <LoadingState label={t('discover.loading')} /> : <>
       {!post || post.publication_route === 'REVIEWED' ? <ReadingText muted>{t('discover.reviewedArticle')}</ReadingText> : null}
       <ReadingText heading>{data.title}</ReadingText>

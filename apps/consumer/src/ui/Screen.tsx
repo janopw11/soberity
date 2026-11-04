@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { useRef, type PropsWithChildren } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -22,6 +22,8 @@ type ScreenProps = PropsWithChildren<{
   contentStyle?: StyleProp<ViewStyle>;
   /** Wraps content in a KeyboardAvoidingView for screens with text inputs. */
   avoidKeyboard?: boolean;
+  /** Scroll viewport for lightweight visibility-triggered presentation. */
+  onViewportChange?: (viewport: { offsetY: number; height: number; scrolled: boolean }) => void;
 }>;
 
 export function Screen({
@@ -30,7 +32,10 @@ export function Screen({
   maxWidth = 1120,
   contentStyle,
   avoidKeyboard = false,
+  onViewportChange,
 }: ScreenProps) {
+  const offset = useRef(0);
+  const scrolled = useRef(false);
   const { colors } = useThemePreferences();
   const styles = createStyles(colors);
   const content = (
@@ -41,6 +46,13 @@ export function Screen({
     <ScrollView
       contentContainerStyle={styles.scrollContent}
       keyboardShouldPersistTaps="handled"
+      onLayout={onViewportChange ? event => onViewportChange({ offsetY: offset.current, height: event.nativeEvent.layout.height, scrolled: scrolled.current }) : undefined}
+      onScroll={onViewportChange ? event => {
+        if (Math.abs(event.nativeEvent.contentOffset.y - offset.current) > 0.5) scrolled.current = true;
+        offset.current = event.nativeEvent.contentOffset.y;
+        onViewportChange({ offsetY: offset.current, height: event.nativeEvent.layoutMeasurement.height, scrolled: scrolled.current });
+      } : undefined}
+      scrollEventThrottle={onViewportChange ? 32 : undefined}
     >
       {content}
     </ScrollView>

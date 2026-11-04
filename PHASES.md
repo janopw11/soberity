@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/7), P1-I03 i P1-I05 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -73,7 +73,7 @@ Blockers: opis lub —
 | Faza | Główny zakres | Iteracje | Ukończone | Status |
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
-| Phase 1 | Science & Discover MVP | 7 | 4/7 | IN_PROGRESS |
+| Phase 1 | Science & Discover MVP | 6 | 4/6 | IN_PROGRESS |
 | Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 79 iteracji agentowych; wykonane: **16/79** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web).
+**Łącznie:** 78 iteracji agentowych; wykonane: **17/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -557,10 +557,12 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 # Phase 1 — Science & Discover MVP
 
 **Status fazy:** IN_PROGRESS
-**Cel:** Źródłowa baza wiedzy, recenzja treści, Discover, fiszki, quizy i Weekly Science Drop.  
+**Cel:** Źródłowa baza wiedzy, recenzja treści, Discover, fiszki i quizy.  
 **Zależności:** lokalne fundamenty Phase 0; odroczenie zdalnego odbioru P0-I13 zatwierdzone przez właściciela 2026-11-03 (`docs/adr/004-local-phase-1-before-staging.md`). Phase 0 pozostaje otwarta.
 **Raport główny:** §3.2, §24, §25  
-**Iteracje:** 7
+**Iteracje:** 6
+
+**Zmiana planu 2026-11-04:** na polecenie właściciela usunięto iterację `P1-I05` z planu; identyfikator pozostaje wycofany i nie jest ponownie używany. Historyczne wpisy sesji zachowano. Nie oznaczono iteracji jako DONE ani nie usunięto kodu aplikacji.
 
 ## P1-I00 — Scientific content schema & source policy
 
@@ -702,44 +704,12 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Definition of Done:** Działający quiz z uzasadnieniem i klikanym źródłem. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
-## P1-I05 — Weekly Science Drop & publishing cadence
-
-**Obowiązująca decyzja właściciela 2026-11-04 — Artykuł tygodnia:** zrezygnowano z osobnego typu/edytora Science Drop. Weekly Science Drop pozostaje nazwą sekcji Home, a panel Artykuł tygodnia wybiera istniejący opublikowany ARTICLE do wyróżnienia od razu lub od terminu. V15 zapisuje tylko referencję i datę, bez kopii treści; karta otwiera /science/post/{id}. Aktualizacje/wycofanie wynikają z opublikowanej wersji artykułu. Zwykłe Articles zachowują własną ścieżkę publikacji/recenzji. Stare Science Drop/audyty zachowane do odczytu, historyczny scheduler wyłączony i stare zapisy HTTP 410. ADR-009 zastępuje wcześniejsze decyzje o osobnym materiale.
-
-**Decyzja właściciela 2026-11-04 — Opublikuj / Zaplanuj:** właściciel wyraźnie zatwierdził bezpośrednią publikację NEWS jak Articles. Autor może opublikować od razu lub zaplanować na przyszły termin; niezależna recenzja opcjonalna. Treść i źródła nadal wymagane. V14 rozróżnia AUTHOR/REVIEWED bez fikcyjnej daty/osoby recenzenta; stare wydania EVIDENCE nadal wymagają recenzji i aktualnych dowodów. Ta decyzja zastępuje pierwotny wymóg obowiązkowej recenzji każdego nowego Science Drop.
-
-**Korekta właściciela 2026-11-04 — krótki news jak artykuł:** właściciel wskazał, że Save draft jest niedostępne, i zlecił prosty formularz jak Articles z wyborem daty/godziny publikacji. Nowy tryb NEWS nie wymaga osobnego EvidenceClaim: tytuł, kanoniczny dokument Tiptap, bezpośrednie źródła HTTPS i datetime picker w strefie przeglądarki. Częściowe szkice zapisywalne i edytowalne; kompletność i przyszły termin wymagane przy submit, niezależna recenzja przed publikacją zachowana. Slug/teaser/przegląd po 6 miesiącach automatyczne. V13 zachowuje stare wydania EVIDENCE; ADR-008 dokumentuje uzgodniony kierunek. Checkboxy nadal otwarte do odbioru.
-
-**Status:** IN_PROGRESS — implementacja do ręcznego odbioru; NOT VERIFIED  
-**Started:** 2026-11-04  
-**Finished:** —  
-**Zależności iteracji:** P1-I02, P1-I03  
-**Dowód:** kod `backend/src/main/java/com/soberity/discovery/*`, migracja V12, `apps/consumer/src/discovery/*`, trasy czytnika i redakcji, integracja Home/Articles, EN/PL; kontrakt i instrukcja odbioru `backend/WEEKLY_SCIENCE_API.md`. T01–T04 zaimplementowane, checkboxy pozostają otwarte do rzeczywistej weryfikacji.  
-**Blokery:** P1-I03 nadal IN_PROGRESS; start P1-I05 wyraźnie zlecony przez właściciela. Na obowiązujące polecenie właściciela bez testów i dodatkowej weryfikacji; nie uruchomiono buildów, migracji V12, restartów API/Expo, check/lint/typecheck, wywołań API ani przeglądarki/symulatorów. Brak zasianych treści naukowych: publikacja wymaga przygotowanego materiału i niezależnego recenzenta.
-
-**Implementacja 2026-11-04:** typ Science Drop z pytaniem refleksyjnym, teaserem, wnioskiem, co ustalono/czego nie ustalono, metodą, populacją i klasyfikacją nowe/przypominane badanie. Powiązanie do konkretnej opublikowanej, recenzowanej i aktualnej wersji EvidenceClaim ze źródłami; EN/PL oddzielnie. DRAFT → IN_REVIEW → SCHEDULED po niezależnej recenzji → PUBLISHED przez scheduler; ARCHIVED do korekt/wycofania. Daty jako instants, strefa IANA dla redakcji, slot jednego wydania/język/tydzień ISO UTC i ochrona unikalnym indeksem. Scheduler co 60 s (start po 10 s), blokada transakcyjna między instancjami, blokady wierszy wydania i dowodów, wspólny commit publikacji/audytu. DB trigger chroni niezmienność treści, recenzję, terminy i dozwolone przejścia. Publiczne API jawnie projektuje pola bez tożsamości redakcji; ukrywa szkice, przyszłe terminy, wycofane/przestarzałe dowody i terminy ponownego przeglądu; no-store. Home/Articles: karta aktualnego materiału, fallback do ostatniego nadal aktualnego wydania z etykietą archiwum albo uczciwy empty state. Czytnik z odkrywaniem wniosków, źródłami i wersją dowodów. Panel web z konta: tworzenie szkicu, paginacja dowodów/kolejki, pełna inspekcja materiału i dowodów, submit/approve/archive z notatką i kontrolą ról. Brak XP/push/Myth Battle i startu P1-I06.
-
-**Odbiór:** instrukcje dat przyszłych, offsetów/DST i granic tygodnia, DRAFT/ACL, recenzji własnego materiału, wycofania dowodów, fallbacku i wielu instancji zapisano w `backend/WEEKLY_SCIENCE_API.md`; żadna z tych czynności nie została wykonana w tej sesji. Web/iOS/Android, EN/PL light/dark, dostępność i kontrakty NOT VERIFIED. CHANGELOG bez nowego wpisu do potwierdzenia implementacji.
-
-**Zakres zadań:**
-
-- [ ] `P1-I05-T01` Wprowadź wybór Artykułu tygodnia z istniejących opublikowanych artykułów, z zachowaniem dat i pochodzenia recenzji artykułu (zmiana zakresu właściciela 2026-11-04; ADR-009).
-- [ ] `P1-I05-T02` Dodaj planowanie tygodniowego wyróżnienia od wskazanego momentu, bezpieczną zmianę/usunięcie wyboru i audyt; widoczność według czasu w API zastępuje osobny scheduler (ADR-009).
-- [ ] `P1-I05-T03` Zbuduj kartę tygodnia w Discover.
-- [ ] `P1-I05-T04` Zaprojektuj fallback do wcześniejszego nadal opublikowanego Artykułu tygodnia lub pustego stanu.
-
-**Weryfikacja:**
-
-- [ ] `P1-I05-V01` Test przyszłych dat publikacji, stref czasowych i ukrywania DRAFT.
-
-**Definition of Done:** Zgodnie z decyzją właściciela 2026-11-04 Weekly Science Drop wyróżnia istniejący opublikowany artykuł i otwiera jego zwykły czytnik, bez drugiego edytora i kopii treści. Przyszłe wybory/szkice i wycofane artykuły nie są ujawniane, pochodzenie recenzji jest uczciwe, historia wcześniejszych Science Drop zachowana. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki odbioru są zapisane.
-
 ## P1-I06 — Myth Battle, seed data & phase gate
 
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P1-I04, P1-I05  
+**Zależności iteracji:** P1-I04  
 **Dowód:** —  
 **Blokery:** —
 
@@ -755,7 +725,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 - [ ] `P1-I06-V01` Test, że wycofany claim nie trafia do nowej rozgrywki.
 - [ ] `P1-I06-V02` Sprawdź źródła i blokady uprawnień.
 
-**Definition of Done:** Discover+Weekly Drop+Myth Battle działają na recenzowanych treściach. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Discover+Myth Battle działają na recenzowanych treściach. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
 ### Gate — Phase 1
 
@@ -1048,7 +1018,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P1-I05, P2-I06  
+**Zależności iteracji:** P1-I03, P2-I06  
 **Dowód:** —  
 **Blokery:** —
 
@@ -1056,7 +1026,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 - [ ] `P3-I04-T01` Dodaj preferencje kanałów: email, native push i web fallback.
 - [ ] `P3-I04-T02` Zaimplementuj rejestrację/unieważnianie tokenów Expo i zgodę na push.
-- [ ] `P3-I04-T03` Powiadamiaj o Science Drop i wydarzeniach zgodnie z preferencjami.
+- [ ] `P3-I04-T03` Powiadamiaj o nowych artykułach naukowych i wydarzeniach zgodnie z preferencjami.
 - [ ] `P3-I04-T04` Dodaj rate limit, opt-out i deduplikację wysyłek.
 
 **Weryfikacja:**
@@ -2200,12 +2170,11 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Bieżąca iteracja (2026-11-04):** `P1-I05` — Artykuł tygodnia pod nazwą Weekly Science Drop na Home, IN_PROGRESS. Selekcja istniejącego artykułu zastępuje osobny typ/edytor; T/V checkboxy otwarte do odbioru. Bez testów i dodatkowej weryfikacji na polecenie właściciela.
-- **Aktywacja lokalna (2026-11-04):** backend przebudowany bez testów i zrestartowany z uproszczonym edytorem; Flyway zastosował V16 (tekst podglądu artykułu), aplikacja uruchomiona na 8090. Log `/private/tmp/soberity-article-preview-backend-start.log`. Odbiór zapisu newsa/UI/API i pełnej P1-I05 nadal otwarty.
-- **Następny krok:** ręczny odbiór `P1-I05-V01` i T01–T04 według ADR-009: wybór opublikowanego artykułu teraz/od terminu, daty/strefy, zmiana/usunięcie wyboru, ACL, wycofanie artykułu i fallback, historia legacy, UI EN/PL light/dark na web/iOS/Android. Nie rozpoczęto P1-I06.
-- **Ostatnio ukończono:** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela 2026-11-04; wszystkie T01–T04 i V01–V02 zaznaczone. Historyczne ograniczenia zachowane.
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 4/7 DONE. P1-I03 nadal IN_PROGRESS; P0-I03A i P0-I13 pozostają otwarte. Bramka Phase 1 nie została zamknięta.
-- **Dokumentacja:** kontrakt i macierz ręcznego odbioru Weekly Science w `backend/WEEKLY_SCIENCE_API.md`, README klienta i BRANDING zaktualizowane. CHANGELOG dla P1-I05 odroczony do weryfikacji; wpis zamknięcia P1-I04 pozostaje.
+- **Zmiana planu (2026-11-04):** na wyraźne polecenie właściciela usunięto z planu iterację Weekly Science Drop & publishing cadence (`P1-I05`). Historyczne wpisy sesji i istniejący kod pozostają; nie zadeklarowano ukończenia ani nowych wyników testów.
+- **Aktualna faza:** Phase 1 — IN_PROGRESS, 4/6 DONE. P1-I03 pozostaje IN_PROGRESS; P0-I03A i P0-I13 pozostają otwarte. Bramka Phase 1 nie została zamknięta.
+- **Ostatnio ukończono:** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela 2026-11-04.
+- **Następny krok:** oczekiwanie na polecenie właściciela; otwarty odbiór P1-I03, a P1-I06 pozostaje TODO i nie jest rozpoczynane automatycznie. Zależność P3-I04 kieruje do biblioteki artykułów P1-I03 zamiast usuniętej iteracji.
+- **Dokumentacja:** zmieniono wyłącznie PHASES.md; brak wpisu CHANGELOG, ponieważ jest to zmiana planu, a nie ukończona funkcjonalność. Bez testów i dodatkowej weryfikacji.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2604,3 +2573,11 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P1-I05 — gwiazdka z popover zamiast tekstowego pill | IN_PROGRESS / NOT VERIFIED | PublicationCard badge: pill z SettingsIcon star, osobny IconHint poza linkiem. Tooltip EN/PL hover/focus/tap, target48×44, Escape/blur, brak nawigacji po kliknięciu gwiazdy, popover przy prawym obrysie poniżej przycisku. Wspólny IconHint rozszerzony o wariant pill i obsługę focus; BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
 
 | 2026-11-04 | P1-I05 — spójne obrysy Home i uproszczone Articles | IN_PROGRESS / NOT VERIFIED | PublicationCard featured używa colors.border jak Today’s spotlight i karta Events; zachowany focusRing. PostPublicationCard list bez preview/opisu i dodatkowej etykiety recenzji, z tytułem/kategorią/datą; Home featured nadal wyświetla zapisany preview, gwiazdka tygodnia zachowana. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — zlecona animacja podglądu biletu Home | IN_PROGRESS / NOT VERIFIED | Mała korekta Home na wyraźne polecenie właściciela, bez startu Phase2: EventTicketPreview dzieli zdjęcie na główną część/odcinek, jednorazowe odsunięcie/obrót/powrót po przewinięciu i widoczności. Screen opcjonalnie raportuje viewport bez rerenderów na każdy scroll; WelcomeScreen wykrywa widoczność tylko pierwszego biletu, próg60%/180ms. RN Animated, reduced motion i cleanup, bez nowych zależności. Branding uzupełniony, preview eventu pozostaje jawnym podglądem. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; web/native/reduced-motion NOT VERIFIED. CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05 i korekty Home. |
+
+| 2026-11-04 | P1-I05 — bez Back to Discover, wolniejsze naderwanie biletu | IN_PROGRESS / NOT VERIFIED | ArticleScreen i LearningScreen bez przycisku Back to Discover; usunięto nieużywany router z czytnika. EventTicketPreview: sekwencja650ms oderwanie +900ms pauza +800ms powrót; zachowana jednorazowość i reduced motion. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — animacja biletu 1,5 s | IN_PROGRESS / NOT VERIFIED | EventTicketPreview:400ms oderwanie +600ms pauza +500ms powrót =1500ms; BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | Plan — usunięcie iteracji Weekly Science Drop | Iteracja usunięta z planu na polecenie właściciela | PHASES.md: usunięto sekcję i checklistę P1-I05, poprawiono licznik Phase1 do4/6 i łącznie17/78, zakres fazy, zależności P1-I06/P3-I04 oraz aktualny punkt pracy. ID nie jest ponownie używane; historyczne wpisy i kod aplikacji zachowane. | Bez testów i dodatkowej weryfikacji; CHANGELOG bez wpisu, wyłącznie zmiana planu. Następna praca tylko na polecenie właściciela. |

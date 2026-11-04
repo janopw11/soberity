@@ -1,138 +1,73 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { radii, spacing, typography } from '@soberity/design-tokens';
-
+import { useFocusEffect } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+import { spacing } from '@soberity/design-tokens';
 import { Screen } from './ui';
 import { DailySpotlight } from './DailySpotlight';
-import { useThemePreferences } from './preferences/ThemePreferencesContext';
 import { ChapterHeading } from './ChapterHeading';
 import WeeklyScienceCard from './discovery/WeeklyScienceCard';
-
-// Owner-provided preview photograph. Preserve the original and crop in the viewport.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const viennaRaveImage = require('../assets/images/schonbrunn-vienna-preview.jpeg');
+import { EventTicketPreview } from './events/EventTicketPreview';
 
 /** Member-only home, mounted by the authenticated route group. */
 export default function WelcomeScreen() {
   const { t } = useTranslation();
-  const { colors } = useThemePreferences();
-  const styles = createStyles(colors);
+  const [revealTicket, setRevealTicket] = useState(false);
+  const seen = useRef(false);
+  const homeFocused = useRef(true);
+  const visibility = useRef({ sectionY: 0, ticketY: 0, ticketHeight: 0, offsetY: 0, height: 0, scrolled: false });
+  const visibilityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const updateVisibility = useCallback(() => {
+    if (seen.current || !homeFocused.current) return;
+    const value = visibility.current;
+    const top = value.sectionY + value.ticketY + spacing.space8;
+    const visibleHeight = Math.max(0, Math.min(top + value.ticketHeight, value.offsetY + value.height) - Math.max(top, value.offsetY));
+    const visible = value.scrolled && value.ticketHeight > 0 && value.height > 0 && visibleHeight >= Math.min(value.ticketHeight * 0.6, value.height * 0.6);
+    if (!visible && visibilityTimer.current !== null) { clearTimeout(visibilityTimer.current); visibilityTimer.current = null; }
+    if (visible && visibilityTimer.current === null) visibilityTimer.current = setTimeout(() => {
+      seen.current = true; setRevealTicket(true); visibilityTimer.current = null;
+    }, 180);
+  }, []);
+  useFocusEffect(useCallback(() => {
+    homeFocused.current = true;
+    updateVisibility();
+    return () => {
+      homeFocused.current = false;
+      if (visibilityTimer.current !== null) clearTimeout(visibilityTimer.current);
+      visibilityTimer.current = null;
+    };
+  }, [updateVisibility]));
+  useEffect(() => () => { if (visibilityTimer.current !== null) clearTimeout(visibilityTimer.current); }, []);
 
   return (
-    <Screen maxWidth={800}>
+    <Screen maxWidth={800} onViewportChange={viewport => {
+      visibility.current.offsetY = viewport.offsetY;
+      visibility.current.height = viewport.height;
+      visibility.current.scrolled = viewport.scrolled;
+      updateVisibility();
+    }}>
       <WeeklyScienceCard />
       <View style={styles.section}>
         <ChapterHeading icon="sun">{t('home.todaysSpotlight')}</ChapterHeading>
         <DailySpotlight />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={event => {
+        visibility.current.sectionY = event.nativeEvent.layout.y;
+        updateVisibility();
+      }}>
         <ChapterHeading icon="calendar">{t('home.eventsNearYou')}</ChapterHeading>
-        <ImageBackground
-          source={viennaRaveImage}
-          resizeMode="cover"
-          style={styles.featureCard}
-          imageStyle={styles.ticketImage}
-        >
-          <View style={styles.ticketOverlay}>
-            <View style={styles.featureContent}>
-              <View style={styles.categoryPill}>
-                <Text style={styles.featureCategory}>{t('home.viennaRave.category')}</Text>
-              </View>
-              <Text accessibilityRole="header" style={styles.featureTitle}>{t('home.viennaRave.title')}</Text>
-              <Text style={styles.featureDescription}>{t('home.viennaRave.location')}</Text>
-            </View>
-            <View style={styles.ticketStub}>
-              <View style={styles.ticketStamp}>
-                <Text style={styles.ticketStubLabel}>{t('home.viennaRave.ticketPreview')}</Text>
-              </View>
-            </View>
-          </View>
-        </ImageBackground>
+        <View onLayout={event => {
+          visibility.current.ticketY = event.nativeEvent.layout.y;
+          visibility.current.ticketHeight = event.nativeEvent.layout.height;
+          updateVisibility();
+        }}>
+          <EventTicketPreview reveal={revealTicket} />
+        </View>
       </View>
 
     </Screen>
   );
 }
 
-function createStyles(
-  colors: ReturnType<typeof useThemePreferences>['colors'],
-) {
-  return StyleSheet.create({
-    section: { gap: spacing.space16 },
-    featureCard: {
-      width: '100%',
-      overflow: 'hidden',
-      borderRadius: radii.sm,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.surfaceAlt,
-    },
-    ticketImage: { borderRadius: radii.sm },
-    ticketOverlay: {
-      minHeight: 180,
-      flexDirection: 'row',
-      alignItems: 'stretch',
-      backgroundColor: colors.eventImageScrim,
-    },
-    ticketStub: {
-      width: '24%',
-      maxWidth: 144,
-      justifyContent: 'center',
-      padding: spacing.space12,
-      borderLeftWidth: 1,
-      borderColor: colors.eventImageText,
-      backgroundColor: colors.eventImageScrim,
-    },
-    ticketStamp: {
-      borderTopWidth: 1,
-      borderBottomWidth: 1,
-      borderColor: colors.eventImageText,
-      paddingVertical: spacing.space12,
-    },
-    ticketStubLabel: {
-      ...typography.caption,
-      fontWeight: '600',
-      letterSpacing: 0.5,
-      color: colors.eventImageText,
-      textAlign: 'center',
-      textTransform: 'uppercase',
-    },
-    featureContent: {
-      flex: 1,
-      minWidth: 0,
-      justifyContent: 'flex-end',
-      gap: spacing.space8,
-      padding: spacing.space16,
-    },
-    categoryPill: {
-      alignSelf: 'flex-start',
-      maxWidth: '100%',
-      marginBottom: 'auto',
-      borderRadius: radii.pill,
-      paddingVertical: spacing.space4 / 2,
-      paddingHorizontal: spacing.space8,
-      backgroundColor: colors.primary,
-    },
-    featureCategory: {
-      ...typography.caption,
-      color: colors.onPrimary,
-      letterSpacing: 0.2,
-      textTransform: 'uppercase',
-    },
-    featureTitle: {
-      ...typography.h2,
-      color: colors.eventImageText,
-      flexShrink: 1,
-    },
-    featureDescription: {
-      ...typography.small,
-      color: colors.eventImageText,
-    },
-  });
-}
+const styles = StyleSheet.create({ section: { gap: spacing.space16 } });
