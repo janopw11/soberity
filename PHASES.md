@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I01 IN_PROGRESS (model danych/API, NOT VERIFIED), P2-I00 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -74,7 +74,7 @@ Blockers: opis lub —
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 6 | 4/6 | IN_PROGRESS |
-| Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | TODO |
+| Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | IN_PROGRESS |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
 | Phase 5 | Community — grupy, posty, interakcje i moderacja | 7 | 0/7 | TODO |
@@ -706,7 +706,8 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I06 — Myth Battle, seed data & phase gate
 
-**Status:** TODO  
+**Status:** TODO
+**Priorytet:** PARKED (approved by owner, 2026-11-04) — Myth Battle odłożone na później; właściciel polecił przejść do Sober Events. Bramka Phase 1 nie jest przez to zaliczona. Powrót do tej iteracji wymaga osobnego polecenia.  
 **Started:** —  
 **Finished:** —  
 **Zależności iteracji:** P1-I04  
@@ -738,20 +739,24 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 # Phase 2 — Sober Events — katalog, organizerzy, kontakt
 
-**Status fazy:** TODO  
+**Status fazy:** IN_PROGRESS  
 **Cel:** Międzynarodowy katalog głównie sober rave/party, rozszerzony o lifestyle; bez własnych płatności.  
 **Zależności:** Phase 0; interfejs Discover można rozwijać równolegle do Phase 1 po zatwierdzeniu kontraktów.  
 **Raport główny:** §3.3–§3.4, §7–§8, §13  
 **Iteracje:** 7
 
+**Decyzja priorytetowa 2026-11-04:** start lokalnego P2-I00 na wyraźne polecenie właściciela, z odłożonym Myth Battle. Otwarte bramki Phase 0/1 nie są zaliczone; odroczenie zdalnego P0-I13 dla lokalnych prac zapisano w ADR-010.
+
 ## P2-I00 — Event policy, taxonomy & trust
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — implementacja do odbioru; NOT VERIFIED  
+**Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P0-I13  
-**Dowód:** —  
-**Blokery:** —
+**Zależności iteracji:** P0-I13 — lokalny start zatwierdzony przez właściciela 2026-11-04 mimo otwartego staging/remote, ADR-010; zależność nie jest oznaczona DONE.  
+**Dowód:** `docs/policies/EVENTS_POLICY.md`, `docs/policies/EVENTS_POLICY_SCENARIOS.md` (scenariusze nieuruchomione), `backend/src/main/java/com/soberity/events/domain/EventPolicy.java`, `backend/EVENTS_POLICY.md`, ADR-010. T01–T04 przygotowane/zaimplementowane, checkboxy otwarte do rzeczywistego odbioru.  
+**Blokery:** brak blokera lokalnego przygotowania polityki; na obowiązujące polecenie właściciela bez testów i dodatkowej weryfikacji. Nie uruchomiono kompilacji/lint/buildów, API, migracji, przeglądarki ani symulatorów. Kryteria produktu i domyślna retencja wymagają odbioru właściciela; żaden organizator/event nie został zatwierdzony.
+
+**Implementacja 2026-11-04:** podział SOBER_NIGHTLIFE/SOBER_LIFESTYLE, kategorie i oddzielna polityka ALCOHOL_FREE/SOBER_FRIENDLY. Domyślne wyniki wyłącznie PUBLISHED+ALCOHOL_FREE+VERIFIED; friendly osobny opt-in, bez cichego fallbacku. Polityka: brak sprzedaży/serwowania/BYOB dla strict; unknown nie jest false, zasady ABV wymagają wyjaśnienia przez moderatora. Kryteria kwalifikacji hosta, źródeł/uprawnień do treści, public/private projekcji, minimalizacji i okresów retencji. Cykl DRAFT/IN_REVIEW/CHANGES_REQUESTED/APPROVED/PUBLISHED/REJECTED/CANCELLED/ARCHIVED, niezależny moderator i unieważnienie po materialnych zmianach. Czysta klasa domenowa koduje enumy, wstępną ocenę z reason codes i dopuszczalne przejścia; nie zastępuje późniejszego ACL/version guards i nie publikuje automatycznie. Scenariusze akceptacyjne zapisane bez wykonania. Nie dodano API/DB/UI ani rzeczywistych wydarzeń; P2-I01 i P2-I02 nierozpoczęte. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
@@ -768,12 +773,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I01 — Events data model & APIs
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
+**Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00  
-**Dowód:** —  
-**Blokery:** —
+**Zależności iteracji:** P2-I00 pozostaje NOT VERIFIED; start P2-I01 na wyraźne polecenie właściciela 2026-11-04, bez zaliczania wcześniejszej iteracji/bramek.  
+**Dowód:** `backend/src/main/resources/db/migration/V17__events_catalog_and_moderation.sql`, `backend/src/main/java/com/soberity/events/application/`, `backend/src/main/java/com/soberity/events/api/`, `SecurityConfig.java`, `backend/EVENTS_API.md`.  
+**Blokery:** wykonanie migracji i odbiór techniczny pozostają do wykonania. Na polecenie właściciela bez testów, kompilacji, dodatkowej weryfikacji i restartu. Checkboxy T01–T04/V01 otwarte; nie deklarowano DONE.
+
+**Implementacja 2026-11-04:** V17: organizatorzy i członkostwo, osobna lista moderatorów, kategorie, niezmienne lokalizacje/media, wersjonowane wydarzenia, niezależne review, audyt i schemat ContactInquiry (bez wysyłki). API organizatora tworzy/odczytuje/edytuje/zgłasza i anuluje; moderacja weryfikuje organizatora, ocenia treść i publikuje. Publiczne projekcje ograniczają pola i widoczność do zatwierdzonych danych zweryfikowanych organizatorów; strict domyślnie, friendly jawnie. Wyszukiwanie: daty, miasto/kraj, kategoria/track, cena/waluta, dostępność/availability, język i opcjonalny promień; paginacja. Daty UTC+IANA, kontrola offsetu/DST, walidacja HTTPS bez pobierania URL, normalizacja zdjęć istniejącym BlogImages. Edycja wycofuje publikację do ponownej moderacji; anulowanie udostępnia wyłącznie ostatni opublikowany snapshot. Integracja z tombstone usuwania kont. Nie dodano eventów demonstracyjnych ani interfejsu P2-I02/P2-I03. CHANGELOG odroczony do rzeczywistej weryfikacji.
 
 **Zakres zadań:**
 
@@ -2170,11 +2177,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Zmiana planu (2026-11-04):** na wyraźne polecenie właściciela usunięto z planu iterację Weekly Science Drop & publishing cadence (`P1-I05`). Historyczne wpisy sesji i istniejący kod pozostają; nie zadeklarowano ukończenia ani nowych wyników testów.
-- **Aktualna faza:** Phase 1 — IN_PROGRESS, 4/6 DONE. P1-I03 pozostaje IN_PROGRESS; P0-I03A i P0-I13 pozostają otwarte. Bramka Phase 1 nie została zamknięta.
-- **Ostatnio ukończono:** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela 2026-11-04.
-- **Następny krok:** oczekiwanie na polecenie właściciela; otwarty odbiór P1-I03, a P1-I06 pozostaje TODO i nie jest rozpoczynane automatycznie. Zależność P3-I04 kieruje do biblioteki artykułów P1-I03 zamiast usuniętej iteracji.
-- **Dokumentacja:** zmieniono wyłącznie PHASES.md; brak wpisu CHANGELOG, ponieważ jest to zmiana planu, a nie ukończona funkcjonalność. Bez testów i dodatkowej weryfikacji.
+- **Bieżąca iteracja (2026-11-04):** `P2-I01` — Events data model & APIs, IN_PROGRESS / NOT VERIFIED. V17 i backend API przygotowane; T01–T04/V01 pozostają otwarte do odbioru. P2-I00 również niezweryfikowane.
+- **Priorytet właściciela:** Myth Battle P1-I06 PARKED/TODO; lokalny rozwój Sober Events zatwierdzony. Otwarte bramki Phase 0/1 pozostają niezaliczone (ADR-010).
+- **Aktywna faza:** Phase 2 — IN_PROGRESS, 0/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE.
+- **Następny krok:** właściciel uruchamia migrację V17 i odbiór P2-I01 według `backend/EVENTS_API.md`. P2-I02 (UI discovery) wymaga osobnego polecenia; nie rozpoczęto.
+- **Weryfikacja:** zgodnie z poleceniem bez testów, buildów, migracji/restartów i wywołań API. Dotychczasowy Home ticket pozostaje jawnym Preview.
+- **Dokumentacja:** `backend/EVENTS_API.md`, README, polityka P2-I00 i ADR-010. CHANGELOG bez nowego wpisu do rzeczywistego odbioru.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2581,3 +2589,7 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P1-I05 — animacja biletu 1,5 s | IN_PROGRESS / NOT VERIFIED | EventTicketPreview:400ms oderwanie +600ms pauza +500ms powrót =1500ms; BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
 
 | 2026-11-04 | Plan — usunięcie iteracji Weekly Science Drop | Iteracja usunięta z planu na polecenie właściciela | PHASES.md: usunięto sekcję i checklistę P1-I05, poprawiono licznik Phase1 do4/6 i łącznie17/78, zakres fazy, zależności P1-I06/P3-I04 oraz aktualny punkt pracy. ID nie jest ponownie używane; historyczne wpisy i kod aplikacji zachowane. | Bez testów i dodatkowej weryfikacji; CHANGELOG bez wpisu, wyłącznie zmiana planu. Następna praca tylko na polecenie właściciela. |
+
+| 2026-11-04 | P2-I00 — start Sober Events; Myth Battle odłożone | IN_PROGRESS / NOT VERIFIED | Na wyraźne polecenie właściciela P1-I06 oznaczono PARKED (TODO, bez zaliczania bramki) i rozpoczęto tylko P2-I00. Polityka/taksonomia/organizatorzy/źródła/retencja/moderacja w docs/policies, klasa EventPolicy z enumami i reason codes/przejściami, scenariusze nieuruchomione, README backendu i ADR-010. | Bez testów i dodatkowej weryfikacji; bez kompilacji, migracji/restartów i API/UI. Checkboxy/Finished pozostają otwarte; CHANGELOG odroczony. Następna P2-I01 dopiero po kolejnym poleceniu; bramki Phase 0/1 nadal otwarte. |
+
+| 2026-11-04 | P2-I01 — model danych i API wydarzeń | IN_PROGRESS / NOT VERIFIED | Na polecenie właściciela rozpoczęto dokładnie P2-I01. V17, model wersjonowany, ACL członkostwa/moderatorów, niezależne review i publikacja, publiczny katalog z filtrami/paginacją/geo, UTC+IANA, walidacja i normalizacja obrazów, integracja usuwania kont; kontrakt backend/EVENTS_API.md. | Bez testów/buildów/dodatkowej weryfikacji, uruchomienia migracji/restartu. T01–T04/V01 i Finished otwarte. CHANGELOG odroczony. P2-I02/P2-I03 nierozpoczęte; P2-I00 nie jest automatycznie zaliczone. |

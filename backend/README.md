@@ -76,3 +76,19 @@ until the author writes a preview. No health claims or summaries are generated.
 V16 local activation: package with tests skipped BUILD SUCCESS, Flyway applied
 V16, API started on8090. Log `/private/tmp/soberity-article-preview-backend-start.log`.
 No additional tests or API/UI verification performed.
+
+### Sober Events — P2-I00 foundation
+
+The owner parked Myth Battle and started local Events policy work. See
+[EVENTS_POLICY.md](EVENTS_POLICY.md) for taxonomy, preliminary domain policy,
+moderation/verification boundaries and acceptance scenarios. No Events API,
+migration or real catalog is introduced yet. P2-I00 remains NOT VERIFIED;
+tests/builds and extra verification were omitted at the owner’s request.
+
+### Sober Events — P2-I01 data and APIs
+
+[EVENTS_API.md](EVENTS_API.md) documents pending migration V17, organizer/member
+ACL, independent moderation, UTC/IANA dates, public search and bounded media.
+This supersedes the P2-I00 foundation-only scope above. No Events UI or inquiry
+sending is included. Implementation is NOT VERIFIED: no build, tests, migration
+execution, API checks or restart performed at the owner's request.
