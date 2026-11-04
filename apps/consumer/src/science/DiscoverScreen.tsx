@@ -8,6 +8,7 @@ import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
 import { documentText, mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
+import { ChapterHeading } from '../ChapterHeading';
 
 type Item = Post | Article | Claim;
 type FeedItem = { type: 'POST' | 'ARTICLE' | 'CLAIM'; content: Item };
@@ -46,7 +47,7 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
     return () => { clearTimeout(timeout); controller.abort(); };
   }, [compact, locale, page, attempt]);
   const content = <>
-    <ReadingText heading>{t(compact ? 'discover.latest' : 'discover.articles')}</ReadingText>
+    <ChapterHeading>{t(compact ? 'discover.latest' : 'discover.articles')}</ChapterHeading>
     {error ? <ReadingCard><Alert variant="danger" message={t('discover.error')} /><Button label={t('discover.retry')} variant="secondary" onPress={() => retry(value => value + 1)} /></ReadingCard> : !data ? <LoadingState label={t('discover.loading')} /> : data.items.length === 0 ? <ReadingCard><ReadingText heading>{t('discover.emptyTitle')}</ReadingText><ReadingText muted>{t('discover.empty')}</ReadingText>{page > 0 ? <Button variant="secondary" label={t('discover.firstPage')} onPress={() => setPage(0)} /> : null}</ReadingCard> : <>
       {(compact ? data.items.slice(0, 3) : data.items).map(({ type, content: item }) => {
         const post = 'document' in item ? item : null;

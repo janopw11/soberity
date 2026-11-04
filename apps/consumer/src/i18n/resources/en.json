@@ -269,6 +269,8 @@
       "title": "Sober rave Vienna",
       "location": "Schönbrunn · Vienna",
       "preview": "Sober rave · Preview",
+      "ticketPreview": "Preview",
+      "category": "Sober rave",
       "imageAlt": "Illuminated Schönbrunn Palace with Vienna at dusk"
     }
   },
