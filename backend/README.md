@@ -92,3 +92,8 @@ ACL, independent moderation, UTC/IANA dates, public search and bounded media.
 This supersedes the P2-I00 foundation-only scope above. No Events UI or inquiry
 sending is included. Implementation is NOT VERIFIED: no build, tests, migration
 execution, API checks or restart performed at the owner's request.
+
+P2-I02 adds shared web/native `/events` discovery and the region/sort query
+parameters. See [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md) for scope, location
+privacy/native manual-coordinate fallback and the unexecuted acceptance handoff.
+No test/build, V17 activation or restart performed in this iteration.

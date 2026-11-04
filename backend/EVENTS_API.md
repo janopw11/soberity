@@ -149,3 +149,11 @@ edit/review/publish/cancel and suspension visibility; timezone/DST and ambiguous
 local times; strict/friendly/unknown controls; date/price/accessibility/geo filters,
 page boundaries, invalid links/images and cross-organizer venue/cover IDs;
 account erasure and cancellation snapshot behavior. No real events are seeded.
+
+### P2-I02 discovery extension — NOT VERIFIED
+
+Search additionally accepts `region` (case-insensitive exact venue region) and
+`sort=START_ASC|START_DESC|PRICE_ASC`, default START_ASC. Sort is applied before
+pagination with deterministic ID tie-breakers. PRICE_ASC requires one ISO
+currency. Shared web/native discovery, date semantics and owner acceptance are
+in [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md). No additional migration beyond V17.

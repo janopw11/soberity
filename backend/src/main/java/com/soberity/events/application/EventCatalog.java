@@ -19,7 +19,8 @@ import static com.soberity.events.application.EventValidation.*;
 public class EventCatalog {
     private final JdbcTemplate jdbc;
     public EventCatalog(JdbcTemplate jdbc) { this.jdbc=jdbc; }
-    public record Search(String q,String city,String country,Track track,Category category,AlcoholPolicy alcoholPolicy,
+    public enum Sort { START_ASC, START_DESC, PRICE_ASC }
+    public record Search(String q,String city,String country,String region,Sort sort,Track track,Category category,AlcoholPolicy alcoholPolicy,
         PriceKind priceKind,String currency,Long maxPriceMinor,Accessibility accessibility,Availability availability,
         Instant from,Instant to,String locale,Double latitude,Double longitude,Double radiusKm,Integer page,Integer size) { }
     private static final String FIELDS="""
@@ -55,6 +56,7 @@ public class EventCatalog {
         add(where,args,"r.track=?",input.track()==null?null:input.track().name());
         add(where,args,"r.category_code=?",input.category()==null?null:input.category().name());
         add(where,args,"lower(v.city)=lower(?)",optional(input.city(),150));
+        add(where,args,"lower(v.region)=lower(?)",optional(input.region(),150));
         add(where,args,"v.country_code=?",input.country()==null?null:country(input.country()));
         add(where,args,"r.price_kind=?",input.priceKind()==null?null:input.priceKind().name());
         add(where,args,"r.accessibility=?",input.accessibility()==null?null:input.accessibility().name());
@@ -77,9 +79,16 @@ public class EventCatalog {
             where.append(" AND v.latitude IS NOT NULL AND (6371.0088 * acos(least(1.0,greatest(-1.0,sin(radians(?))*sin(radians(v.latitude))+cos(radians(?))*cos(radians(v.latitude))*cos(radians(v.longitude-?))))))<=?");
             args.add(input.latitude());args.add(input.latitude());args.add(input.longitude());args.add(input.radiusKm());
         }
+        Sort sort=input.sort()==null?Sort.START_ASC:input.sort();
+        if(sort==Sort.PRICE_ASC && input.currency()==null) throw bad("Price sorting requires a single currency.");
+        String order=switch(sort) {
+            case START_ASC -> "r.starts_at ASC,e.id";
+            case START_DESC -> "r.starts_at DESC,e.id";
+            case PRICE_ASC -> "r.price_minor ASC NULLS LAST,r.starts_at ASC,e.id";
+        };
         long total=jdbc.queryForObject("SELECT count(*) "+JOIN+" WHERE "+where,Long.class,args.toArray());
         args.add(size);args.add((long)page*size);
-        var items=jdbc.queryForList("SELECT "+FIELDS+JOIN+" WHERE "+where+" ORDER BY r.starts_at,e.id LIMIT ? OFFSET ?",args.toArray());
+        var items=jdbc.queryForList("SELECT "+FIELDS+JOIN+" WHERE "+where+" ORDER BY "+order+" LIMIT ? OFFSET ?",args.toArray());
         return Map.of("items",items,"page",page,"size",size,"total",total);
     }
     public Map<String,Object> detail(UUID id) {
