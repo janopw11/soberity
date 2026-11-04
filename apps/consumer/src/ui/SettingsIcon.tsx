@@ -2,6 +2,11 @@ import { Platform } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export type SettingsIconName =
+  | 'star'
+  | 'arrowUpRight'
+  | 'calendar'
+  | 'book'
+  | 'flask'
   | 'brain'
   | 'people'
   | 'question'
@@ -25,6 +30,11 @@ export type SettingsIconName =
   | 'alert';
 
 const ICON_PATHS: Record<SettingsIconName, string[]> = {
+  star: ['M12 3l2.8 5.7 6.3.9-4.6 4.4 1.1 6.3L12 17.3l-5.6 3 1.1-6.3L3 9.6l6.2-.9L12 3z'],
+  arrowUpRight: ['M7 17L17 7', 'M7 7h10v10'],
+  calendar: ['M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z', 'M8 3v4 M16 3v4 M4 10h16', 'M8 14h2 M14 14h2 M8 17h2'],
+  book: ['M12 6v15', 'M12 6C9 4 6 4 3 5v14c3-1 6-1 9 2 3-3 6-3 9-2V5c-3-1-6-1-9 1z'],
+  flask: ['M9 3h6 M10 3v7L5 19a1.3 1.3 0 0 0 1.2 2h11.6a1.3 1.3 0 0 0 1.2-2l-5-9V3', 'M8 15h8'],
   brain: [
     'M12 5c-2-4-7-2-6 2-4 0-5 6-2 8-1 4 4 7 8 4V5z',
     'M12 5c2-4 7-2 6 2 4 0 5 6 2 8 1 4-4 7-8 4',

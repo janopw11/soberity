@@ -1,65 +1,62 @@
-import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-
+import { useId, useState, type ReactNode } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { radii, spacing, typography } from '@soberity/design-tokens';
-
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 type IconHintProps = {
   text: string;
   children: ReactNode;
+  /** Border badge: accessible target, right-aligned popover below the icon. */
+  pill?: boolean;
 };
 
-/** Shows `text` as a popover on hover (web), or on tap/long press (native). The icon stays the visible label. */
-export function IconHint({ text, children }: IconHintProps) {
+/** Hover/focus hints with a separately toggleable tap state on every platform. */
+export function IconHint({ text, children, pill = false }: IconHintProps) {
   const { colors } = useThemePreferences();
-  const [visible, setVisible] = useState(false);
-
-  return (
-    <Pressable
-      accessibilityRole="image"
-      accessibilityLabel={text}
-      onHoverIn={() => setVisible(true)}
-      onHoverOut={() => setVisible(false)}
-      onPress={() => setVisible((value) => !value)}
-      onLongPress={() => setVisible(true)}
-      style={styles.wrap}
+  const id = useId();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const visible = !dismissed && (hovered || focused || pinned);
+  return <Pressable
+    accessibilityRole="button"
+    accessibilityLabel={text}
+    accessibilityState={{ expanded: visible }}
+    onHoverIn={() => { setHovered(true); setDismissed(false); }}
+    onHoverOut={() => setHovered(false)}
+    onFocus={() => { setFocused(true); setDismissed(false); }}
+    onBlur={() => { setFocused(false); setPinned(false); }}
+    onPress={event => { event.stopPropagation(); setDismissed(false); setPinned(value => !value); }}
+    onLongPress={() => { setDismissed(false); setPinned(true); }}
+    {...(Platform.OS === 'web' ? {
+      'aria-describedby': visible ? id : undefined,
+      onKeyDown: (event: { key: string; stopPropagation: () => void }) => {
+        if (event.key === 'Escape') { setDismissed(true); setPinned(false); event.stopPropagation(); }
+      },
+    } : {})}
+    style={[
+      styles.wrap,
+      pill && [styles.pill, { backgroundColor: colors.primary, borderColor: focused ? colors.focusRing : colors.surface }],
+    ]}
+  >
+    {children}
+    {visible ? <View
+      nativeID={id}
+      pointerEvents="none"
+      importantForAccessibility="no"
+      {...(Platform.OS === 'web' ? { role: 'tooltip' as const } : {})}
+      style={[styles.bubble, pill ? styles.bubbleBelow : styles.bubbleAbove, { backgroundColor: colors.textPrimary }]}
     >
-      {children}
-      {visible ? (
-        <View
-          pointerEvents="none"
-          importantForAccessibility="no"
-          style={[styles.bubble, { backgroundColor: colors.textPrimary }]}
-        >
-          <Text
-            numberOfLines={1}
-            style={[styles.text, { color: colors.background }]}
-          >
-            {text}
-          </Text>
-        </View>
-      ) : null}
-    </Pressable>
-  );
+      <Text style={[styles.text, { color: colors.background }]}>{text}</Text>
+    </View> : null}
+  </Pressable>;
 }
-
 const styles = StyleSheet.create({
   wrap: { minWidth: 22, minHeight: 22, justifyContent: 'center' },
-  bubble: {
-    position: 'absolute',
-    bottom: '100%',
-    left: 0,
-    marginBottom: spacing.space8,
-    paddingHorizontal: spacing.space12,
-    paddingVertical: spacing.space4,
-    borderRadius: radii.sm,
-    zIndex: 10,
-    elevation: 4,
-  },
-  text: {
-    fontSize: typography.small.fontSize,
-    lineHeight: typography.small.lineHeight,
-    fontWeight: typography.label.fontWeight,
-  },
+  pill: { minWidth: 48, minHeight: 44, alignItems: 'center', borderRadius: radii.pill, borderWidth: 2, paddingHorizontal: spacing.space12, paddingVertical: spacing.space8 },
+  bubble: { position: 'absolute', width: 200, maxWidth: 240, paddingHorizontal: spacing.space12, paddingVertical: spacing.space8, borderRadius: radii.sm, zIndex: 30, elevation: 4 },
+  bubbleAbove: { bottom: '100%', left: 0, marginBottom: spacing.space8 },
+  bubbleBelow: { top: '100%', right: 0, marginTop: spacing.space8 },
+  text: { ...typography.small, fontWeight: typography.label.fontWeight },
 });

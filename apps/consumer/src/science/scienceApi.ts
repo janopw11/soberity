@@ -8,7 +8,7 @@ export type DocumentNode = {
 export type Page<T> = { items: T[]; page: number; size: number; total: number };
 export type Category = { code: string; label: string };
 export type Post = {
-  id: string; title: string; document: DocumentNode;
+  id: string; title: string; preview_content?: string | null; document: DocumentNode;
   evidence: { title: string; url: string }[]; category_code: string;
   cover_id: string | null; cover_alt: string | null;
   created_at: string; updated_at: string; published_at: string;

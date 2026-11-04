@@ -16,6 +16,7 @@ export default function AuthenticatedLayout() {
           headerTitle: () => <AppLogo />,
         }}
       />
+      <Stack.Screen name="editorial-weekly" options={{ title: t('weekly.editorTitle') }} />
       <Stack.Screen name="editorial-quizzes" options={{ title: t('learning.editor.title') }} />
       <Stack.Screen
         name="editorial-evidence"

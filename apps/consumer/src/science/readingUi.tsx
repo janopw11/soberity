@@ -3,6 +3,8 @@ import { useEffect, useState, type PropsWithChildren } from 'react';
 import { Image, Linking, Platform, Pressable, StyleSheet, Text, View, type TextStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { radii, spacing, typography } from '@soberity/design-tokens';
+import { IconHint } from '../ui/IconHint';
+import { SettingsIcon } from '../ui/SettingsIcon';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { documentText, mediaUri, researchUrl, type DocumentNode } from './scienceApi';
 
@@ -15,40 +17,51 @@ export function ReadingCard({ children }: PropsWithChildren) {
   return <View style={{ gap: spacing.space12, padding: spacing.space16, backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radii.lg }}>{children}</View>;
 }
 /** Real web anchor (including modifier-click/new tab) and shared native navigation. */
-export function PublicationCard({ href, title, children, variant = 'card' }: PropsWithChildren<{ href: Href; title: string; variant?: 'card' | 'list' }>) {
+export function PublicationCard({ href, title, children, variant = 'card', badge }: PropsWithChildren<{ href: Href; title: string; variant?: 'card' | 'list' | 'featured'; badge?: string | undefined }>) {
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [badgeHeight, setBadgeHeight] = useState(44);
   return (
     <View style={{
-      width: variant === 'list' ? 800 : '100%',
+      width: variant !== 'card' ? 800 : '100%',
       maxWidth: '100%',
       minWidth: 0,
       alignSelf: 'center',
-      overflow: 'hidden',
-      borderRadius: variant === 'list' ? radii.md : radii.xl,
-      borderWidth: variant === 'list' ? 1 : 2,
+      overflow: badge ? 'visible' : 'hidden',
+      marginTop: badge ? badgeHeight / 2 : 0,
+      zIndex: badge ? 2 : 0,
+      borderRadius: variant === 'featured' ? radii.lg : variant === 'list' ? radii.md : radii.xl,
+      borderWidth: variant === 'card' ? 2 : 1,
       borderStyle: 'solid',
-      borderColor: focused ? colors.focusRing : variant === 'list' && !hovered && !pressed ? colors.border : colors.primary,
-      backgroundColor: pressed || hovered ? colors.surfaceAlt : variant === 'list' ? colors.listSurface : colors.surface,
+      borderColor: focused ? colors.focusRing : variant === 'featured' ? colors.border : variant === 'list' && !hovered && !pressed ? colors.border : colors.primary,
+      backgroundColor: pressed || hovered || (variant === 'featured' && focused) ? colors.surfaceAlt : variant === 'list' ? colors.listSurface : colors.surface,
       ...(focused && Platform.OS === 'web' ? { outlineColor: colors.focusRing, outlineWidth: 2, outlineStyle: 'solid' as const, outlineOffset: 2 } : {}),
     }}>
       <Link href={href} asChild>
         <Pressable
           accessibilityRole="link"
-          accessibilityLabel={title}
+          accessibilityLabel={badge ? `${title}. ${badge}` : title}
           onFocus={() => setFocused(true)}
           onBlur={() => { setFocused(false); setPressed(false); }}
           onHoverIn={() => setHovered(true)}
           onHoverOut={() => setHovered(false)}
           onPressIn={() => setPressed(true)}
           onPressOut={() => setPressed(false)}
-          style={{ width: '100%', minHeight: 48, flexDirection: variant === 'list' ? 'row' : 'column', alignItems: 'stretch', ...(variant === 'list' ? { gap: spacing.space16, padding: spacing.space12 } : {}) }}
+          style={{ width: '100%', minHeight: 48, flexDirection: variant === 'list' ? 'row' : 'column', alignItems: 'stretch', ...(variant === 'list' ? { gap: spacing.space16, padding: spacing.space12, ...(badge ? { paddingTop: Math.max(spacing.space12, badgeHeight / 2 + spacing.space8) } : {}) } : variant === 'featured' ? { gap: 0, opacity: pressed ? 0.96 : 1 }  : {}) }}
         >
           {children}
         </Pressable>
       </Link>
+      {badge ? <View
+        onLayout={event => setBadgeHeight(event.nativeEvent.layout.height)}
+        style={{ position: 'absolute', top: 0, right: spacing.space12, transform: [{ translateY: -badgeHeight / 2 }], zIndex: 3 }}
+      >
+        <IconHint text={badge} pill>
+          <SettingsIcon name="star" size={20} color={colors.onPrimary} />
+        </IconHint>
+      </View> : null}
     </View>
   );
 }

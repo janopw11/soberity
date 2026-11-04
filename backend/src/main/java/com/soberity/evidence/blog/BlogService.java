@@ -23,10 +23,14 @@ public class BlogService {
     private final JsonMapper json;
     public BlogService(JdbcTemplate jdbc,EditorialService access,JsonMapper json) {this.jdbc=jdbc;this.access=access;this.json=json;}
     public record Evidence(String title,String url) { }
-    public record Draft(Integer expectedVersion,String kind,String title,JsonNode document,List<Evidence> evidence,String categoryCode,UUID coverId,String action) { }
+    public record Draft(Integer expectedVersion,String kind,String title,JsonNode document,List<Evidence> evidence,String categoryCode,UUID coverId,String action,String previewContent) {
+        public Draft(Integer expectedVersion,String kind,String title,JsonNode document,List<Evidence> evidence,String categoryCode,UUID coverId,String action) {
+            this(expectedVersion,kind,title,document,evidence,categoryCode,coverId,action,null);
+        }
+    }
     public record Decision(int version,String decision,String notes) { }
     public record Page(List<Map<String,Object>> items,int page,int size,long total) { }
-    private static final String PROJECTION="SELECT p.id,p.author_uid,p.created_at,v.id AS revision_id,v.version,v.kind,v.title,v.document,v.evidence,v.category_code,v.cover_id,m.alt_text AS cover_alt,v.status,v.reviewed_by,v.review_notes,v.created_at AS updated_at,v.published_at FROM editorial_post p JOIN editorial_post_version v ON v.post_id=p.id LEFT JOIN editorial_media m ON m.id=v.cover_id ";
+    private static final String PROJECTION="SELECT p.id,p.author_uid,p.created_at,v.id AS revision_id,v.version,v.kind,v.title,v.preview_content,v.document,v.evidence,v.category_code,v.cover_id,m.alt_text AS cover_alt,v.status,v.reviewed_by,v.review_notes,v.created_at AS updated_at,v.published_at FROM editorial_post p JOIN editorial_post_version v ON v.post_id=p.id LEFT JOIN editorial_media m ON m.id=v.cover_id ";
 
     private void role(VerifiedToken actor,String required) {
         if(!access.roles(actor).contains(required))throw error(HttpStatus.FORBIDDEN,"Editorial role required.");
@@ -79,6 +83,9 @@ public class BlogService {
     public UUID save(VerifiedToken actor,UUID id,Draft draft) {
         role(actor,"AUTHOR");
         String title=text(draft.title(),500);
+        String preview=draft.previewContent()==null?null:draft.previewContent().strip().replaceAll("\\s+"," ");
+        if(preview!=null && preview.isEmpty()) preview=null;
+        if(preview!=null && preview.length()>280) throw error(HttpStatus.BAD_REQUEST,"Article preview must be at most 280 characters.");
         if(!Set.of("ARTICLE","EDITORIAL").contains(draft.kind()))throw error(HttpStatus.BAD_REQUEST,"Invalid material type");
         if(!Set.of("DRAFT","PUBLISH","REVIEW").contains(draft.action()))throw error(HttpStatus.BAD_REQUEST,"Invalid action");
         if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM science_category WHERE code=?)",Boolean.class,draft.categoryCode())))throw error(HttpStatus.BAD_REQUEST,"Category required");
@@ -104,7 +111,7 @@ public class BlogService {
             version=current+1;
         }
         UUID revision=UUID.randomUUID();
-        jdbc.update("INSERT INTO editorial_post_version(id,post_id,version,kind,title,document,evidence,category_code,cover_id,status) VALUES (?,?,?,?,?,?::jsonb,?::jsonb,?,?,'DRAFT')",revision,id,version,draft.kind(),title,json.writeValueAsString(checked.document()),json.writeValueAsString(evidence),draft.categoryCode(),draft.coverId());
+        jdbc.update("INSERT INTO editorial_post_version(id,post_id,version,kind,title,preview_content,document,evidence,category_code,cover_id,status) VALUES (?,?,?,?,?,?,?::jsonb,?::jsonb,?,?,'DRAFT')",revision,id,version,draft.kind(),title,preview,json.writeValueAsString(checked.document()),json.writeValueAsString(evidence),draft.categoryCode(),draft.coverId());
         for(UUID media:images)jdbc.update("INSERT INTO editorial_post_media VALUES (?,?)",revision,media);
         audit(actor,revision,"SAVED","Saved version "+version,"POST");
         // Older unpublished versions leave the queue; published predecessor stays live until replacement.

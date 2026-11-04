@@ -56,3 +56,23 @@ Discover uses `GET /api/v1/science/feed?locale=en&page=0` for one timeline of
 published blog posts, reviewed articles and evidence cards (20/page, newest
 publication first). It reuses the existing public projections within a repeatable
 read transaction, preserving withdrawal rules. Existing catalogs remain.
+
+### Weekly Science Drop — P1-I05
+
+Implementation and local activation instructions: [WEEKLY_SCIENCE_API.md](WEEKLY_SCIENCE_API.md).
+V12 adds independently reviewed scheduled issues and immutable editorial audit.
+The in-process scheduler publishes due eligible issues; public reads recheck
+publication time, expiry and pinned evidence. No seeded content, notifications
+or XP. P1-I05 implementation has not been compiled, migrated or tested in its
+implementation session, as requested by the owner.
+
+Article preview (V16): POST/PUT editorial posts accept optional `previewContent`
+(plain text, max280 characters; blank/null clears it). Private/public post
+projections return `preview_content`. Stored per immutable article revision,
+so draft changes do not leak into the published preview. Weekly feature and
+Discover use the same published post projection. Existing articles remain NULL
+until the author writes a preview. No health claims or summaries are generated.
+
+V16 local activation: package with tests skipped BUILD SUCCESS, Flyway applied
+V16, API started on8090. Log `/private/tmp/soberity-article-preview-backend-start.log`.
+No additional tests or API/UI verification performed.

@@ -5,12 +5,13 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Alert, Button, LoadingState, Screen, SettingsIcon, TextField } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
-import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
-import { mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
+import { PublicationCard, ReadingCard, ReadingText } from './readingUi';
+import { scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
 import { Pagination } from '../ui/Pagination';
 import { ChapterHeading } from '../ChapterHeading';
 import CategorySelect from './CategorySelect';
+import { PostPublicationCard } from './PostPublicationCard';
 
 const SEARCH_DEBOUNCE_MS = 500;
 
@@ -37,6 +38,7 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
   }, [searchInput]);
   const [attempt, retry] = useState(0);
   useFocusEffect(useCallback(() => { retry(value => value + 1); }, []));
+  const [weeklyArticle, setWeeklyArticle] = useState<{ locale: string; id: string | null } | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [data, setData] = useState<Page<FeedItem> | null>(null);
   const [error, setError] = useState(false);
@@ -61,8 +63,19 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
       .finally(() => clearTimeout(timeout));
     return () => { clearTimeout(timeout); controller.abort(); };
   }, [compact, locale, page, query, category, attempt]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setWeeklyArticle(null);
+    if (compact) return () => controller.abort();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    void scienceGet<{ article: Post | null }>(`/api/v1/discover/weekly/current?locale=${locale}`, controller.signal)
+      .then(value => { if (!controller.signal.aborted) setWeeklyArticle({ locale, id: value.article?.id ?? null }); })
+      .catch(() => { /* An unavailable optional marker must not block article browsing. */ })
+      .finally(() => clearTimeout(timeout));
+    return () => { clearTimeout(timeout); controller.abort(); };
+  }, [compact, locale, attempt]);
   const content = <>
-    {compact ? <ChapterHeading>{t('discover.latest')}</ChapterHeading> : null}
+    {compact ? <ChapterHeading icon="book">{t('discover.latest')}</ChapterHeading> : null}
     {!compact ? <View style={styles.filters}>
       <View style={styles.searchField}>
         <TextField
@@ -95,20 +108,16 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
         const title = claim ? claim.claim_text : (item as Article | Post).title;
         const target = post ? 'post' : claim ? 'evidence' : 'article';
         const category = 'category_code' in item ? (categories.find(value => value.code === item.category_code)?.label ?? item.category_code) : null;
+        if (post) return <PostPublicationCard key={`${type}:${item.id}`} post={post} categoryLabel={category ?? undefined} articleOfWeek={!compact && weeklyArticle?.locale === locale && weeklyArticle.id === post.id} />;
         return <PublicationCard key={`${type}:${item.id}`} href={`/science/${target}/${item.id}`} title={title} variant="list">
-          {post?.cover_id ? (
-            <View style={styles.listThumbnail}>
-              <ReadingImage uri={mediaUri(post.cover_id)} alt={post.cover_alt || title} cover thumbnail />
-            </View>
-          ) : null}
           <View style={styles.listContent}>
-            {!post || post.publication_route === 'REVIEWED' ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t(claim ? 'discover.evidence' : 'discover.reviewedArticle')}</Text> : null}
+            <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t(claim ? 'discover.evidence' : 'discover.reviewedArticle')}</Text>
             <Text accessibilityRole="header" style={[styles.cardTitle, { color: colors.primary }]}>{title}</Text>
             <View style={styles.listMeta}>
               {category ? <View style={[styles.categoryPill, { backgroundColor: colors.primary }]}>
                 <Text style={[styles.cardMeta, { color: colors.onPrimary }]}>{category}</Text>
               </View> : null}
-              <Text style={[styles.cardMeta, { color: colors.textMuted }]}>{date(post ? post.created_at : item.published_at)}</Text>
+              <Text style={[styles.cardMeta, { color: colors.textMuted }]}>{date(item.published_at)}</Text>
             </View>
             {claim ? <Text style={[styles.cardMeta, { color: colors.textSecondary }]}>{t('discover.certainty')}: {t(`discover.levels.${claim.evidence_level}`, { defaultValue: t('discover.notProvided') })}</Text> : null}
           </View>

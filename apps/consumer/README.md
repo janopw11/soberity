@@ -273,3 +273,53 @@ Science → Articles searches a case-insensitive title substring and filters by 
 ### Saved quiz results (P1-I04)
 
 Signed-in users save a server-scored completion when pressing Finish; saving unfinished answers remains optional. Cards load private results, display the latest percentage and use blue for unfinished / red <40 / orange 40–79 / green >=80. Every completed quiz can be retaken; the previous result remains until a new completion. Completion retries reuse an opaque attempt ID and preserve answers on failure. Guest scores remain in-session. Forget learning data/account deletion removes saved results. Backend migration V10 and a restart are required (applied locally during implementation).
+
+### P1-I05 — Weekly Science Drop (implementation, NOT VERIFIED)
+
+Home and Articles now include `WeeklyScienceCard`. Open a published issue at
+`/science/weekly/{slug}?locale=en|pl`; the reader includes a reflection question,
+revealed findings, methodology, population, certainty, limitations, review dates
+and sources. No XP, timer or push notifications in this iteration.
+
+Editorial members on web enter **Account → Science Drop editor**
+(`/editorial-weekly`): prepare a draft using a published reviewed claim, specify
+future publication with an explicit timezone offset and next review, submit,
+and have another REVIEWER approve the schedule. One issue per locale per UTC
+ISO week. Corrections require archiving and a new draft/review.
+
+A week without a new issue shows the last still-valid reviewed issue with an
+archive label, otherwise an empty state. Publication/evidence withdrawal is
+checked again by the public API; dates and drafts are never bypassed.
+
+Backend V12 and a restart are required. No build/restart/tests/runtime or platform
+checks were run for P1-I05 at the owner's request. Activation and manual acceptance:
+`backend/WEEKLY_SCIENCE_API.md`. There is no seeded scientific content.
+
+Science Drop simplification (2026-11-04, V13): new drops use an article-style
+rich-text editor, direct research sources and a local date/time picker. Save
+partial drafts without a separate EvidenceClaim; reopen drafts from the queue
+to edit them. Sources/content/future publication are required before independent
+review. URL and six-month freshness review are assigned automatically. Existing
+evidence-backed issues remain readable with their original protections.
+
+Science Drop publication update (2026-11-04, V14): **Publish** immediately or
+**Schedule** for the date/time selected. Both require title, content and HTTPS
+sources. Save draft and optional independent review remain available. Public
+cards/readers distinguish author publication from independently reviewed news.
+Existing EVIDENCE issues keep their original review safeguards.
+
+Article of the week (2026-11-04, V15) supersedes separate Science Drop creation:
+Account → Article of the week selects an existing published ARTICLE to feature
+now or from a future date. Home still says **Weekly Science Drop**, first before
+Today's spotlight, and opens the ordinary article reader. Content and sources
+are edited only in Articles. Cancelling selection does not delete the article.
+Older Science Drops remain in the panel's read-only history; legacy creation and
+publication are retired. General scheduled article publication is not added.
+
+Article preview content (2026-11-04, V16): the article editor includes an optional
+plain-text card teaser, up to 280 characters, stored with the article revision.
+The published preview appears on Articles and the Home weekly feature, limited
+to two lines. Missing preview omits the description instead of extracting the
+first paragraph. The reader continues to display the complete article body.
+Weekly feature is more compact: cover height reduced by about 17%, tighter
+spacing/padding and a maximum two-line headline and preview.

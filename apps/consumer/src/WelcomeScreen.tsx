@@ -10,8 +10,8 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Screen } from './ui';
 import { DailySpotlight } from './DailySpotlight';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
-import DiscoverScreen from './science/DiscoverScreen';
 import { ChapterHeading } from './ChapterHeading';
+import WeeklyScienceCard from './discovery/WeeklyScienceCard';
 
 // Owner-provided preview photograph. Preserve the original and crop in the viewport.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25,13 +25,14 @@ export default function WelcomeScreen() {
 
   return (
     <Screen maxWidth={800}>
+      <WeeklyScienceCard />
       <View style={styles.section}>
-        <ChapterHeading>{t('home.todaysSpotlight')}</ChapterHeading>
+        <ChapterHeading icon="sun">{t('home.todaysSpotlight')}</ChapterHeading>
         <DailySpotlight />
       </View>
 
       <View style={styles.section}>
-        <ChapterHeading>{t('home.eventsNearYou')}</ChapterHeading>
+        <ChapterHeading icon="calendar">{t('home.eventsNearYou')}</ChapterHeading>
         <ImageBackground
           source={viennaRaveImage}
           resizeMode="cover"
@@ -55,7 +56,6 @@ export default function WelcomeScreen() {
         </ImageBackground>
       </View>
 
-      <DiscoverScreen compact />
     </Screen>
   );
 }

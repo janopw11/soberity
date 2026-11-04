@@ -12,6 +12,7 @@ export type BlogPost = {
   author_uid: string;
   kind: BlogKind;
   title: string;
+  preview_content?: string | null;
   document: JSONContent;
   evidence: BlogEvidence[];
   category_code: string;

@@ -29,6 +29,7 @@ export default function ScienceLayout() {
           headerTitle: () => <ScienceTitle section="quizzes" />,
         }}
       />
+      <Stack.Screen name="weekly/[slug]" options={{ title: t('weekly.title') }} />
       <Stack.Screen name="learn" options={{ title: t('learning.title') }} />
       <Stack.Screen
         name="flashcards"

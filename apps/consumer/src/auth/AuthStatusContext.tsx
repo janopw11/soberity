@@ -57,6 +57,24 @@ type AuthStatusContextValue = AuthState & {
   accountActions: AccountActions;
 };
 
+const SDK_TIMEOUT_MS = 10_000;
+const INITIAL_SESSION_TIMEOUT_MS = 15_000;
+
+/** SDK initialization/token refresh can stall before an HTTP request even starts. */
+async function withSdkTimeout<T>(operation: Promise<T>): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error('Session check timed out')), SDK_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
+  }
+}
+
 const AuthStatusContext = createContext<AuthStatusContextValue | null>(null);
 
 type AuthStatusProviderProps = PropsWithChildren<{ adapter?: AuthAdapter }>;
@@ -70,6 +88,7 @@ export function AuthStatusProvider({
     user: null,
   });
   const latestUser = useRef<AuthUser | null>(null);
+  const [subscriptionAttempt, setSubscriptionAttempt] = useState(0);
   // Incremented on every session change so stale backend responses are ignored.
   const sequence = useRef(0);
 
@@ -87,7 +106,7 @@ export function AuthStatusProvider({
       setState((previous) => ({ ...previous, user }));
 
       try {
-        const token = await adapter.getIdToken(forceTokenRefresh);
+        const token = await withSdkTimeout(adapter.getIdToken(forceTokenRefresh));
         if (!isCurrent()) return;
         if (!token) {
           setState({ status: 'guest', user: null });
@@ -103,7 +122,7 @@ export function AuthStatusProvider({
           setState({ status: 'verification-pending', user });
         } else {
           // The backend rejected the token, so the local Firebase session is not trusted.
-          await adapter.signOut();
+          await withSdkTimeout(adapter.signOut());
           if (isCurrent()) setState({ status: 'guest', user: null });
         }
       } catch {
@@ -115,20 +134,29 @@ export function AuthStatusProvider({
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let mounted = true;
+    const startupTimeout = setTimeout(() => {
+      if (mounted) setState({ status: 'offline', user: latestUser.current });
+    }, INITIAL_SESSION_TIMEOUT_MS);
     try {
       unsubscribe = adapter.subscribe((user) => {
+        if (!mounted) return;
+        clearTimeout(startupTimeout);
         void resolveSession(user);
       });
     } catch {
+      clearTimeout(startupTimeout);
       // Firebase is not configured for this build; the app stays usable as a guest.
       setState({ status: 'guest', user: null });
     }
 
     return () => {
+      mounted = false;
+      clearTimeout(startupTimeout);
       sequence.current++;
       unsubscribe?.();
     };
-  }, [adapter, resolveSession]);
+  }, [adapter, resolveSession, subscriptionAttempt]);
 
   const signIn = useCallback(
     (email: string, password: string) => adapter.signIn(email, password),
@@ -175,12 +203,14 @@ export function AuthStatusProvider({
       setState({ status: 'guest', user: null });
     }
   }, [adapter]);
-  const retry = useCallback(
-    () => resolveSession(latestUser.current),
-    [resolveSession],
-  );
+  const retry = useCallback(async () => {
+    // Resubscribe as well: the first Firebase event may never have arrived.
+    sequence.current++;
+    setState(previous => ({ ...previous, status: 'loading' }));
+    setSubscriptionAttempt(value => value + 1);
+  }, []);
 
-  const getIdToken = useCallback(() => adapter.getIdToken(), [adapter]);
+  const getIdToken = useCallback(() => withSdkTimeout(adapter.getIdToken()), [adapter]);
   const accountActions = useMemo<AccountActions>(
     () => ({
       reauthenticate: (password) => adapter.reauthenticate(password),

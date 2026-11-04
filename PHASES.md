@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/7), P1-I03 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
+**Status globalny:** IN_PROGRESS — Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/7), P1-I03 i P1-I05 IN_PROGRESS (implementacja, NOT VERIFIED). Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte zgodnie z odroczeniem zatwierdzonym przez właściciela.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -704,25 +704,35 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P1-I05 — Weekly Science Drop & publishing cadence
 
-**Status:** TODO  
-**Started:** —  
+**Obowiązująca decyzja właściciela 2026-11-04 — Artykuł tygodnia:** zrezygnowano z osobnego typu/edytora Science Drop. Weekly Science Drop pozostaje nazwą sekcji Home, a panel Artykuł tygodnia wybiera istniejący opublikowany ARTICLE do wyróżnienia od razu lub od terminu. V15 zapisuje tylko referencję i datę, bez kopii treści; karta otwiera /science/post/{id}. Aktualizacje/wycofanie wynikają z opublikowanej wersji artykułu. Zwykłe Articles zachowują własną ścieżkę publikacji/recenzji. Stare Science Drop/audyty zachowane do odczytu, historyczny scheduler wyłączony i stare zapisy HTTP 410. ADR-009 zastępuje wcześniejsze decyzje o osobnym materiale.
+
+**Decyzja właściciela 2026-11-04 — Opublikuj / Zaplanuj:** właściciel wyraźnie zatwierdził bezpośrednią publikację NEWS jak Articles. Autor może opublikować od razu lub zaplanować na przyszły termin; niezależna recenzja opcjonalna. Treść i źródła nadal wymagane. V14 rozróżnia AUTHOR/REVIEWED bez fikcyjnej daty/osoby recenzenta; stare wydania EVIDENCE nadal wymagają recenzji i aktualnych dowodów. Ta decyzja zastępuje pierwotny wymóg obowiązkowej recenzji każdego nowego Science Drop.
+
+**Korekta właściciela 2026-11-04 — krótki news jak artykuł:** właściciel wskazał, że Save draft jest niedostępne, i zlecił prosty formularz jak Articles z wyborem daty/godziny publikacji. Nowy tryb NEWS nie wymaga osobnego EvidenceClaim: tytuł, kanoniczny dokument Tiptap, bezpośrednie źródła HTTPS i datetime picker w strefie przeglądarki. Częściowe szkice zapisywalne i edytowalne; kompletność i przyszły termin wymagane przy submit, niezależna recenzja przed publikacją zachowana. Slug/teaser/przegląd po 6 miesiącach automatyczne. V13 zachowuje stare wydania EVIDENCE; ADR-008 dokumentuje uzgodniony kierunek. Checkboxy nadal otwarte do odbioru.
+
+**Status:** IN_PROGRESS — implementacja do ręcznego odbioru; NOT VERIFIED  
+**Started:** 2026-11-04  
 **Finished:** —  
 **Zależności iteracji:** P1-I02, P1-I03  
-**Dowód:** —  
-**Blokery:** —
+**Dowód:** kod `backend/src/main/java/com/soberity/discovery/*`, migracja V12, `apps/consumer/src/discovery/*`, trasy czytnika i redakcji, integracja Home/Articles, EN/PL; kontrakt i instrukcja odbioru `backend/WEEKLY_SCIENCE_API.md`. T01–T04 zaimplementowane, checkboxy pozostają otwarte do rzeczywistej weryfikacji.  
+**Blokery:** P1-I03 nadal IN_PROGRESS; start P1-I05 wyraźnie zlecony przez właściciela. Na obowiązujące polecenie właściciela bez testów i dodatkowej weryfikacji; nie uruchomiono buildów, migracji V12, restartów API/Expo, check/lint/typecheck, wywołań API ani przeglądarki/symulatorów. Brak zasianych treści naukowych: publikacja wymaga przygotowanego materiału i niezależnego recenzenta.
+
+**Implementacja 2026-11-04:** typ Science Drop z pytaniem refleksyjnym, teaserem, wnioskiem, co ustalono/czego nie ustalono, metodą, populacją i klasyfikacją nowe/przypominane badanie. Powiązanie do konkretnej opublikowanej, recenzowanej i aktualnej wersji EvidenceClaim ze źródłami; EN/PL oddzielnie. DRAFT → IN_REVIEW → SCHEDULED po niezależnej recenzji → PUBLISHED przez scheduler; ARCHIVED do korekt/wycofania. Daty jako instants, strefa IANA dla redakcji, slot jednego wydania/język/tydzień ISO UTC i ochrona unikalnym indeksem. Scheduler co 60 s (start po 10 s), blokada transakcyjna między instancjami, blokady wierszy wydania i dowodów, wspólny commit publikacji/audytu. DB trigger chroni niezmienność treści, recenzję, terminy i dozwolone przejścia. Publiczne API jawnie projektuje pola bez tożsamości redakcji; ukrywa szkice, przyszłe terminy, wycofane/przestarzałe dowody i terminy ponownego przeglądu; no-store. Home/Articles: karta aktualnego materiału, fallback do ostatniego nadal aktualnego wydania z etykietą archiwum albo uczciwy empty state. Czytnik z odkrywaniem wniosków, źródłami i wersją dowodów. Panel web z konta: tworzenie szkicu, paginacja dowodów/kolejki, pełna inspekcja materiału i dowodów, submit/approve/archive z notatką i kontrolą ról. Brak XP/push/Myth Battle i startu P1-I06.
+
+**Odbiór:** instrukcje dat przyszłych, offsetów/DST i granic tygodnia, DRAFT/ACL, recenzji własnego materiału, wycofania dowodów, fallbacku i wielu instancji zapisano w `backend/WEEKLY_SCIENCE_API.md`; żadna z tych czynności nie została wykonana w tej sesji. Web/iOS/Android, EN/PL light/dark, dostępność i kontrakty NOT VERIFIED. CHANGELOG bez nowego wpisu do potwierdzenia implementacji.
 
 **Zakres zadań:**
 
-- [ ] `P1-I05-T01` Wprowadź typ Science Drop z datą publikacji, datą przeglądu i recenzją.
-- [ ] `P1-I05-T02` Dodaj planowanie tygodniowej publikacji i bezpieczny scheduler.
+- [ ] `P1-I05-T01` Wprowadź wybór Artykułu tygodnia z istniejących opublikowanych artykułów, z zachowaniem dat i pochodzenia recenzji artykułu (zmiana zakresu właściciela 2026-11-04; ADR-009).
+- [ ] `P1-I05-T02` Dodaj planowanie tygodniowego wyróżnienia od wskazanego momentu, bezpieczną zmianę/usunięcie wyboru i audyt; widoczność według czasu w API zastępuje osobny scheduler (ADR-009).
 - [ ] `P1-I05-T03` Zbuduj kartę tygodnia w Discover.
-- [ ] `P1-I05-T04` Zaprojektuj fallback przy braku nowego recenzowanego badania.
+- [ ] `P1-I05-T04` Zaprojektuj fallback do wcześniejszego nadal opublikowanego Artykułu tygodnia lub pustego stanu.
 
 **Weryfikacja:**
 
 - [ ] `P1-I05-V01` Test przyszłych dat publikacji, stref czasowych i ukrywania DRAFT.
 
-**Definition of Done:** Tygodniowy materiał jest publikowany dopiero po recenzji. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Zgodnie z decyzją właściciela 2026-11-04 Weekly Science Drop wyróżnia istniejący opublikowany artykuł i otwiera jego zwykły czytnik, bez drugiego edytora i kopii treści. Przyszłe wybory/szkice i wycofane artykuły nie są ujawniane, pochodzenie recenzji jest uczciwe, historia wcześniejszych Science Drop zachowana. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki odbioru są zapisane.
 
 ## P1-I06 — Myth Battle, seed data & phase gate
 
@@ -2190,11 +2200,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Ostatnio ukończono (2026-11-04):** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela; wszystkie T01–T04 i V01–V02 zaznaczone. Bez nowych testów agenta ani deklarowania niepodanych wyników platformowych.
+- **Bieżąca iteracja (2026-11-04):** `P1-I05` — Artykuł tygodnia pod nazwą Weekly Science Drop na Home, IN_PROGRESS. Selekcja istniejącego artykułu zastępuje osobny typ/edytor; T/V checkboxy otwarte do odbioru. Bez testów i dodatkowej weryfikacji na polecenie właściciela.
+- **Aktywacja lokalna (2026-11-04):** backend przebudowany bez testów i zrestartowany z uproszczonym edytorem; Flyway zastosował V16 (tekst podglądu artykułu), aplikacja uruchomiona na 8090. Log `/private/tmp/soberity-article-preview-backend-start.log`. Odbiór zapisu newsa/UI/API i pełnej P1-I05 nadal otwarty.
+- **Następny krok:** ręczny odbiór `P1-I05-V01` i T01–T04 według ADR-009: wybór opublikowanego artykułu teraz/od terminu, daty/strefy, zmiana/usunięcie wyboru, ACL, wycofanie artykułu i fallback, historia legacy, UI EN/PL light/dark na web/iOS/Android. Nie rozpoczęto P1-I06.
+- **Ostatnio ukończono:** `P1-I04` — Flashcards & quizzes, DONE na podstawie odbioru właściciela 2026-11-04; wszystkie T01–T04 i V01–V02 zaznaczone. Historyczne ograniczenia zachowane.
 - **Aktualna faza:** Phase 1 — IN_PROGRESS, 4/7 DONE. P1-I03 nadal IN_PROGRESS; P0-I03A i P0-I13 pozostają otwarte. Bramka Phase 1 nie została zamknięta.
-- **Otwarta praca:** `P1-I03` — biblioteka/Articles i jej pozostały odbiór. Zamknięcie P1-I04 nie zmienia statusu tej zależności.
-- **Dokumentacja:** końcowy zakres P1-I04 podsumowano w CHANGELOG.md pod 2026-11-04; wcześniejsze wyniki i ograniczenia zachowano w sekcji iteracji i dzienniku.
-- **Następny krok:** oczekiwanie na polecenie właściciela. `P1-I05` — Weekly Science Drop & publishing cadence pozostaje TODO; nie rozpoczęto nowej iteracji ani fazy. Treści pilotażowe/Myth Battle pozostają w P1-I06, automatyczne tłumaczenia odroczone.
+- **Dokumentacja:** kontrakt i macierz ręcznego odbioru Weekly Science w `backend/WEEKLY_SCIENCE_API.md`, README klienta i BRANDING zaktualizowane. CHANGELOG dla P1-I05 odroczony do weryfikacji; wpis zamknięcia P1-I04 pozostaje.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2547,3 +2558,49 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P1-I04 — miniatura quizu zamiast pytajnika | IN_PROGRESS / NOT VERIFIED | QuizCard: przesłany obraz w kafelku 56 × 56 obok tytułu, zamiast ikony; brak/błąd zdjęcia pokazuje pytajnik. Usunięto oddzielny górny cover. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony do odbioru. Kolejny krok: ręczny odbiór P1-I04. |
 
 | 2026-11-04 | P1-I04 — odbiór i zamknięcie | DONE; T01–T04, V01–V02 zaznaczone | Właściciel uznał fiszki i quizy za zakończone na teraz i wyraźnie polecił zaznaczyć wszystkie punkty. PHASES: status, Finished 2026-11-04, checklista, licznik Phase 1 4/7 i aktualny punkt pracy; CHANGELOG: końcowy zakres. Bez nowych testów lub dodatkowej weryfikacji agenta; historyczne ograniczenia i wyniki zachowane. | Brak zgłoszonych blokerów odbioru P1-I04. Nie podano nowej macierzy platform i nie zadeklarowano nowych PASS. P1-I03 i bramka fazy nadal otwarte; P1-I05 TODO, wyłącznie na kolejne polecenie. |
+
+| 2026-11-04 | P1-I05 — Weekly Science Drop & publishing cadence | IN_PROGRESS; T01–T04 zaimplementowane, NOT VERIFIED | V12 discovery_issue/audit/guard, discovery service/controller/scheduler, reguły public GET; karta i czytnik RN Home/Articles, panel redakcji web i trasy, EN/PL. Niezależna recenzja, terminy UTC/IANA, slot tygodniowy, zabezpieczony scheduler, aktualność dowodów i fallback. Kontrakt/odbiór w WEEKLY_SCIENCE_API.md; README/BRANDING/aktualny punkt pracy uzupełnione. | Zgodnie z poleceniem bez testów i dodatkowej weryfikacji, bez buildów/migracji/restartów. V12 do lokalnej aktywacji; wszystkie checkboxy otwarte, Finished —, bez wpisu CHANGELOG do odbioru. P1-I03 nadal otwarte; P1-I06 nierozpoczęte. |
+
+| 2026-11-04 | P1-I05 — lokalna aktywacja Science Drop | IN_PROGRESS; V12 zastosowana | Na wyraźne polecenie właściciela uruchomiono scripts/start-local-backend.mjs z pominięciem testów: BUILD SUCCESS, Flyway Successfully applied 1 migration, schema v12; Tomcat 8090 i Started SoberityBackendApplication. Log /private/tmp/soberity-weekly-backend-start.log. | Bez dodatkowych testów i weryfikacji endpointów/UI. Brak seedowanych materiałów; właściciel odświeża aplikację i wykonuje odbiór P1-I05. Checkboxy/Finished bez zmian, CHANGELOG bez wpisu do odbioru funkcjonalności. |
+
+| 2026-11-04 | P1-I05 — nagłówek w stylu chapter | IN_PROGRESS / NOT VERIFIED | WeeklyScienceCard: zastąpiono nagłówek z ikoną globu wspólnym ChapterHeading, spójnym z pozostałymi sekcjami Home/Articles. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — ikony nagłówków sekcji | IN_PROGRESS / NOT VERIFIED | ChapterHeading: opcjonalna dekoracyjna ikona 22 px/primary przed tytułem. SettingsIcon: kalendarz, książka, kolba; przypisanie ikon spotlight/events/publications/Science Drop. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — blokada wejścia Checking your session | IN_PROGRESS / NOT VERIFIED | Konieczna poprawka dostępu: AuthStatusContext ma limit pierwszego zdarzenia Firebase 15 s i operacji tokenu SDK 10 s. Retry ponownie subskrybuje odczyt sesji, bez uznawania niepotwierdzonego użytkownika za zalogowanego; zachowane sekwencje ignorowania starych odpowiedzi i cleanup timerów. Backend w istniejących logach obsługuje żądania. | Przyczyna konkretnego zawieszenia SDK niepotwierdzona bez diagnostyki przeglądarki. Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ponowne otwarcie web i ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — ponowne uruchomienie web po poprawce sesji | IN_PROGRESS / NOT VERIFIED | Zrestartowano wyłącznie Expo 8082 bez CI mode, z --clear i włączonym watch. Metro zgłasza Web Bundled (7170 ms) i SSR Bundled; poprawka timeout/retry sesji wczytana przez nową instancję. | Bez testów i dodatkowej weryfikacji przeglądarki; potwierdzenie wejścia przez właściciela nadal potrzebne. CHANGELOG odroczony; P1-I05 pozostaje otwarte. |
+
+| 2026-11-04 | P1-I05 — uproszczenie do krótkiego newsa | IN_PROGRESS / NOT VERIFIED | Na wyraźne polecenie właściciela formularz jak artykuł + data/godzina: Tiptap, źródła HTTPS, zapis/edycja częściowego szkicu, automatyczny adres/teaser/przegląd; bez obowiązkowej karty EvidenceClaim. V13 NEWS/EVIDENCE, API POST/PUT news i DB guard, niezależna recenzja nadal wymagana; czytnik/karta rozróżniają tryby bez fikcyjnej pewności dowodów. ADR-008, API/README/BRANDING/EN/PL uzupełnione. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. Wymagana lokalna aktywacja V13; odbiór P1-I05 pozostaje otwarty, CHANGELOG odroczony. |
+
+| 2026-11-04 | P1-I05 — aktywacja uproszczonego edytora | IN_PROGRESS; V13 zastosowana | Lokalny helper package -DskipTests: BUILD SUCCESS; Flyway Successfully applied 1 migration, schema v13; Tomcat 8090 i Started SoberityBackendApplication. Log /private/tmp/soberity-weekly-news-backend-start.log. | Bez testów i dodatkowej weryfikacji API/UI. Właściciel odświeża /editorial-weekly i zapisuje szkic; pełny odbiór P1-I05 nadal otwarty. CHANGELOG bez wpisu do odbioru. |
+
+| 2026-11-04 | P1-I05 — Opublikuj i Zaplanuj | IN_PROGRESS / NOT VERIFIED | Na wyraźną zgodę właściciela V14 i API decyzji PUBLISH/SCHEDULE dla własnych NEWS DRAFT/IN_REVIEW, z obowiązkową treścią/źródłami. Publikacja od razu według zegara DB; harmonogram wymaga przyszłej daty. Pochodzenie AUTHOR/REVIEWED w publicznych projekcjach, uczciwe etykiety kart/czytnika; opcjonalna recenzja zachowana, starsze EVIDENCE bez osłabienia. UI i EN/PL, ADR-008/API/README uzupełnione. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; checkboxy/Finished bez zmian, CHANGELOG odroczony do odbioru. Następny krok: aktywacja V14 i ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — aktywacja Opublikuj/Zaplanuj | IN_PROGRESS; V14 zastosowana | Lokalny helper package -DskipTests BUILD SUCCESS; Flyway schema v14; Tomcat 8090 i Started SoberityBackendApplication. Log /private/tmp/soberity-weekly-publication-backend-start.log. | Bez testów i dodatkowej weryfikacji endpointów/UI; nie publikowano żadnego newsa. Ręczny odbiór P1-I05 przez właściciela; CHANGELOG odroczony. |
+
+| 2026-11-04 | P1-I05 — Science Drop pierwszy na Home | IN_PROGRESS / NOT VERIFIED | WelcomeScreen: WeeklyScienceCard przed Today’s spotlight. DiscoverScreen compact bez kopii Science Drop; pełne Articles zachowuje kartę tygodnia. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — Artykuł tygodnia zamiast osobnego Science Drop | IN_PROGRESS / NOT VERIFIED | Na decyzję właściciela V15 weekly_article_feature/audit, nowy serwis i API selekcji, karta oparta na istniejącym artykule i zwykłym czytniku. Panel wybiera opublikowany ARTICLE teraz/od terminu, zmienia/usuwa wyróżnienie; EN/PL i historia wcześniejszych treści do odczytu. Stare write API 410, historyczny scheduler wyłączony bez usuwania danych; ADR-009 i docs/tracker uzupełnione. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; wymaga aktywacji V15. Checkboxy/Finished otwarte, CHANGELOG odroczony. P1-I06 nierozpoczęte. |
+
+| 2026-11-04 | P1-I05 — aktywacja Artykułu tygodnia | IN_PROGRESS; V15 zastosowana | Lokalny helper package -DskipTests BUILD SUCCESS; Flyway schema v15; Tomcat 8090 i Started SoberityBackendApplication. Log /private/tmp/soberity-weekly-article-backend-start.log. | Bez testów i dodatkowej weryfikacji API/UI. Nie wybrano/nie opublikowano treści za właściciela. Ręczny odbiór P1-I05 otwarty; CHANGELOG odroczony. |
+
+| 2026-11-04 | P1-I05 — karta tygodnia jak Latest publications | IN_PROGRESS / NOT VERIFIED | Wspólny PostPublicationCard dla WeeklyScienceCard i postów DiscoverScreen: ten sam list layout, miniatura, tytuł Ocean, kategoria EN/PL i data. Usunięto osobny teaser/CTA i pionowy cover tygodnia; fallback, loading/error/empty oraz link do artykułu zachowane. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — Home bez Latest publications, naturalniejszy weekly feature | IN_PROGRESS / NOT VERIFIED | WelcomeScreen bez kompaktowego DiscoverScreen i jego sekcji Latest publications. WeeklyScienceCard używa wariantu featured wspólnej karty: brak widocznej ramki/pastelowego pudełka, większa miniatura, tytuł h3/Ocean, spokojna kategoria i data zamiast pill, większe odstępy. Pozostałe Articles bez zmiany wariantu. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — klikalność weekly feature | IN_PROGRESS / NOT VERIFIED | PublicationCard featured: widoczna ramka border i padding16; PostPublicationCard featured: akcja Czytaj artykuł/Read article z chevronem w primary. Cała karta jednym linkiem, bez dodatkowego przycisku w linku. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — błękitny panel pod miniaturą | IN_PROGRESS / NOT VERIFIED | PostPublicationCard featured: pełnowysokościowa lewa kolumna surfaceAlt jak Today’s spotlight, zdjęcie wyśrodkowane z padding12; panel tekstu padding16. Wariant list Articles bez zmian. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — editorial Weekly Science Drop redesign | IN_PROGRESS / NOT VERIFIED | FeaturedArticleCard + PostPublicationCard featured delegation, PublicationCard featured: vertical 16:9 cover, radius16, subtle 1px theme border, dark h2 headline max3 lines, localized category/publication date, dynamic summary max2 lines and footer with estimated reading time + Read article arrow. Missing/failed image fallback, whole-card real link, focus/hover/press, active theme tokens. SettingsIcon arrowUpRight and EN/PL; BRANDING updated. Other Home sections and standard article list/API unchanged. | No tests, build/lint/typecheck, browser/simulator or additional verification run, per owner instruction. Web/iOS/Android/light/dark/a11y NOT VERIFIED. No new dependencies or generated/hardcoded article content. CHANGELOG deferred until acceptance. Next: owner manual acceptance of P1-I05. |
+
+| 2026-11-04 | P1-I05 — oznaczenie artykułu tygodnia na liście | IN_PROGRESS / NOT VERIFIED | DiscoverScreen bez sekcji WeeklyScienceCard; niezależny odczyt bieżącego wyboru oznacza wyłącznie pasujący PostPublicationCard pill na górnym prawym obrysie. PublicationCard badge: primary/onPrimary, dynamiczna wysokość/odstępy, etykieta dostępności, jedna akcja całej karty; Home bez zmian. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji zgodnie z poleceniem właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — autorski preview i kompaktowa karta tygodnia | IN_PROGRESS / NOT VERIFIED | V16 preview_content w wersji artykułu, walidacja max280, public/private projekcje i zapis previewContent; edytor Articles EN/PL z polem/opisem/licznikiem i przywracaniem wartości. Karty Home/Articles pokazują wyłącznie autorski preview do2 linii, bez ekstrakcji body. Weekly: grafika16:7.5, padding16/gap8, tytuł2 linie i ciaśniejsza stopka. README/BRANDING uzupełnione. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; wymaga aktywacji V16. Nie wpisano przykładowych twierdzeń zdrowotnych, brak wpisu CHANGELOG do odbioru. Kolejny krok: lokalna aktywacja i ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — aktywacja preview artykułu | IN_PROGRESS; V16 zastosowana | Lokalny helper package -DskipTests BUILD SUCCESS, Flyway schema v16, Tomcat8090 i Started SoberityBackendApplication. Log /private/tmp/soberity-article-preview-backend-start.log. | Bez testów i dodatkowej weryfikacji API/UI. Właściciel uzupełnia Tekst podglądu i publikuje nową wersję artykułu; zapis szkicu nie zmienia publicznego preview. CHANGELOG odroczony; P1-I05 do ręcznego odbioru. |
+
+| 2026-11-04 | P1-I05 — gwiazdka z popover zamiast tekstowego pill | IN_PROGRESS / NOT VERIFIED | PublicationCard badge: pill z SettingsIcon star, osobny IconHint poza linkiem. Tooltip EN/PL hover/focus/tap, target48×44, Escape/blur, brak nawigacji po kliknięciu gwiazdy, popover przy prawym obrysie poniżej przycisku. Wspólny IconHint rozszerzony o wariant pill i obsługę focus; BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
+
+| 2026-11-04 | P1-I05 — spójne obrysy Home i uproszczone Articles | IN_PROGRESS / NOT VERIFIED | PublicationCard featured używa colors.border jak Today’s spotlight i karta Events; zachowany focusRing. PostPublicationCard list bez preview/opisu i dodatkowej etykiety recenzji, z tytułem/kategorią/datą; Home featured nadal wyświetla zapisany preview, gwiazdka tygodnia zachowana. BRANDING uzupełniony. | Bez testów i dodatkowej weryfikacji na polecenie właściciela; CHANGELOG odroczony. Kolejny krok: ręczny odbiór P1-I05. |
