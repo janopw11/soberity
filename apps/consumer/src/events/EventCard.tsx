@@ -1,15 +1,18 @@
+import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { SettingsIcon } from '../ui';
 import { eventImageUri, type DiscoveryEvent } from './eventsApi';
 
-/** Discovery summary only. Event detail/navigation is introduced in P2-I03. */
+/** Shared discovery card, one real link to the public event route. */
 export function EventCard({ event, category }: { event: DiscoveryEvent; category: string }) {
   const { t, i18n } = useTranslation();
   const { colors } = useThemePreferences();
+  const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [failedImage, setFailedImage] = useState<string | null>(null);
   const locale = i18n.resolvedLanguage === 'pl' ? 'pl-PL' : 'en-GB';
   const nightlife = event.category_code === 'SOBER_PARTY' || event.category_code === 'SOBER_RAVE';
@@ -25,7 +28,10 @@ export function EventCard({ event, category }: { event: DiscoveryEvent; category
       price = format.format(event.price_minor / 10 ** (format.resolvedOptions().maximumFractionDigits ?? 2));
     } catch { price = t('events.priceUnknown'); }
   }
-  return <View style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+  return <Link href={{ pathname: '/events/[id]', params: { id: event.id } }} asChild>
+    <Pressable accessibilityRole="link" accessibilityLabel={event.title} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [styles.card, { borderColor: focused ? colors.focusRing : colors.border, backgroundColor: pressed || hovered ? colors.surfaceAlt : colors.surface, opacity: pressed ? 0.94 : 1 }]}>
+
     <View style={[styles.picture, { backgroundColor: colors.surfaceAlt }]}>
       {event.cover_id && failedImage !== event.cover_id ? <Image source={{ uri: eventImageUri(event.cover_id) }} style={StyleSheet.absoluteFill} resizeMode="cover"
         accessibilityLabel={event.cover_alt_text ?? event.title} onError={() => setFailedImage(event.cover_id)} />
@@ -57,7 +63,7 @@ export function EventCard({ event, category }: { event: DiscoveryEvent; category
       {event.accessibility !== 'UNKNOWN' ? <Text style={[styles.caption, { color: colors.textSecondary }]}>{t(`events.accessibilityValues.${event.accessibility}`)}</Text> : null}
       {event.locale !== (i18n.resolvedLanguage === 'pl' ? 'pl' : 'en') ? <Text style={[styles.caption, { color: colors.textMuted }]}>{t(`events.contentLanguage.${event.locale}`)}</Text> : null}
     </View>
-  </View>;
+  </Pressable></Link>;
 }
 const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: radii.lg, overflow: 'hidden', width: '100%' },

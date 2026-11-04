@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/discover/weekly/current", "/api/v1/discover/weekly/*").permitAll()
                         .requestMatchers("/api/v1/discover/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events", "/api/v1/events/categories",
-                                "/api/v1/events/*", "/api/v1/events/media/*", "/api/v1/organizers/*").permitAll()
+                                "/api/v1/events/*", "/api/v1/events/*/calendar.ics", "/api/v1/events/media/*", "/api/v1/organizers/*").permitAll()
                         .requestMatchers("/api/v1/events/**", "/api/v1/organizers/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/learning/quizzes", "/api/v1/learning/quizzes/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/learning/quizzes/*/answers").permitAll()

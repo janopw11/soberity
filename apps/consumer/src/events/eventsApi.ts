@@ -15,9 +15,12 @@ export type DiscoveryEvent = {
   cover_id: string | null; cover_alt_text: string | null;
 };
 export type EventPage = Page<DiscoveryEvent>;
+export class EventRequestError extends Error {
+  constructor(readonly status: number) { super('Event request failed'); }
+}
 export async function eventsGet<T>(path: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(`${readBackendApiUrl()}/api/v1/events${path}`, { signal, cache: 'no-store' });
-  if (!response.ok) throw new Error('Event request failed');
+  if (!response.ok) throw new EventRequestError(response.status);
   return response.json() as Promise<T>;
 }
 export function eventImageUri(id: string): string {
@@ -36,3 +39,30 @@ export function dateBoundary(value: string, exclusiveEnd = false): string | unde
   return date.toISOString();
 }
 export const CATEGORY_CODES = ['SOBER_PARTY', 'SOBER_RAVE', 'DANCE', 'LIVE_MUSIC', 'COFFEE_MEETUP', 'SPORT', 'OUTDOORS', 'WORKSHOP', 'CULTURE', 'OTHER'] as const;
+
+export type EventDetail = DiscoveryEvent & {
+  status: 'PUBLISHED' | 'CANCELLED'; description: string; alcohol_rules: string; beverage_notes: string;
+  entry_rules: string; accessibility_notes: string | null; address: string;
+  organizer_id: string; external_ticket_url: string | null;
+};
+export type PublicOrganizer = { id: string; name: string; description: string; website: string; verification: 'VERIFIED' };
+export const validEventId = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+/** Only HTTP requests to the configured API; callers cannot supply a redirect destination. */
+export function eventCalendarUri(id: string): string {
+  if (!validEventId(id)) throw new Error('Invalid event');
+  return `${readBackendApiUrl()}/api/v1/events/${id}/calendar.ics`;
+}
+export function safeEventLink(value: unknown): string | null {
+  if (typeof value !== 'string' || /[\u0000-\u0020\u007f]/.test(value)) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || url.username || url.password || !url.hostname) return null;
+    return url.href;
+  } catch { return null; }
+}
+export async function organizerGet(id: string, signal: AbortSignal): Promise<PublicOrganizer> {
+  if (!validEventId(id)) throw new Error('Invalid organizer');
+  const response = await fetch(`${readBackendApiUrl()}/api/v1/organizers/${id}`, { signal, cache: 'no-store' });
+  if (!response.ok) throw new Error('Organizer unavailable');
+  return response.json() as Promise<PublicOrganizer>;
+}

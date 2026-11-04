@@ -30,7 +30,6 @@ export function PublicationCard({ href, title, children, variant = 'card', badge
       minWidth: 0,
       alignSelf: 'center',
       overflow: badge ? 'visible' : 'hidden',
-      marginTop: badge ? badgeHeight / 2 : 0,
       zIndex: badge ? 2 : 0,
       borderRadius: variant === 'featured' ? radii.lg : variant === 'list' ? radii.md : radii.xl,
       borderWidth: variant === 'card' ? 2 : 1,
@@ -49,17 +48,17 @@ export function PublicationCard({ href, title, children, variant = 'card', badge
           onHoverOut={() => setHovered(false)}
           onPressIn={() => setPressed(true)}
           onPressOut={() => setPressed(false)}
-          style={{ width: '100%', minHeight: 48, flexDirection: variant === 'list' ? 'row' : 'column', alignItems: 'stretch', ...(variant === 'list' ? { gap: spacing.space16, padding: spacing.space12, ...(badge ? { paddingTop: Math.max(spacing.space12, badgeHeight / 2 + spacing.space8) } : {}) } : variant === 'featured' ? { gap: 0, opacity: pressed ? 0.96 : 1 }  : {}) }}
+          style={{ width: '100%', minHeight: 48, flexDirection: variant === 'list' ? 'row' : 'column', alignItems: 'stretch', ...(variant === 'list' ? { gap: spacing.space16, padding: spacing.space12 } : variant === 'featured' ? { gap: 0, opacity: pressed ? 0.96 : 1 }  : {}) }}
         >
           {children}
         </Pressable>
       </Link>
       {badge ? <View
         onLayout={event => setBadgeHeight(event.nativeEvent.layout.height)}
-        style={{ position: 'absolute', top: 0, right: spacing.space12, transform: [{ translateY: -badgeHeight / 2 }], zIndex: 3 }}
+        style={{ position: 'absolute', top: 0, right: spacing.space12, transform: [{ translateY: -badgeHeight / 2 - spacing.space4 }], zIndex: 3 }}
       >
         <IconHint text={badge} pill>
-          <SettingsIcon name="star" size={20} color={colors.onPrimary} />
+          <SettingsIcon name="star" size={16} color={colors.onPrimary} />
         </IconHint>
       </View> : null}
     </View>

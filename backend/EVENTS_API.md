@@ -157,3 +157,11 @@ Search additionally accepts `region` (case-insensitive exact venue region) and
 pagination with deterministic ID tie-breakers. PRICE_ASC requires one ISO
 currency. Shared web/native discovery, date semantics and owner acceptance are
 in [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md). No additional migration beyond V17.
+
+### P2-I03 — public calendar and details
+
+`GET /api/v1/events/{id}/calendar.ics`: public eligible event → escaped/folded
+UTF-8 ICS attachment, no-store; cancelled/ended410, unavailable404.
+See [EVENT_DETAIL.md](EVENT_DETAIL.md) for app routes, external links, calendar
+import limitations and minimum production SEO requirements. NOT VERIFIED;
+no migration beyond V17, no build/restart performed.

@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I02 IN_PROGRESS (discovery web/mobile, NOT VERIFIED), P2-I00/P2-I01 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I03 IN_PROGRESS (szczegóły/linki/kalendarz, NOT VERIFIED), P2-I00–P2-I02 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -821,12 +821,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I03 — Event detail, external checkout & links
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
+**Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I01, P2-I02  
-**Dowód:** —  
-**Blokery:** —
+**Zależności iteracji:** P2-I01/P2-I02 pozostają NOT VERIFIED; start P2-I03 na wyraźne polecenie właściciela, bez zaliczania poprzednich iteracji.  
+**Dowód:** `apps/consumer/app/events/{_layout,index,[id]}.tsx`, `apps/consumer/src/events/EventDetailScreen.tsx`, `EventCard.tsx`, `eventsApi.ts`, `calendarDownload.ts`/`.web.ts`, `EventMetadata.tsx`/`.web.ts`, EN/PL, `EventCalendar.java`, publiczny kontroler/SecurityConfig, `backend/EVENT_DETAIL.md`.  
+**Blokery:** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
+
+**Implementacja 2026-11-04:** szczegóły rzeczywistego publicznego wydarzenia, zdjęcie/fallback, opis, daty/strefa, cena, zasady sober/napojów, miejsce i dostępność, zasady wstępu i zweryfikowany organizator. Całe karty prowadzą do /events/{UUID}, web href i native route w istniejącym scheme. Invalid ID/404, ładowanie, błędy i ponowienie; cancelled/ended oznaczone bez zakupu/kalendarza. Linki HTTPS bez credentials/control characters, dialog z domeną, ponowny odczyt aktualnego eventu/organizatora i porównanie celu; brak dowolnego redirect parametru. Eksport .ics przez publiczny endpoint: aktualna kwalifikacja, 410 dla cancelled/ended, UTC, UTF-8 fold/escape/CRLF, no-store, import bez uprawnień do kalendarza; native otwiera attachment w OS/browser, bez deklaracji bezpośredniego zapisu. Minimalny kontrakt SEO w EVENT_DETAIL.md, runtime title/description i noindex do przygotowania serwerowego renderowania/hostingu. EN/PL, oba motywy. Bez następnej P2-I04 i płatności. Dodatkowa korekta właściciela: wizualny pill gwiazdki Articles mniejszy (36×28, ikona16), target48×44 i popover zachowane. CHANGELOG odroczony do odbioru.
 
 **Zakres zadań:**
 
@@ -2179,12 +2181,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Bieżąca iteracja (2026-11-04):** `P2-I02` — Event discovery web + mobile, IN_PROGRESS / NOT VERIFIED. Wspólny katalog `/events`, filtry, sortowanie/paginacja i opcjonalny punkt lokalizacji przygotowane; T01–T04/V01 otwarte. P2-I00/P2-I01 nadal niezweryfikowane.
+- **Bieżąca iteracja (2026-11-04):** `P2-I03` — Event detail, external checkout & links, IN_PROGRESS / NOT VERIFIED. Szczegóły, linki, ICS i wymagania SEO przygotowane; T01–T04/V01/V02 otwarte. P2-I00–P2-I02 nadal niezweryfikowane.
 - **Priorytet właściciela:** Myth Battle P1-I06 PARKED/TODO; lokalny rozwój Sober Events zatwierdzony. Otwarte bramki Phase 0/1 pozostają niezaliczone (ADR-010).
 - **Aktywna faza:** Phase 2 — IN_PROGRESS, 0/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE.
-- **Następny krok:** aktywacja/odbiór V17 i API P2-I01 oraz odbiór katalogu P2-I02 według `backend/EVENT_DISCOVERY.md` przez właściciela. P2-I03 (szczegóły, kalendarz, link zakupu) wymaga osobnego polecenia; nie rozpoczęto.
-- **Weryfikacja:** zgodnie z poleceniem bez testów/buildów/typecheck, migracji/restartów i wywołań API/przeglądarki/symulatorów. Brak nowych dependencies i fikcyjnych eventów; Home preview bez zmian.
-- **Dokumentacja:** `backend/EVENT_DISCOVERY.md`, `backend/EVENTS_API.md`, README, branding i tracker. CHANGELOG bez nowego wpisu do rzeczywistego odbioru.
+- **Następny krok:** aktywacja backendu/V17 i odbiór przepływu lista→szczegóły→zewnętrzny link/kalendarz według `backend/EVENT_DETAIL.md` przez właściciela. P2-I04 (portal organizatora/moderacji) wymaga osobnego polecenia.
+- **Weryfikacja:** bez testów/buildów/typecheck, migracji/restartów i wywołań API/przeglądarki/symulatorów. Eksport ICS nie deklaruje zapisu do kalendarza; SEO produkcyjne i universal links wymagają finalnego hostingu/origin.
+- **Dokumentacja:** `backend/EVENT_DETAIL.md`, EVENTS_API/README, branding i tracker. CHANGELOG odroczony do rzeczywistego odbioru.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2597,3 +2599,7 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | P2-I01 — model danych i API wydarzeń | IN_PROGRESS / NOT VERIFIED | Na polecenie właściciela rozpoczęto dokładnie P2-I01. V17, model wersjonowany, ACL członkostwa/moderatorów, niezależne review i publikacja, publiczny katalog z filtrami/paginacją/geo, UTC+IANA, walidacja i normalizacja obrazów, integracja usuwania kont; kontrakt backend/EVENTS_API.md. | Bez testów/buildów/dodatkowej weryfikacji, uruchomienia migracji/restartu. T01–T04/V01 i Finished otwarte. CHANGELOG odroczony. P2-I02/P2-I03 nierozpoczęte; P2-I00 nie jest automatycznie zaliczone. |
 
 | 2026-11-04 | P2-I02 — discovery wydarzeń web/mobile | IN_PROGRESS / NOT VERIFIED | Wspólny katalog /events, filtry miasto/region/data/kategoria/cena/accessibility, strict/friendly, sortowanie i paginacja, karty z datami/strefą/ceną, EN/PL Ocean, opcjonalny promień/ręczny punkt i jednorazowa geolokalizacja web; API region/sort. backend/EVENT_DISCOVERY.md z zakresem i odbiorem. | Na polecenie właściciela bez testów/buildów/dodatkowej weryfikacji/aktywacji V17/restartów. T01–T04/V01 otwarte. GPS native automatyczny niedostarczony; współrzędne ręczne bez uprawnień. P2-I03 nierozpoczęte; CHANGELOG odroczony. |
+
+| 2026-11-04 | P2-I03 — szczegóły, checkout zewnętrzny i linki | IN_PROGRESS / NOT VERIFIED | Szczegóły /events/{UUID}, całe karty jako link, publiczny organizator, stany anulowania/zakończenia, HTTPS i domena przed wyjściem, rewalidacja celu, eksport ICS z UTC/escaping/folding, istniejący native scheme, runtime metadata i minimum SEO w EVENT_DETAIL.md. Korekta pill Articles: mniejsza gwiazdka i tło przy zachowaniu target48×44. | Zgodnie z poleceniem bez testów/buildów/weryfikacji/API/UI/migracji/restartów. T01–T04/V01/V02 otwarte; zależności niezaliczone. Produkcyjne SEO/universal links i natywny import wymagają odbioru. CHANGELOG odroczony; P2-I04 nierozpoczęte. |
+
+| 2026-11-04 | Articles — oznaczenie tygodnia bez zmiany wymiarów karty | NOT VERIFIED | Usunięto dodatkowy marginTop i paddingTop zależne od gwiazdki w PublicationCard. Badge pozostaje absolutną nakładką przy górnym prawym obrysie, lekko nad treścią; wspólny padding kart12, target i popover zachowane. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. Status P2-I03 bez zmian; CHANGELOG odroczony do odbioru. |

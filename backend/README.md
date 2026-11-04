@@ -97,3 +97,8 @@ P2-I02 adds shared web/native `/events` discovery and the region/sort query
 parameters. See [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md) for scope, location
 privacy/native manual-coordinate fallback and the unexecuted acceptance handoff.
 No test/build, V17 activation or restart performed in this iteration.
+
+P2-I03 adds `/events/{uuid}` details, external organizer/ticket links and public
+ICS export. [EVENT_DETAIL.md](EVENT_DETAIL.md) records boundaries, native import
+limitations and production SEO prerequisites. All runtime checks remain NOT
+VERIFIED; no test/build/migration/restart performed.
