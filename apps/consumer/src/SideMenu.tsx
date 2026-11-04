@@ -17,12 +17,14 @@ import {
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
 
+import { SettingsIcon } from './ui/SettingsIcon';
 import { navigationItems, scienceNavigationItems } from './navigation';
 import { useThemePreferences } from './preferences/ThemePreferencesContext';
 
 /** Header hamburger opens the shared navigation without reducing screen width. */
 export default function SideMenu() {
   const [open, setOpen] = useState(false);
+  const [scienceExpanded, setScienceExpanded] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -66,7 +68,16 @@ export default function SideMenu() {
     const label = t(`navigation.features.${id}`);
     if (id === 'science') {
       return (
-        <View key={id} style={styles.item}>
+        <Pressable
+          key={id}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityState={{ expanded: scienceExpanded }}
+          onPress={() => setScienceExpanded(value => !value)}
+          onFocus={() => setFocused(id)}
+          onBlur={() => setFocused(null)}
+          style={({ pressed }) => [styles.item, pressed && styles.pressed, focused === id && styles.focused]}
+        >
           <Image
             source={image}
             style={styles.iconImage}
@@ -75,8 +86,9 @@ export default function SideMenu() {
             accessible={false}
             importantForAccessibility="no"
           />
-          <Text accessibilityRole="header" style={styles.label}>{label}</Text>
-        </View>
+          <Text style={styles.label}>{label}</Text>
+          <SettingsIcon name={scienceExpanded ? 'chevronDown' : 'chevron'} color={colors.primary} size={20} />
+        </Pressable>
       );
     }
     const selected = pathname === href;
@@ -140,7 +152,7 @@ export default function SideMenu() {
               {navigationItems.map((entry) => (
                 <View key={entry.id}>
                   {item(entry.id, theme === 'dark' && 'imageDark' in entry ? entry.imageDark : entry.image, 'href' in entry ? entry.href : undefined)}
-                  {entry.id === 'science' ? (
+                  {entry.id === 'science' && scienceExpanded ? (
                     <View style={styles.submenu}>
                       {scienceNavigationItems.map((section) => {
                         const id = `science-${section.id}`;

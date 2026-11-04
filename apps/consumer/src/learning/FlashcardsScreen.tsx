@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { spacing } from '@soberity/design-tokens';
@@ -17,7 +17,6 @@ export default function FlashcardsScreen() {
 }
 function FlashcardDeck() {
   const { t, i18n } = useTranslation();
-  const router = useRouter();
   const { getIdToken } = useAuthStatus();
   const locale = i18n.resolvedLanguage === 'pl' ? 'pl' : 'en';
   const [page, setPage] = useState(0);
@@ -71,7 +70,6 @@ function FlashcardDeck() {
   }
   function move(next: number) { setIndex(next); setRevealed(false); setShowEvidence(false); }
   return <Screen maxWidth={760}>
-    <Button label={t('learning.back')} variant="tertiary" onPress={() => router.replace('/science/learn')} />
     <ReadingText heading>{t('learning.flashcards')}</ReadingText>
     <ReadingText muted>{t('learning.flashcardIntro')}</ReadingText>
     <ProgressControl enabled={enabled} busy={busy} onChange={value => { void changeProgress(value); }} />

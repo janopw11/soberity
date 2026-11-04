@@ -2,6 +2,10 @@ import { Platform } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export type SettingsIconName =
+  | 'brain'
+  | 'people'
+  | 'question'
+  | 'basketball'
   | 'person'
   | 'lock'
   | 'sliders'
@@ -21,6 +25,21 @@ export type SettingsIconName =
   | 'alert';
 
 const ICON_PATHS: Record<SettingsIconName, string[]> = {
+  brain: [
+    'M12 5c-2-4-7-2-6 2-4 0-5 6-2 8-1 4 4 7 8 4V5z',
+    'M12 5c2-4 7-2 6 2 4 0 5 6 2 8 1 4-4 7-8 4',
+    'M6 7l2 2 M4 15l4-1 M8 18v-4 M18 7l-2 2 M20 15l-4-1 M16 18v-4',
+  ],
+  people: [
+    'M9 4a3 3 0 1 0 0 6 3 3 0 1 0 0-6z',
+    'M2 20v-2a7 6 0 0 1 14 0v2',
+    'M16 4a3 3 0 0 1 0 6 M18 13c3 .5 4 2.5 4 5v2',
+  ],
+  question: ['M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18z', 'M9 9a3 3 0 1 1 4 2.8c-1 .4-1 1.2-1 2.2', 'M12 17h0'],
+  basketball: [
+    'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18z',
+    'M3 12h18 M12 3v18 M5.6 5.6c7 2 6 10 12.8 12.8 M18.4 5.6c-7 2-6 10-12.8 12.8',
+  ],
   person: ['M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5'],
   lock: ['M6 11h12v9H6z', 'M8.5 11V8a3.5 3.5 0 0 1 7 0v3'],
   sliders: ['M4 7h9', 'M17 7h3', 'M4 17h3', 'M11 17h9'],

@@ -8,6 +8,7 @@ import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { PublicationCard, ReadingCard, ReadingImage, ReadingText } from './readingUi';
 import { mediaUri, scienceGet, type Article, type Category, type Claim, type Page, type Post } from './scienceApi';
 import { useReadingDate } from './EvidenceCard';
+import { Pagination } from '../ui/Pagination';
 import { ChapterHeading } from '../ChapterHeading';
 import CategorySelect from './CategorySelect';
 
@@ -148,47 +149,11 @@ export default function DiscoverScreen({ compact = false }: { compact?: boolean 
     <Screen maxWidth={800} contentStyle={styles.fullPage}>
       <View style={styles.feed}>{content}</View>
       {!error && data && data.items.length > 0 ? (
-        <View style={[styles.pagination, { backgroundColor: colors.surfaceAlt }]}>
-          <PageArrow direction="previous" disabled={data.page === 0} onPress={() => setPage(Math.max(0, data.page - 1))} />
-          <Text accessibilityLiveRegion="polite" style={[styles.pageLabel, { color: colors.textSecondary }]}>
-            {t('discover.page', { page: data.page + 1, pages: Math.max(1, Math.ceil(data.total / Math.max(1, data.size))), count: data.total })}
-          </Text>
-          <PageArrow direction="next" disabled={(data.page + 1) * data.size >= data.total} onPress={() => setPage(data.page + 1)} />
-        </View>
+        <Pagination page={data.page} size={data.size} total={data.total} onPageChange={setPage}
+          label={t('discover.page', { page: data.page + 1, pages: Math.max(1, Math.ceil(data.total / Math.max(1, data.size))), count: data.total })}
+        />
       ) : null}
     </Screen>
-  );
-}
-
-function PageArrow({ direction, disabled, onPress }: {
-  direction: 'previous' | 'next';
-  disabled: boolean;
-  onPress: () => void;
-}) {
-  const { t } = useTranslation();
-  const { colors } = useThemePreferences();
-  const [focused, setFocused] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={t(`discover.${direction}`)}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      onHoverIn={() => setHovered(true)}
-      onHoverOut={() => setHovered(false)}
-      style={({ pressed }) => [styles.pageArrow, {
-        backgroundColor: !disabled && (pressed || hovered) ? colors.surface : 'transparent',
-        borderColor: focused ? colors.focusRing : 'transparent',
-      }]}
-    >
-      <View style={direction === 'previous' ? styles.arrowLeft : undefined} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <SettingsIcon name="chevron" size={20} color={disabled ? colors.textMuted : colors.primary} />
-      </View>
-    </Pressable>
   );
 }
 
@@ -205,25 +170,6 @@ const styles = StyleSheet.create({
   cardMeta: { ...typography.caption },
   fullPage: { flexGrow: 1 },
   feed: { width: '100%', minWidth: 0, flexGrow: 1, gap: spacing.space24 },
-  pagination: {
-    alignSelf: 'center',
-    maxWidth: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: radii.pill,
-    padding: spacing.space4,
-    gap: spacing.space4,
-  },
-  pageArrow: {
-    width: 48,
-    minHeight: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.pill,
-    borderWidth: 2,
-  },
-  arrowLeft: { transform: [{ rotate: '180deg' }] },
-  pageLabel: { ...typography.small, flexShrink: 1, textAlign: 'center' },
   browse: {
     minHeight: 48,
     alignSelf: 'center',

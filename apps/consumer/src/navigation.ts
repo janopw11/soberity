@@ -51,7 +51,7 @@ export const navigationItems = [
   },
 ] as const;
 
-/** Always visible subsections beneath Science & Discover in the shared menu. */
+/** Expandable subsections beneath Science & Discover in the shared menu. */
 export const scienceNavigationItems = [
   {
     id: 'articles',

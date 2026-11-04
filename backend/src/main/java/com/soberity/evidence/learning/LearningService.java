@@ -29,25 +29,35 @@ public class LearningService {
     public record Question(UUID id, String type, String prompt, List<Option> options, String explanation,
                            UUID claimId, UUID revisionId, List<Source> sources) { }
     public record Definition(List<Question> questions) { }
-    public record Draft(String locale, String title, List<Question> questions, String action) { }
+    public record Draft(String locale, String title, List<Question> questions, String action, String categoryCode, UUID coverId) {
+        public Draft(String locale,String title,List<Question> questions,String action) {this(locale,title,questions,action,"alco-facts",null);}
+    }
+    public record Presentation(String categoryCode,UUID coverId,Integer expectedVersion) { }
     public record Answer(UUID questionId, List<UUID> selectedOptionIds, boolean saveProgress) { }
+    public record Completion(String attemptId, List<Answer> answers) { }
     public record Decision(String action, String notes) { }
     public record Page(List<Map<String,Object>> items, int page, int size, long total) { }
     private static final String LIVE = " q.status='PUBLISHED' AND jsonb_array_length(q.definition->'questions')>0 "
         + "AND NOT EXISTS (SELECT 1 FROM learning_quiz_evidence e JOIN claim_revision r ON r.id=e.revision_id "
         + "WHERE e.quiz_id=q.id AND (r.status<>'PUBLISHED' OR NOT EXISTS (SELECT 1 FROM scientific_review sr WHERE sr.revision_id=r.id AND sr.decision='APPROVED'))) ";
 
-    public Page catalog(String locale, int page) {
+    public Page catalog(String locale,int page) {return catalog(locale,page,null);}
+    public Page catalog(String locale,int page,String category) {
         locale(locale); page(page);
-        long total=jdbc.queryForObject("SELECT count(*) FROM learning_quiz q WHERE "+LIVE+" AND q.locale=?",Long.class,locale);
-        var rows=jdbc.queryForList("SELECT q.id,q.title,q.locale,q.version,q.publication_route,q.published_at,jsonb_array_length(q.definition->'questions') AS question_count FROM learning_quiz q WHERE "+LIVE+" AND q.locale=? ORDER BY q.published_at DESC,q.id LIMIT 20 OFFSET ?",locale,(long)page*20);
+        if(category!=null) category(category);
+        String where=LIVE+" AND q.locale=?";
+        var args=new ArrayList<Object>();args.add(locale);
+        if(category!=null){where+=" AND q.category_code=?";args.add(category);}
+        long total=jdbc.queryForObject("SELECT count(*) FROM learning_quiz q WHERE "+where,Long.class,args.toArray());
+        args.add((long)page*20);
+        var rows=jdbc.queryForList("SELECT q.id,q.title,q.locale,q.version,q.publication_route,q.published_at,q.category_code,q.cover_id,(SELECT alt_text FROM editorial_media m WHERE m.id=q.cover_id) AS cover_alt,jsonb_array_length(q.definition->'questions') AS question_count FROM learning_quiz q WHERE "+where+" ORDER BY q.published_at DESC,q.id LIMIT 20 OFFSET ?",args.toArray());
         return new Page(rows,page,20,total);
     }
     public Map<String,Object> quiz(UUID id) {
         var row=live(id);
         Definition definition=definition(row);
         var result=new LinkedHashMap<String,Object>();
-        for(String key:List.of("id","title","locale","version","publication_route","published_at")) result.put(key,row.get(key));
+        for(String key:List.of("id","title","locale","version","publication_route","published_at","category_code","cover_id")) result.put(key,row.get(key));
         result.put("questions",definition.questions().stream().map(q -> Map.of(
             "id",q.id(),"type",q.type(),"prompt",q.prompt(),
             "options",q.options().stream().map(o -> Map.of("id",o.id(),"label",o.label())).toList())).toList());
@@ -91,10 +101,44 @@ public class LearningService {
         }
         return Map.of("quiz_id",id,"version",row.get("version"),"answers",results);
     }
+    public Map<String,Object> complete(VerifiedToken actor,UUID id,Completion input) {
+        progressActor(actor);
+        if(input==null || input.attemptId()==null || !input.attemptId().matches("[a-zA-Z0-9-]{8,100}") || input.answers()==null) throw bad();
+        var row=live(id);
+        var questions=definition(row).questions();
+        if(input.answers().size()!=questions.size()) throw bad();
+        var submitted=new HashMap<UUID,Answer>();
+        for(var answer:input.answers()) {
+            if(answer==null || answer.questionId()==null || submitted.put(answer.questionId(),answer)!=null) throw bad();
+        }
+        int correct=0;
+        for(var question:questions) {
+            var answer=submitted.get(question.id());
+            if(answer==null || answer.selectedOptionIds()==null || answer.selectedOptionIds().size()>6) throw bad();
+            var selected=new HashSet<>(answer.selectedOptionIds());
+            if(selected.isEmpty() || selected.contains(null) || selected.size()!=answer.selectedOptionIds().size()
+                || !question.options().stream().map(Option::id).toList().containsAll(selected)
+                || (!question.type().equals("MULTIPLE_CHOICE") && selected.size()!=1)) throw bad();
+            if(Boolean.TRUE.equals(grade(question,selected).get("correct"))) correct++;
+        }
+        int inserted=jdbc.update("INSERT INTO learning_quiz_result(firebase_uid,quiz_id,attempt_id,version,correct_count,question_count) VALUES (?,?,?,?,?,?) ON CONFLICT DO NOTHING",
+            actor.uid(),id,input.attemptId(),row.get("version"),correct,questions.size());
+        var result=jdbc.queryForMap("SELECT quiz_id,attempt_id,version,correct_count,question_count,round(100.0*correct_count/question_count)::int AS percentage,completed_at FROM learning_quiz_result WHERE firebase_uid=? AND quiz_id=? AND attempt_id=?",actor.uid(),id,input.attemptId());
+        if(((Number)result.get("correct_count")).intValue()!=correct || ((Number)result.get("question_count")).intValue()!=questions.size())
+            throw error(HttpStatus.CONFLICT,"This completed attempt cannot be changed.");
+        // Retakes begin with fresh optional progress; the completed summary remains available.
+        if(inserted>0) jdbc.update("DELETE FROM learning_progress WHERE firebase_uid=? AND quiz_id=?",actor.uid(),id);
+        return result;
+    }
+    public List<Map<String,Object>> results(VerifiedToken actor) {
+        progressActor(actor);
+        return jdbc.queryForList("SELECT DISTINCT ON (r.quiz_id) r.quiz_id,r.attempt_id,r.version,r.correct_count,r.question_count,round(100.0*r.correct_count/r.question_count)::int AS percentage,r.completed_at FROM learning_quiz_result r JOIN learning_quiz q ON q.id=r.quiz_id AND q.version=r.version WHERE r.firebase_uid=? AND "+LIVE+" ORDER BY r.quiz_id,r.completed_at DESC,r.attempt_id DESC",actor.uid());
+    }
     public void forget(VerifiedToken actor) {
         progressActor(actor);
         jdbc.update("DELETE FROM learning_progress WHERE firebase_uid=?",actor.uid());
         jdbc.update("DELETE FROM learning_flashcard_progress WHERE firebase_uid=?",actor.uid());
+        jdbc.update("DELETE FROM learning_quiz_result WHERE firebase_uid=?",actor.uid());
     }
     public List<UUID> flashcardProgress(VerifiedToken actor) {
         progressActor(actor);
@@ -109,7 +153,7 @@ public class LearningService {
     public Page editorialList(VerifiedToken actor,int page) {
         reader(actor); page(page);
         long total=jdbc.queryForObject("SELECT count(*) FROM learning_quiz",Long.class);
-        return new Page(jdbc.queryForList("SELECT id,title,locale,status,author_uid,reviewer_uid,review_notes,created_at,version,publication_route FROM learning_quiz ORDER BY created_at DESC,id LIMIT 20 OFFSET ?",(long)page*20),page,20,total);
+        return new Page(jdbc.queryForList("SELECT id,title,locale,status,author_uid,reviewer_uid,review_notes,created_at,version,publication_route,category_code,cover_id,presentation_version FROM learning_quiz ORDER BY created_at DESC,id LIMIT 20 OFFSET ?",(long)page*20),page,20,total);
     }
     public Map<String,Object> editorialDetail(VerifiedToken actor,UUID id) {
         reader(actor); var row=one("SELECT * FROM learning_quiz WHERE id=?",id);
@@ -147,12 +191,31 @@ public class LearningService {
                 throw error(HttpStatus.BAD_REQUEST,"Every answer explanation requires a research source.");
             }
         }
+        String category=input.categoryCode()==null?"alco-facts":input.categoryCode();category(category);checkCover(actor,input.coverId());
         UUID id=UUID.randomUUID();
-        jdbc.update("INSERT INTO learning_quiz(id,locale,title,definition,author_uid,status) VALUES (?,?,?,?::jsonb,?,'IN_REVIEW')",id,input.locale(),title,json.writeValueAsString(new Definition(input.questions())),actor.uid());
+        jdbc.update("INSERT INTO learning_quiz(id,locale,title,definition,author_uid,status,category_code,cover_id) VALUES (?,?,?,?::jsonb,?,'IN_REVIEW',?,?)",id,input.locale(),title,json.writeValueAsString(new Definition(input.questions())),actor.uid(),category,input.coverId());
         input.questions().stream().map(Question::revisionId).filter(Objects::nonNull).distinct().forEach(revision -> jdbc.update("INSERT INTO learning_quiz_evidence(quiz_id,revision_id) VALUES (?,?)",id,revision));
         audit(actor,id,action.equals("PUBLISH")?"CREATED":"SUBMITTED",action.equals("PUBLISH")?"Created for author publication":"Submitted for independent review");
         if(action.equals("PUBLISH")) decide(actor,id,new Decision("AUTHOR_PUBLISH","Published directly by author"));
         return id;
+    }
+    public Map<String,Object> presentation(VerifiedToken actor,UUID id,Presentation input) {
+        require(actor,"AUTHOR");
+        var row=one("SELECT * FROM learning_quiz WHERE id=? FOR UPDATE",id);
+        if(!actor.uid().equals(row.get("author_uid"))) throw error(HttpStatus.FORBIDDEN,"Only the quiz author can edit its presentation.");
+        if("ARCHIVED".equals(row.get("status"))) throw error(HttpStatus.CONFLICT,"Archived quizzes cannot be edited.");
+        if(input==null || input.expectedVersion()==null || input.expectedVersion().intValue()!=((Number)row.get("presentation_version")).intValue()) throw error(HttpStatus.CONFLICT,"Quiz presentation changed. Reload before saving.");
+        category(input.categoryCode());checkCover(actor,input.coverId());
+        jdbc.update("UPDATE learning_quiz SET category_code=?,cover_id=?,presentation_version=presentation_version+1 WHERE id=?",input.categoryCode(),input.coverId(),id);
+        audit(actor,id,"PRESENTATION","Updated category or background image");
+        return editorialDetail(actor,id);
+    }
+    private static void category(String value) {
+        if(value==null || !Set.of("brain","relationships","alco-facts","sport").contains(value)) throw bad();
+    }
+    private void checkCover(VerifiedToken actor,UUID coverId) {
+        if(coverId!=null && !Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM editorial_media WHERE id=? AND owner_uid=? AND purpose='COVER')",Boolean.class,coverId,actor.uid())))
+            throw error(HttpStatus.BAD_REQUEST,"Upload your own background image first.");
     }
     public void decide(VerifiedToken actor,UUID id,Decision input) {
         if(input==null) throw bad();

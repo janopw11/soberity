@@ -9,36 +9,75 @@ export default function ScienceLayout() {
   const { t } = useTranslation();
   const headerOptions = useAppHeaderOptions();
   return (
-    <Stack screenOptions={{
-      title: t('science.title'),
-      ...headerOptions,
-    }}>
-      <Stack.Screen name="index" options={{ title: t('discover.articles'), headerTitle: () => <ArticlesTitle /> }} />
-      <Stack.Screen name="quizzes" options={{ title: t('learning.quizzes') }} />
+    <Stack
+      screenOptions={{
+        title: t('science.title'),
+        ...headerOptions,
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          title: t('discover.articles'),
+          headerTitle: () => <ScienceTitle section="articles" />,
+        }}
+      />
+      <Stack.Screen
+        name="quizzes"
+        options={{
+          title: t('learning.quizzes'),
+          headerTitle: () => <ScienceTitle section="quizzes" />,
+        }}
+      />
       <Stack.Screen name="learn" options={{ title: t('learning.title') }} />
-      <Stack.Screen name="flashcards" options={{ title: t('learning.flashcards') }} />
-      <Stack.Screen name="quiz/[id]" options={{ title: t('learning.quizzes') }} />
-      <Stack.Screen name="post/[id]" options={{ title: t('discover.article') }} />
-      <Stack.Screen name="article/[id]" options={{ title: t('discover.article') }} />
-      <Stack.Screen name="evidence/[id]" options={{ title: t('discover.evidence') }} />
+      <Stack.Screen
+        name="flashcards"
+        options={{ title: t('learning.flashcards') }}
+      />
+      <Stack.Screen
+        name="quiz/[id]"
+        options={{ title: t('learning.quizzes') }}
+      />
+      <Stack.Screen
+        name="post/[id]"
+        options={{ title: t('discover.article') }}
+      />
+      <Stack.Screen
+        name="article/[id]"
+        options={{ title: t('discover.article') }}
+      />
+      <Stack.Screen
+        name="evidence/[id]"
+        options={{ title: t('discover.evidence') }}
+      />
     </Stack>
   );
 }
 
-function ArticlesTitle() {
+function ScienceTitle({ section }: { section: 'articles' | 'quizzes' }) {
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
   return (
     <View style={styles.title}>
       <Image
-        // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
-        source={require('../../assets/images/articles-icon-ocean.png')}
+        source={
+          section === 'articles'
+            ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
+              require('../../assets/images/articles-icon-ocean.png')
+            : // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
+              require('../../assets/images/quizzes-icon-ocean.png')
+        }
         style={styles.icon}
         resizeMode="contain"
         accessible={false}
         importantForAccessibility="no"
       />
-      <Text accessibilityRole="header" style={[styles.label, { color: colors.primary }]}>{t('discover.articles')}</Text>
+      <Text
+        accessibilityRole="header"
+        style={[styles.label, { color: colors.primary }]}
+      >
+        {t(section === 'articles' ? 'discover.articles' : 'learning.quizzes')}
+      </Text>
     </View>
   );
 }

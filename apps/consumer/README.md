@@ -211,9 +211,9 @@ options; answers are graded by the API, followed by explanation and evidence.
 No timers, streaks or penalties. Published quiz material disappears when its
 pinned evidence revision is withdrawn/replaced.
 
-Saving is off by default. Guests can learn without saving. Members can opt in
-to loading/resuming account progress, save subsequent answers/reviewed cards,
-stop saving, or erase all saved learning progress with confirmation. Private
+Quiz progress automatically loads and saves for signed-in members, with no
+opt-in box. Guests can learn without account storage. Flashcard saving remains
+optional; its controls also allow erasing all saved learning progress with confirmation. Private
 state is scoped to the current account; no learning history is written to
 AsyncStorage/localStorage. Account deletion erases saved progress in V8.
 
@@ -269,3 +269,7 @@ No tests or client builds were run for this navigation change.
 ### Articles search (P1-I03)
 
 Science → Articles searches a case-insensitive title substring and filters by category through `/api/v1/science/feed?q=...&category=...`, before pagination. Typing uses a 500 ms debounce; changing either filter resets to page 0. Empty search/all categories restores the full feed. Search controls appear only on Articles, not Home. Restart the local backend after updating its code; no new migration is needed.
+
+### Saved quiz results (P1-I04)
+
+Signed-in users save a server-scored completion when pressing Finish; saving unfinished answers remains optional. Cards load private results, display the latest percentage and use blue for unfinished / red <40 / orange 40–79 / green >=80. Every completed quiz can be retaken; the previous result remains until a new completion. Completion retries reuse an opaque attempt ID and preserve answers on failure. Guest scores remain in-session. Forget learning data/account deletion removes saved results. Backend migration V10 and a restart are required (applied locally during implementation).

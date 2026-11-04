@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePathname, useRouter } from 'expo-router';
+import { useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { radii, spacing } from '@soberity/design-tokens';
@@ -11,17 +11,22 @@ import { SettingsIcon } from '../ui';
 function HeaderMenu() {
   const router = useRouter();
   const pathname = usePathname();
+  const { category } = useGlobalSearchParams<{ category?: string }>();
+  const inQuizCategory = pathname === '/science/quizzes' && Boolean(category);
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.leftActions}>
       <SideMenu />
-      {pathname !== '/' && router.canGoBack() ? (
+      {inQuizCategory || (pathname !== '/' && router.canGoBack()) ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('navigation.goBack')}
-          onPress={() => router.back()}
+          onPress={() => {
+            if (inQuizCategory) router.setParams({ category: undefined });
+            else router.back();
+          }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={[styles.iconButton, { borderColor: focused ? colors.focusRing : 'transparent' }]}

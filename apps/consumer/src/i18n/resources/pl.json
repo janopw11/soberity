@@ -610,6 +610,32 @@
     "articles": "Artykuły"
   },
   "learning": {
+    "discoverQuizzes": "Odkryj quizy",
+    "questionPosition": "Pytanie {{current}} z {{total}}",
+    "answeredCount": "Odpowiedzi: {{count}} / {{total}}",
+    "quizProgress": "Postęp quizu",
+    "explanationTitle": "Poznaj wyjaśnienie",
+    "allQuizCategories": "Wszystkie kategorie",
+    "quizCategory": "Kategoria quizu",
+    "backgroundImage": "Obraz tła",
+    "backgroundDescription": "Opis obrazu tła",
+    "uploadBackground": "Prześlij tło",
+    "removeBackground": "Usuń tło",
+    "savePresentation": "Zapisz kategorię i tło",
+    "backgroundUploadError": "Nie udało się przesłać lub wczytać obrazu. Spróbuj ponownie.",
+    "categories": {
+      "brain": "Mózg",
+      "relationships": "Relacje",
+      "alco-facts": "Fakty o alkoholu",
+      "sport": "Sport"
+    },
+    "retakeQuizShort": "Powtórz quiz",
+    "resultPercentage": "Wynik: {{percentage}}%",
+    "completionPrivacy": "Wynik ukończonego quizu zapisuje się na Twoim koncie. Zapis odpowiedzi w trakcie pozostaje opcjonalny.",
+    "completionSaveError": "Nie udało się zapisać wyniku. Wybierz ponownie Zakończ — Twoje odpowiedzi są zachowane.",
+    "startQuizShort": "Start quizu",
+    "page": "Strona {{page}} z {{pages}} · Quizy: {{count}}",
+    "noQuizzes": "Brak quizów",
     "title": "Ucz się na podstawie dowodów",
     "intro": "Poznawaj recenzowane badania we własnym tempie. Bez limitu czasu, serii i kar.",
     "openLearning": "Fiszki i quizy",
@@ -671,7 +697,8 @@
       "PUBLISH": "Opublikowano",
       "ARCHIVE": "Wycofano",
       "AUTHOR_PUBLISH": "Publikacja autora",
-      "CREATED": "Utworzono"
+      "CREATED": "Utworzono",
+      "PRESENTATION": "Zmieniono kategorię lub tło"
     },
     "editor": {
       "title": "Panel redakcyjny quizów",

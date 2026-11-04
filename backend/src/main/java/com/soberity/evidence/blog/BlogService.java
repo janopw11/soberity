@@ -158,7 +158,7 @@ public class BlogService {
     }
     public byte[] media(VerifiedToken actor,UUID id,boolean publicRead) {
         if(publicRead) {
-            if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM editorial_post_media m JOIN editorial_post_version v ON v.id=m.version_id WHERE m.media_id=? AND v.status='PUBLISHED')",Boolean.class,id)))throw error(HttpStatus.NOT_FOUND,"Image not found");
+            if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM editorial_post_media m JOIN editorial_post_version v ON v.id=m.version_id WHERE m.media_id=? AND v.status='PUBLISHED') OR EXISTS(SELECT 1 FROM learning_quiz q WHERE q.cover_id=? AND q.status='PUBLISHED' AND jsonb_array_length(q.definition->'questions')>0 AND NOT EXISTS(SELECT 1 FROM learning_quiz_evidence e JOIN claim_revision r ON r.id=e.revision_id WHERE e.quiz_id=q.id AND (r.status<>'PUBLISHED' OR NOT EXISTS(SELECT 1 FROM scientific_review sr WHERE sr.revision_id=r.id AND sr.decision='APPROVED'))))",Boolean.class,id,id)))throw error(HttpStatus.NOT_FOUND,"Image not found");
         } else reader(actor);
         return jdbc.query("SELECT data FROM editorial_media WHERE id=?",rs->{if(!rs.next())throw error(HttpStatus.NOT_FOUND,"Image not found");return rs.getBytes(1);},id);
     }

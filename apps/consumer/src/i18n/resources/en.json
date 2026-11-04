@@ -606,6 +606,32 @@
     "articles": "Articles"
   },
   "learning": {
+    "discoverQuizzes": "Discover quizzes",
+    "questionPosition": "Question {{current}} of {{total}}",
+    "answeredCount": "Answered {{count}} / {{total}}",
+    "quizProgress": "Quiz progress",
+    "explanationTitle": "Let’s explore the answer",
+    "allQuizCategories": "All categories",
+    "quizCategory": "Quiz category",
+    "backgroundImage": "Background image",
+    "backgroundDescription": "Background description",
+    "uploadBackground": "Upload background",
+    "removeBackground": "Remove background",
+    "savePresentation": "Save category and background",
+    "backgroundUploadError": "Could not upload or load this image. Please try again.",
+    "categories": {
+      "brain": "Brain",
+      "relationships": "Relationships",
+      "alco-facts": "Alco Facts",
+      "sport": "Sport"
+    },
+    "retakeQuizShort": "Retake Quiz",
+    "resultPercentage": "Result: {{percentage}}%",
+    "completionPrivacy": "Your completed quiz result is saved to your account. Saving answers in progress remains optional.",
+    "completionSaveError": "Your result could not be saved. Please try Finish again; your answers are still here.",
+    "startQuizShort": "Start Quiz",
+    "page": "Page {{page}} of {{pages}} · Quizzes: {{count}}",
+    "noQuizzes": "No quizzes",
     "title": "Learn with evidence",
     "intro": "Explore reviewed research at your own pace. No timer, streak or penalties.",
     "openLearning": "Flashcards & quizzes",
@@ -665,7 +691,8 @@
       "PUBLISH": "Published",
       "ARCHIVE": "Archived",
       "AUTHOR_PUBLISH": "Author publication",
-      "CREATED": "Created"
+      "CREATED": "Created",
+      "PRESENTATION": "Category or background updated"
     },
     "editor": {
       "title": "Quiz editorial workspace",

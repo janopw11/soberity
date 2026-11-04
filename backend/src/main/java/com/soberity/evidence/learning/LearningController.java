@@ -15,8 +15,8 @@ public class LearningController {
     private final LearningAnswerLimiter limiter;
     public LearningController(LearningService service, LearningAnswerLimiter limiter) {this.service=service;this.limiter=limiter;}
     @GetMapping("/api/v1/learning/quizzes")
-    public ResponseEntity<LearningService.Page> catalog(@RequestParam(defaultValue="en") String locale,@RequestParam(defaultValue="0") int page) {
-        return noStore(service.catalog(locale,page));
+    public ResponseEntity<LearningService.Page> catalog(@RequestParam(defaultValue="en") String locale,@RequestParam(defaultValue="0") int page,@RequestParam(required=false) String category) {
+        return noStore(service.catalog(locale,page,category));
     }
     @GetMapping("/api/v1/learning/quizzes/{id}")
     public ResponseEntity<Map<String,Object>> quiz(@PathVariable UUID id) {return noStore(service.quiz(id));}
@@ -28,6 +28,10 @@ public class LearningController {
         }
         return noStore(service.answer(actor,id,input));
     }
+    @GetMapping("/api/v1/me/learning/quizzes/results")
+    public ResponseEntity<List<Map<String,Object>>> results(@AuthenticationPrincipal VerifiedToken actor) {return noStore(service.results(actor));}
+    @PostMapping("/api/v1/me/learning/quizzes/{id}/complete")
+    public ResponseEntity<Map<String,Object>> complete(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestBody LearningService.Completion input) {return noStore(service.complete(actor,id,input));}
     @GetMapping("/api/v1/me/learning/quizzes/{id}")
     public ResponseEntity<Map<String,Object>> progress(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id) {return noStore(service.progress(actor,id));}
     @GetMapping("/api/v1/me/learning/flashcards")
@@ -46,6 +50,8 @@ public class LearningController {
     @PostMapping("/api/v1/editorial/quizzes")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String,Object> create(@AuthenticationPrincipal VerifiedToken actor,@RequestBody LearningService.Draft input) {return Map.of("id",service.create(actor,input));}
+    @PutMapping("/api/v1/editorial/quizzes/{id}/presentation")
+    public ResponseEntity<Map<String,Object>> presentation(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestBody LearningService.Presentation input) {return noStore(service.presentation(actor,id,input));}
     @PostMapping("/api/v1/editorial/quizzes/{id}/decision")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void decide(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestBody LearningService.Decision input) {service.decide(actor,id,input);}

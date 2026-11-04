@@ -67,13 +67,13 @@ published, independently reviewed EvidenceClaims in the selected locale.
 
 Only the server scores answers. A multi-option answer must match the exact set.
 Unknown/duplicate options are rejected. Responses are no-store. Anonymous
-answers are not persisted. The answer endpoint has a bounded per-process token
+answers are not persisted. Completed authenticated runs save a separate minimal result summary as described below. The answer endpoint has a bounded per-process token
 bucket (30 burst, refill 1/s; 10,000 ephemeral UID/connection-address buckets).
 429 includes Retry-After. No XP, streaks, timers or penalties are introduced.
 
 ## Optional account progress
 
-Saving starts disabled; the user opts in to load progress and save subsequent
+In-progress answer saving starts disabled; the user opts in to load progress and save subsequent
 answers/reviewed cards. No learning data in localStorage or AsyncStorage.
 Private client state remounts when the account changes. Earlier unsaved answers
 are not silently uploaded when enabling saving mid-quiz.
@@ -100,6 +100,27 @@ library. Loading/empty/error/retry, EN/PL, keyboard focus and both token themes
 are implemented. Pilot content/Myth Battle remain P1-I06, cadence P1-I05.
 
 V8/V9 were applied locally. Source links use the existing immutable definition
-JSON and need no additional migration. The latest backend was packaged with
--DskipTests and started successfully on 8090. No quizzes were published by the
-agent. No tests ran; API/UI behavior and native runtime remain NOT VERIFIED.
+JSON and need no additional migration. The earlier source-link implementation was packaged with -DskipTests on 2026-11-03. Current completion-result verification is documented below; no existing quiz was published by the agent. Native runtime remains NOT VERIFIED.
+
+## Completed quiz results (2026-11-04)
+
+Completed signed-in runs save minimal result summaries independently of optional in-progress answer storage. The quiz UI automatically loads/saves in-progress answers for signed-in users using `saveProgress:true`; guest results remain session-only. No health/consumption data or raw answer history is added to the result table.
+
+- `POST /api/v1/me/learning/quizzes/{id}/complete`: verified identity required; body `{attemptId, answers:[{questionId,selectedOptionIds}]}`. All questions must be present exactly once and all selections valid. The server grades against the live immutable quiz definition, ignoring client score/identity fields. Returns `{quiz_id,attempt_id,version,correct_count,question_count,percentage,completed_at}`; percentage is rounded to a whole number.
+- `GET /api/v1/me/learning/quizzes/results`: latest completed result per live quiz/version, only for the token owner. No results are added to public catalog responses. All private responses use `Cache-Control: no-store`.
+
+`attemptId` is an opaque 8–100-character alphanumeric/hyphen request identifier, not an authentication secret. Retries with the same identifier and score return the original completion; changing its score returns 409. Retrying an older completion cannot replace the latest result. Successful first completion clears that quiz's optional in-progress answers; duplicate retries do not clear a newer retake. Retakes get a new attempt ID and remain available regardless of score; the previous result remains on the card until the next completion.
+
+V10 adds `learning_quiz_result`, storing completed-attempt counts, quiz version and server timestamp. Latest completion, rather than best score, determines the card. `DELETE /api/v1/me/learning` and the account-deletion trigger erase all result summaries. Saves and erasure use the existing account lock/tombstone checks. Unpublished/withdrawn quizzes remain unavailable.
+
+Cards: blue without a completed result, red below 40%, orange from 40% to below 80%, green at 80% and above. Percentage text supplements color. Failures to save keep answers in memory and offer Finish again with the same request identifier; no false successful-save state is shown.
+
+Verification: Maven 13 unit + 27 integration tests PASS, including QuizResultsApiIT (server score, retakes/latest/idempotence, private ownership, input validation, forget/account deletion); client 12 component tests PASS. Browser synthetic-identity/API smoke EN/PL × light/dark × mobile/desktop 8/8 PASS, including completion/reload/retake in the first scenario. Native runtime remains NOT VERIFIED. Local backend restarted and V10 applied; health HTTP 200/UP.
+
+Final validation pass: QuizResultsApiIT 4/4 PASS additionally verifies complete-length payloads with unknown question/option IDs and duplicate selections, and confirms a delayed completion retry preserves a newer retake’s in-progress answers. Existing Articles translation keys were preserved.
+
+Completion payload compatibility (2026-11-04): every item in `answers` must include
+`saveProgress:false` alongside `questionId` and `selectedOptionIds`. The current
+completion DTO reuses `Answer`, whose primitive boolean is required by the strict
+JSON deserializer. This flag does not disable result persistence: completion
+always stores the authenticated result and clears in-progress answers.
