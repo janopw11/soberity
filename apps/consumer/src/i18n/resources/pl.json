@@ -409,7 +409,8 @@
       "community": "Soberity (społeczność)",
       "map": "World Map",
       "brain": "Brain Lab",
-      "myths": "Myth Buster"
+      "myths": "Myth Buster",
+      "about": "O nas"
     },
     "open": "Otwórz menu",
     "close": "Zamknij menu",
@@ -1069,5 +1070,15 @@
       "VERIFIED": "Zweryfikowany",
       "SUSPENDED": "Zawieszony"
     }
+  },
+  "about": {
+    "title": "O nas",
+    "mission": "Życie z jasnym umysłem. Razem.",
+    "description": "Soberity łączy edukację opartą na nauce z doświadczeniami bez alkoholu, wspierając życie bez picia.",
+    "scienceTitle": "Poznaj naukę",
+    "science": "Odkrywaj artykuły, quizy i fiszki oparte na weryfikowalnych źródłach.",
+    "communityTitle": "Łącz się przez doświadczenia",
+    "community": "Odkrywaj sober parties, rave’y i codzienne aktywności, które łączą ludzi.",
+    "approach": "Rzetelne źródła. Wsparcie bez oceniania."
   }
 }

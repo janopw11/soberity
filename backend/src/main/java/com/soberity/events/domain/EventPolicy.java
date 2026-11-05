@@ -35,12 +35,29 @@ public final class EventPolicy {
                         AlcoholControls alcoholControls,Verification organizerVerification,
                         boolean sourceTraceable,boolean contentPermissionConfirmed,
                         Instant startsAt,Instant endsAt,String timezone) { }
+    /** Content evidence is independent of the deferred organizer-account verification workflow. */
+    public record ContentFacts(Track track,Category category,AlcoholPolicy alcoholPolicy,String alcoholRules,
+                               AlcoholControls alcoholControls,boolean sourceTraceable,
+                               boolean contentPermissionConfirmed,Instant startsAt,Instant endsAt,String timezone) { }
     public record Assessment(Eligibility eligibility,List<Reason> reasons) {
         public Assessment { reasons=List.copyOf(reasons); }
     }
     private static final Set<Category> NIGHTLIFE=Set.of(Category.SOBER_PARTY,Category.SOBER_RAVE,Category.DANCE,Category.LIVE_MUSIC);
 
     public static Assessment assess(Facts facts,Instant now) {
+        Objects.requireNonNull(facts,"Event facts required");
+        var content=assessContent(new ContentFacts(facts.track(),facts.category(),facts.alcoholPolicy(),
+            facts.alcoholRules(),facts.alcoholControls(),facts.sourceTraceable(),facts.contentPermissionConfirmed(),
+            facts.startsAt(),facts.endsAt(),facts.timezone()),now,false);
+        var reasons=new ArrayList<>(content.reasons());
+        boolean ineligible=content.eligibility()==Eligibility.INELIGIBLE;
+        if(facts.organizerVerification()==Verification.SUSPENDED) { reasons.add(Reason.ORGANIZER_SUSPENDED); ineligible=true; }
+        else if(facts.organizerVerification()==Verification.REJECTED) { reasons.add(Reason.ORGANIZER_REJECTED); ineligible=true; }
+        else if(facts.organizerVerification()!=Verification.VERIFIED) reasons.add(Reason.ORGANIZER_NOT_VERIFIED);
+        return assessment(reasons,ineligible);
+    }
+
+    static Assessment assessContent(ContentFacts facts,Instant now,boolean endOptional) {
         Objects.requireNonNull(facts,"Event facts required"); Objects.requireNonNull(now,"Current instant required");
         var reasons=new ArrayList<Reason>(); boolean ineligible=false;
         if(facts.track()==null || facts.category()==null || facts.alcoholPolicy()==null) reasons.add(Reason.MISSING_CLASSIFICATION);
@@ -48,9 +65,6 @@ public final class EventPolicy {
             (facts.track()==Track.SOBER_NIGHTLIFE)!=NIGHTLIFE.contains(facts.category())) {
             reasons.add(Reason.CATEGORY_TRACK_MISMATCH); ineligible=true;
         }
-        if(facts.organizerVerification()==Verification.SUSPENDED) { reasons.add(Reason.ORGANIZER_SUSPENDED); ineligible=true; }
-        else if(facts.organizerVerification()==Verification.REJECTED) { reasons.add(Reason.ORGANIZER_REJECTED); ineligible=true; }
-        else if(facts.organizerVerification()!=Verification.VERIFIED) reasons.add(Reason.ORGANIZER_NOT_VERIFIED);
         if(!facts.sourceTraceable()) reasons.add(Reason.MISSING_SOURCE);
         if(!facts.contentPermissionConfirmed()) reasons.add(Reason.MISSING_CONTENT_PERMISSION);
         if(facts.alcoholRules()==null || facts.alcoholRules().isBlank()) reasons.add(Reason.MISSING_ALCOHOL_RULES);
@@ -68,11 +82,17 @@ public final class EventPolicy {
         if(facts.alcoholPolicy()==AlcoholPolicy.SOBER_FRIENDLY &&
             (controls==null || !Boolean.TRUE.equals(controls.explicitAlcoholFreeParticipation())))
             reasons.add(Reason.SOBER_FRIENDLY_NOT_DEMONSTRATED);
-        if(facts.startsAt()==null || facts.endsAt()==null) reasons.add(Reason.MISSING_DATES);
-        else if(!facts.endsAt().isAfter(facts.startsAt())) { reasons.add(Reason.INVALID_DATES); ineligible=true; }
-        else if(!facts.endsAt().isAfter(now)) { reasons.add(Reason.EVENT_ALREADY_ENDED); ineligible=true; }
-        try { ZoneId.of(Objects.requireNonNullElse(facts.timezone(),"")); }
+        if(facts.startsAt()==null || (!endOptional && facts.endsAt()==null)) reasons.add(Reason.MISSING_DATES);
+        else if(facts.endsAt()!=null && !facts.endsAt().isAfter(facts.startsAt())) { reasons.add(Reason.INVALID_DATES); ineligible=true; }
+        else if(facts.endsAt()!=null && !facts.endsAt().isAfter(now)) { reasons.add(Reason.EVENT_ALREADY_ENDED); ineligible=true; }
+        try {
+            ZoneId.of(Objects.requireNonNullElse(facts.timezone(),""));
+            if(!ZoneId.getAvailableZoneIds().contains(facts.timezone())) reasons.add(Reason.INVALID_TIMEZONE);
+        }
         catch(DateTimeException e) { reasons.add(Reason.INVALID_TIMEZONE); }
+        return assessment(reasons,ineligible);
+    }
+    private static Assessment assessment(List<Reason> reasons,boolean ineligible) {
         return new Assessment(ineligible?Eligibility.INELIGIBLE:reasons.isEmpty()?Eligibility.READY_FOR_REVIEW:Eligibility.NEEDS_INFORMATION,reasons);
     }
     /** Transition permission is necessary, never sufficient: ownership, review and version guards belong to the API. */

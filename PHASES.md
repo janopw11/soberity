@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I04 IN_PROGRESS (ręczny panel wydarzeń, częściowy / NOT VERIFIED), P2-I00–P2-I03 nadal IN_PROGRESS / NOT VERIFIED, 0/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I00 DONE (polityka etapu 1, 2026-11-05), P2-I01–P2-I04 nadal IN_PROGRESS / NOT VERIFIED, 1/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -74,7 +74,7 @@ Blockers: opis lub —
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 6 | 4/6 | IN_PROGRESS |
-| Phase 2 | Sober Events — katalog, organizerzy, kontakt | 7 | 0/7 | IN_PROGRESS |
+| Phase 2 | Sober Events — katalog admina, lokalizacja i Dołączam (etap 1) | 7 | 1/7 | IN_PROGRESS |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
 | Phase 5 | Community — grupy, posty, interakcje i moderacja | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 78 iteracji agentowych; wykonane: **17/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web).
+**Łącznie:** 78 iteracji agentowych; wykonane: **18/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web; 2026-11-05: P2-I00 DONE po testach reguł domenowych i przeglądzie polityki etapu 1).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -737,191 +737,229 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ---
 
-# Phase 2 — Sober Events — katalog, organizerzy, kontakt
+# Phase 2 — Sober Events — katalog admina, lokalizacja i Dołączam (etap 1)
 
 **Status fazy:** IN_PROGRESS  
-**Cel:** Międzynarodowy katalog głównie sober rave/party, rozszerzony o lifestyle; bez własnych płatności.  
+**Cel:** Międzynarodowy katalog sober events zarządzany przez administratora, globalny wybór kraju/miasta, najbliższe wydarzenia na Home po zgodzie na lokalizację oraz prywatna deklaracja „Dołączam”; bez własnych płatności.
+
 **Zależności:** Phase 0; interfejs Discover można rozwijać równolegle do Phase 1 po zatwierdzeniu kontraktów.  
 **Raport główny:** §3.3–§3.4, §7–§8, §13  
 **Iteracje:** 7
 
 **Decyzja priorytetowa 2026-11-04:** start lokalnego P2-I00 na wyraźne polecenie właściciela, z odłożonym Myth Battle. Otwarte bramki Phase 0/1 nie są zaliczone; odroczenie zdalnego P0-I13 dla lokalnych prac zapisano w ADR-010.
 
+**Obowiązujący zakres pierwszego etapu — decyzja właściciela 2026-11-05:**
+
+- **Lokalizacja:** globalna baza krajów i miast ze stabilnymi identyfikatorami i współrzędnymi miast. Przy definiowaniu miejsca wydarzenia dwa osobne pola z wyszukiwaniem pełnotekstowym: najpierw kraj, potem miasto z tego kraju. Wpisany tekst służy wyszukiwaniu; zapis wymaga wyboru rekordu, nie dowolnego stringa. Ten sam słownik obsługuje filtr lokalizacji w katalogu.
+- **Administrator:** dodaje i publikuje sober event: nazwa, lokalizacja (kraj + miasto, opcjonalnie miejsce/adres), opis, link do strony organizatora, zdjęcie, data i godzina ze strefą czasową oraz typ potrzebny do filtrowania. Może usunąć konkretne wydarzenie. Dodanie nie wymaga zakładania konta organizatora ani niezależnego obiegu recenzji; kryteria sober i autoryzacja backendu nadal obowiązują.
+- **Home:** po dobrowolnej zgodzie i uzyskaniu lokalizacji pokazuje rzeczywiste nadchodzące wydarzenia w obecnym stylu biletu, od najbliższych. Brak wydarzeń w promieniu oznacza komunikat „Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń” z linkiem do Sober Events; bez zastępowania odległymi wydarzeniami. Bez zgody sekcja na Home jest całkowicie ukryta; katalog pozostaje dostępny. Zgoda bez możliwej do ustalenia pozycji oznacza uczciwy komunikat o niedostępnej lokalizacji i link do katalogu, nie „brak wydarzeń”.
+- **Sober Events:** wyszukiwanie po nazwie, typie, lokalizacji (kraj/miasto), zakresie dat od–do i filtrze „Dołączone / Joined”. Filtry łączą się przed paginacją i działają bez zgody na GPS; jedynie Joined wymaga zalogowania.
+- **Dołączam:** zalogowany użytkownik zaznacza zamiar udziału i może go cofnąć. Jest to wyłącznie prywatna informacja w Soberity, zachowywana między sesjami i dostępna przez filtr Joined; bez rezerwacji, biletu, płatności, wysyłania zgłoszenia do organizatora i publicznej listy uczestników.
+
+**Odłożone poza pierwszy etap:** samoobsługa i publiczne profile organizatorów, osobny portal moderacji zgłoszeń, formularz kontaktowy i odpowiedzi/powiadomienia, ulubione jako odrębna funkcja, eksport kalendarza, dedykowany checkout oraz dodatkowe filtry ceny/dostępności/języka/regionu. Powrót wymaga osobnego polecenia; nie blokują bramki pierwszego etapu. Płatności/bilety/QR pozostają w Phase 4. Raport §3.3–§3.4 opisuje szerszy kierunek produktu; ten zatwierdzony etap zawęża jego realizację, bez zmiany raportu.
+
+**Stan kodu a nowy zakres:** istniejące opisy „Implementacja 2026-11-04” poniżej są historyczne i pozostają NOT VERIFIED. Kod używa tekstowego miasta, organizer ACL i procesu moderacji; geolokalizacja jest przeglądarkowa, native ma tylko ręczne współrzędne. Nie stanowi to dowodu wykonania globalnego słownika, admin-only dodawania/usuwania, rzeczywistych biletów Home ani Joined. Dostosowanie istniejącego modelu/API/UI wymaga kolejnego zlecenia implementacyjnego. Zachowano ID i historię; punkty oznaczone **ODŁOŻONE** są nieobowiązkowe dla tego etapu i pozostają niezaznaczone. Żadna iteracja nie została rozpoczęta ani zamknięta tą zmianą planu.
+
 ## P2-I00 — Event policy, taxonomy & trust
 
-**Status:** IN_PROGRESS — implementacja do odbioru; NOT VERIFIED  
+**Status:** DONE — obowiązkowy zakres polityki etapu 1 zweryfikowany 2026-11-05; T02 odłożone, bez zaliczania portalu organizatorów.
 **Started:** 2026-11-04  
-**Finished:** —  
+**Finished:** 2026-11-05
 **Zależności iteracji:** P0-I13 — lokalny start zatwierdzony przez właściciela 2026-11-04 mimo otwartego staging/remote, ADR-010; zależność nie jest oznaczona DONE.  
-**Dowód:** `docs/policies/EVENTS_POLICY.md`, `docs/policies/EVENTS_POLICY_SCENARIOS.md` (scenariusze nieuruchomione), `backend/src/main/java/com/soberity/events/domain/EventPolicy.java`, `backend/EVENTS_POLICY.md`, ADR-010. T01–T04 przygotowane/zaimplementowane, checkboxy otwarte do rzeczywistego odbioru.  
-**Blokery:** brak blokera lokalnego przygotowania polityki; na obowiązujące polecenie właściciela bez testów i dodatkowej weryfikacji. Nie uruchomiono kompilacji/lint/buildów, API, migracji, przeglądarki ani symulatorów. Kryteria produktu i domyślna retencja wymagają odbioru właściciela; żaden organizator/event nie został zatwierdzony.
+**Dowód:** wersjonowane `backend/EVENTS_POLICY.md`, `backend/EVENTS_POLICY_SCENARIOS.md`; lokalne kopie w `docs/policies/`; `EventPolicy.java`, `CuratedEventPolicy.java`, `backend/src/test/java/com/soberity/events/EventPolicyTest.java`. 2026-11-05: `cd backend && ./mvnw --batch-mode test` — exit 0 / BUILD SUCCESS, 31 testów, 0 failures/errors/skips, w tym 18 Events i 3 reguły architektury. Raporty `backend/target/surefire-reports/`, log `/tmp/soberity-p2-i00-tests.log`. V01: Q01–Q11 PASS; V02: D01–D07 PASS w kodzie i W01–W10 PASS jako przegląd polityki, nie runtime.
+
+**Blokery:** brak dla P2-I00. Zdalny P0-I13 nadal otwarty zgodnie z lokalnym wyjątkiem ADR-010. Baza/importer, rzeczywiste ACL/API, zgody i retencja w storage oraz UI web/iOS/Android nie są zaimplementowane/zweryfikowane tą iteracją; ich odbiór należy do P2-I01–P2-I06. Historyczne polecenie bez testów dotyczyło sesji 2026-11-04.
+
+**Wynik 2026-11-05:** rozdzielono wspólne reguły kwalifikacji treści od odłożonej weryfikacji kont organizatorów. CuratedEventPolicy określa kwalifikację strict, adminowy cykl DRAFT/PUBLISHED/DELETED, stany Home, promień 100 km (konfiguracja 1–500 km), przybliżoną odległość i kolejność distance/start/ID; nie uruchamia publikacji i nie zastępuje ACL. Polityka wybiera lokalny pełny GeoNames/CC BY 4.0 z aliasami EN/PL, stabilnymi ID i miesięczną aktualizacją; definiuje prawa do treści, zgody, brak trwałego zapisu pozycji oraz prywatne Joined z usuwaniem. Źródła dostawcy zweryfikowano w oficjalnej dokumentacji. T01/T03–T06/V01–V02 wykonane; T02 pozostaje odłożone. Aktualizacja CHANGELOG pod 2026-11-05.
 
 **Implementacja 2026-11-04:** podział SOBER_NIGHTLIFE/SOBER_LIFESTYLE, kategorie i oddzielna polityka ALCOHOL_FREE/SOBER_FRIENDLY. Domyślne wyniki wyłącznie PUBLISHED+ALCOHOL_FREE+VERIFIED; friendly osobny opt-in, bez cichego fallbacku. Polityka: brak sprzedaży/serwowania/BYOB dla strict; unknown nie jest false, zasady ABV wymagają wyjaśnienia przez moderatora. Kryteria kwalifikacji hosta, źródeł/uprawnień do treści, public/private projekcji, minimalizacji i okresów retencji. Cykl DRAFT/IN_REVIEW/CHANGES_REQUESTED/APPROVED/PUBLISHED/REJECTED/CANCELLED/ARCHIVED, niezależny moderator i unieważnienie po materialnych zmianach. Czysta klasa domenowa koduje enumy, wstępną ocenę z reason codes i dopuszczalne przejścia; nie zastępuje późniejszego ACL/version guards i nie publikuje automatycznie. Scenariusze akceptacyjne zapisane bez wykonania. Nie dodano API/DB/UI ani rzeczywistych wydarzeń; P2-I01 i P2-I02 nierozpoczęte. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I00-T01` Ustal Sober Nightlife vs Sober Lifestyle, 100% ALCOHOL-FREE vs SOBER-FRIENDLY.
-- [ ] `P2-I00-T02` Spisz kryteria kwalifikacji i weryfikacji organizatora.
-- [ ] `P2-I00-T03` Zdefiniuj zasady źródła danych, prywatności i retencji.
-- [ ] `P2-I00-T04` Zaprojektuj cykl MODERATION statusów.
+- [x] `P2-I00-T01` Ustal typy sober events (w tym sober party/rave) i kryteria bezalkoholowości; nie rozszerzaj wyników pobliskich o niekwalifikujące się wydarzenia.
+- [ ] `P2-I00-T02` **ODŁOŻONE:** samodzielna kwalifikacja i weryfikacja kont organizatorów. W etapie 1 za wiarygodność wpisu i linku odpowiada administrator.
+- [x] `P2-I00-T03` Spisz zasady legalnego pozyskiwania opisów/zdjęć i danych lokalizacyjnych oraz prywatność i retencję; pozycja użytkownika nie trafia do profilu, trwałych logów ani historii śledzenia, Joined pozostaje prywatne.
+- [x] `P2-I00-T04` Określ minimalny cykl dodania/publikacji/usunięcia przez admina i widoczność katalogu. Rozbudowany obieg niezależnej moderacji zgłoszeń organizatorów **ODŁOŻONY**.
+- [x] `P2-I00-T05` Ustal jawny, konfigurowalny promień „w pobliżu”, sortowanie rosnąco po odległości (przy remisie po dacie), źródło współrzędnych wydarzenia (miasto lub dokładniejsze miejsce) i sposób prezentacji przybliżonej odległości. Dobór wartości promienia zapisz przed wdrożeniem i użyj w API/UI/testach; bez cichego rozszerzania zasięgu.
+- [x] `P2-I00-T06` Wybierz i udokumentuj źródło globalnej bazy krajów/miast: pokrycie, licencja/atrybucja, stabilne ID, nazwy/aliasy EN/PL, region rozróżniający miasta o tej samej nazwie, współrzędne i strategia aktualizacji. Nie ograniczaj danych do miast z obecnymi wydarzeniami.
 
 **Weryfikacja:**
 
-- [ ] `P2-I00-V01` Przetestuj scenariusze niekwalifikujących się wydarzeń na przykładach.
+- [x] `P2-I00-V01` Przetestuj scenariusze niekwalifikujących się wydarzeń na przykładach.
+- [x] `P2-I00-V02` Przejrzyj scenariusze zgody/odmowy/cofnięcia zgody, braku pozycji, braku wydarzeń w promieniu, prywatnego Joined i usunięcia eventu; potwierdź zasady globalnego słownika i retencji.
 
-**Definition of Done:** Wydarzenia mają jasne, moderowalne kryteria. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Kryteria sober, uprawnienia admina, globalne źródło lokalizacji, reguła „w pobliżu” i prywatność są udokumentowane i zweryfikowane. Każdy obowiązkowy punkt ma dowód; odłożone funkcje nie są uznane za wykonane.
 
-## P2-I01 — Events data model & APIs
+## P2-I01 — Global locations, events data model & APIs
 
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00 pozostaje NOT VERIFIED; start P2-I01 na wyraźne polecenie właściciela 2026-11-04, bez zaliczania wcześniejszej iteracji/bramek.  
+**Zależności iteracji:** P2-I00 DONE dla etapu 1 (2026-11-05). Historyczny start P2-I01: 2026-11-04 przed odbiorem polityki; istniejący model/API wymagają dostosowania do nowego zakresu po osobnym poleceniu. Inne bramki pozostają otwarte.
 **Dowód:** `backend/src/main/resources/db/migration/V17__events_catalog_and_moderation.sql`, `backend/src/main/java/com/soberity/events/application/`, `backend/src/main/java/com/soberity/events/api/`, `SecurityConfig.java`, `backend/EVENTS_API.md`.  
-**Blokery:** wykonanie migracji i odbiór techniczny pozostają do wykonania. Na polecenie właściciela bez testów, kompilacji, dodatkowej weryfikacji i restartu. Checkboxy T01–T04/V01 otwarte; nie deklarowano DONE.
+**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** wykonanie migracji i odbiór techniczny pozostają do wykonania. Na polecenie właściciela bez testów, kompilacji, dodatkowej weryfikacji i restartu. Checkboxy T01–T04/V01 otwarte; nie deklarowano DONE.
 
 **Implementacja 2026-11-04:** V17: organizatorzy i członkostwo, osobna lista moderatorów, kategorie, niezmienne lokalizacje/media, wersjonowane wydarzenia, niezależne review, audyt i schemat ContactInquiry (bez wysyłki). API organizatora tworzy/odczytuje/edytuje/zgłasza i anuluje; moderacja weryfikuje organizatora, ocenia treść i publikuje. Publiczne projekcje ograniczają pola i widoczność do zatwierdzonych danych zweryfikowanych organizatorów; strict domyślnie, friendly jawnie. Wyszukiwanie: daty, miasto/kraj, kategoria/track, cena/waluta, dostępność/availability, język i opcjonalny promień; paginacja. Daty UTC+IANA, kontrola offsetu/DST, walidacja HTTPS bez pobierania URL, normalizacja zdjęć istniejącym BlogImages. Edycja wycofuje publikację do ponownej moderacji; anulowanie udostępnia wyłącznie ostatni opublikowany snapshot. Integracja z tombstone usuwania kont. Nie dodano eventów demonstracyjnych ani interfejsu P2-I02/P2-I03. CHANGELOG odroczony do rzeczywistej weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I01-T01` Dodaj Event, Venue, Organizer, Category, Moderation, ContactInquiry i bazową lokalizację.
-- [ ] `P2-I01-T02` Implementuj API tworzenia/odczytu/wyszukiwania z rolami.
-- [ ] `P2-I01-T03` Daty przechowuj poprawnie UTC + IANA timezone.
-- [ ] `P2-I01-T04` Dodaj paginację, walidację linków, zdjęć i geolokacji.
+- [ ] `P2-I01-T01` Dodaj/dostosuj Event, Venue i Category do katalogu zarządzanego przez admina. Osobne konta Organizer, rozbudowana Moderation i ContactInquiry **ODŁOŻONE**; istniejące struktury nie mogą wymuszać tego procesu przy adminowym dodaniu eventu.
+- [ ] `P2-I01-T02` Implementuj API dodania/publikacji przez administratora oraz odczytu/wyszukiwania; autoryzację egzekwuj po stronie backendu.
+- [ ] `P2-I01-T03` Daty przechowuj jako UTC + IANA timezone; waliduj offset/DST i zakres od–do.
+- [ ] `P2-I01-T04` Dodaj paginację, walidację linku strony organizatora, zdjęć i współrzędnych; wymagane pola wpisu: nazwa, lokalizacja, opis, URL organizatora, zdjęcie, data/godzina/strefa i typ. Opcjonalne rozszerzenia modelu nie blokują dodania podstawowego wpisu.
+- [ ] `P2-I01-T05` Wprowadź globalny słownik Country/City zgodny z P2-I00-T06 oraz API wyszukiwania pełnotekstowego krajów i miast ograniczone do wybranego kraju. Wspieraj aliasy i znaki diakrytyczne; zwracaj region dla niejednoznacznych nazw. Zapisuj stabilne ID i waliduj relację miasto–kraj po stronie serwera; tekstowe nazwy są etykietami, nie kluczami. Zaplanuj bezpieczne dopasowanie istniejących danych bez zgadywania niejednoznacznych miast.
+- [ ] `P2-I01-T06` Dodaj wyszukiwanie po nazwie, typie, countryId/cityId i datach oraz zapytanie najbliższych nadchodzących eventów według współrzędnych i promienia. Filtry/sortowanie przed paginacją; brak wyników w promieniu zwraca pustą listę. Joined rozszerza kontrakt w P2-I05, bez publicznego ujawnienia relacji użytkownika.
+- [ ] `P2-I01-T07` Dodaj API usunięcia konkretnego eventu wyłącznie dla admina, z audytem i spójną obsługą powiązań. Usunięty wpis znika z katalogu, Home, szczegółów i Joined; określ odpowiedź dla starych linków, bez pozostawienia aktywnej kopii w cache.
 
 **Weryfikacja:**
 
-- [ ] `P2-I01-V01` Testy migracji, ACL, timezone, parametrów wyszukiwania.
+- [ ] `P2-I01-V01` Testy migracji, ACL, timezone i łączonych parametrów wyszukiwania; zwykły użytkownik/organizator nie może dodawać, publikować ani usuwać eventów przez API admina.
+- [ ] `P2-I01-V02` Testy słownika: kraje z różnych regionów świata, aliasy/diakrytyki, miasta o tej samej nazwie, błędna para kraj–miasto i migracja niejednoznacznych nazw bez utraty danych.
+- [ ] `P2-I01-V03` Testy odległości, granicy promienia, kolejności, pustych wyników i wykluczenia przeszłych/usuniętych wpisów; brak współrzędnych użytkownika w trwałych logach. Usuwanie powiązań Joined weryfikuje P2-I05 po ich wdrożeniu.
 
-**Definition of Done:** API eventów oddziela dane publiczne od niezatwierdzonych. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** API obsługuje katalog admina, globalne lokalizacje, wymagane filtry i najbliższe wydarzenia oraz bezpieczne usuwanie. Każdy obowiązkowy punkt ma dowód i zapisane wyniki testów.
 
-## P2-I02 — Event discovery web + mobile
+## P2-I02 — Event search & nearby tickets on Home
 
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
 **Zależności iteracji:** P2-I01 pozostaje NOT VERIFIED; start P2-I02 na wyraźne polecenie właściciela, bez automatycznego zaliczenia zależności i wykonania V17.  
 **Dowód:** `apps/consumer/app/events.tsx`, `apps/consumer/src/events/{EventsScreen,EventCard,EventSelect}.tsx`, `eventsApi.ts`, `location.ts` / `location.web.ts`, EN/PL resources, `EventCatalog.java`, `EventPublicController.java`, `backend/EVENT_DISCOVERY.md`.  
-**Blokery:** backend/V17 z P2-I01 muszą zostać uruchomione i odebrane; katalog wymaga prawdziwych zatwierdzonych danych. Zgodnie z poleceniem właściciela nie uruchamiano testów/buildów/typecheck, migracji/restartów, API, przeglądarki ani symulatorów. T01–T04/V01 pozostają niezaliczone do odbioru.
+**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** backend/V17 z P2-I01 muszą zostać uruchomione i odebrane; katalog wymaga prawdziwych zatwierdzonych danych. Zgodnie z poleceniem właściciela nie uruchamiano testów/buildów/typecheck, migracji/restartów, API, przeglądarki ani symulatorów. T01–T04/V01 pozostają niezaliczone do odbioru.
 
 **Implementacja 2026-11-04:** `/events` zastępuje UnavailableScreen wspólnym katalogiem Expo web/iOS/Android. Filtry miasto/region/kraj/data/kategoria/cena/waluta/accessibility, jawny strict/friendly, zastosowanie i czyszczenie filtrów, sortowanie dat serwerowe i paginacja12. Ocean light/dark, EN/PL, responsywny grid, rzeczywiste zdjęcia lub neutralny fallback, silniejsza etykieta sober party/rave, data/czas w strefie wydarzenia, cena z jednostek najmniejszych. Dni zakresu w strefie użytkownika, koniec przez następny dzień kalendarzowy (DST). Obsługa loading/error/retry/empty i anulowania starych zapytań. Opcjonalny promień: ręczne współrzędne na każdej platformie, jednorazowa geolokalizacja przeglądarki dopiero po kliknięciu; bez zapisu w profilu/storage i śledzenia. Automatyczny GPS native nie jest dostarczony, pozostaje tryb ręczny. API rozszerzone o region i bezpieczny enum sort przed paginacją; bez nowej migracji. Nie rozpoczęto szczegółów/biletów/kalendarza P2-I03 ani nie zmieniano Home. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I02-T01` Zbuduj listę wydarzeń z filtrami miasto/region/data/kategoria/cena.
-- [ ] `P2-I02-T02` Dodaj sortowanie i stany pustej listy, paginację.
-- [ ] `P2-I02-T03` Wyróżnij sober party/rave w UI.
-- [ ] `P2-I02-T04` Dodaj opcjonalny tryb lokalizacji bez żądania niepotrzebnych uprawnień.
+- [ ] `P2-I02-T01` Zbuduj katalog Sober Events z łączonymi filtrami: nazwa, typ, kraj/miasto i data od–do. Kraje i miasta wybieraj w dwóch polach z wyszukiwaniem pełnotekstowym; miasto jest ograniczone do kraju, zmiana kraju czyści niepasujące miasto. Katalog działa bez udostępniania pozycji urządzenia. Dodatkowe filtry ceny/regionu/dostępności **ODŁOŻONE**.
+- [ ] `P2-I02-T02` Dodaj sortowanie, paginację, czyszczenie filtrów i stany loading/error/retry/empty. Zakres dat uwzględnia cały dzień końcowy i strefę użytkownika, odrzuca od > do; pusta lista nie jest błędem sieci.
+- [ ] `P2-I02-T03` Zachowaj czytelne typy wydarzeń, w tym sober party/rave, oraz istniejący styl biletów na Home według docs/BRANDING.md, bez tworzenia nowego wzorca kart.
+- [ ] `P2-I02-T04` Dodaj dobrowolną zgodę na lokalizację i jednorazowe pobranie pozycji na web/iOS/Android, bez lokalizacji w tle i śledzenia. Wejście do ustawień zgody poza ukrytą sekcją Home; nie wywołuj systemowego pytania automatycznie po otwarciu Home. Odmowa/cofnięcie zgody ukrywa całą sekcję pobliskich na Home i czyści bieżącą pozycję oraz wyniki; nie blokuje katalogu.
+- [ ] `P2-I02-T05` Po zgodzie i otrzymaniu pozycji podłącz rzeczywiste nadchodzące eventy w promieniu do biletów Home, od najbliższego. Brak pobliskich: „No events nearby — check out the event base” / „Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń” i działający link do katalogu, bez odległego fallbacku i danych demo. Zgoda z timeoutem/niedostępną pozycją: osobny stan niedostępnej lokalizacji z ponowieniem i linkiem do katalogu. Bilet otwiera szczegóły eventu.
 
 **Weryfikacja:**
 
-- [ ] `P2-I02-V01` Test filtrów, przekraczania daty, a11y i responsywności.
+- [ ] `P2-I02-V01` Test filtrów (po Joined także regresja w P2-I05), dat/DST, dwóch wyszukiwalnych pól kraj/miasto, a11y, EN/PL, obu motywów i responsywności.
+- [ ] `P2-I02-V02` Web/iOS/Android: zgoda, odmowa, cofnięcie, brak wsparcia/timeout, pusty promień i kolejność rzeczywistych biletów. Potwierdź całkowicie ukrytą sekcję bez zgody, dostępny katalog i działający link pustego stanu; niedostępne platformy oznacz NOT VERIFIED.
 
-**Definition of Done:** Użytkownik znajduje aktualne eventy w wybranym mieście. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Użytkownik wyszukuje eventy bez GPS; Home pokazuje bilety najbliższych wyłącznie za zgodą i z poprawnie uzyskaną pozycją. Stany braku wydarzeń i braku pozycji są rozróżnione. Wszystkie obowiązkowe zadania mają dowody.
 
-## P2-I03 — Event detail, external checkout & links
+## P2-I03 — Event detail & organizer link
 
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
 **Zależności iteracji:** P2-I01/P2-I02 pozostają NOT VERIFIED; start P2-I03 na wyraźne polecenie właściciela, bez zaliczania poprzednich iteracji.  
 **Dowód:** `apps/consumer/app/events/{_layout,index,[id]}.tsx`, `apps/consumer/src/events/EventDetailScreen.tsx`, `EventCard.tsx`, `eventsApi.ts`, `calendarDownload.ts`/`.web.ts`, `EventMetadata.tsx`/`.web.ts`, EN/PL, `EventCalendar.java`, publiczny kontroler/SecurityConfig, `backend/EVENT_DETAIL.md`.  
-**Blokery:** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
+**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
 
 **Implementacja 2026-11-04:** szczegóły rzeczywistego publicznego wydarzenia, zdjęcie/fallback, opis, daty/strefa, cena, zasady sober/napojów, miejsce i dostępność, zasady wstępu i zweryfikowany organizator. Całe karty prowadzą do /events/{UUID}, web href i native route w istniejącym scheme. Invalid ID/404, ładowanie, błędy i ponowienie; cancelled/ended oznaczone bez zakupu/kalendarza. Linki HTTPS bez credentials/control characters, dialog z domeną, ponowny odczyt aktualnego eventu/organizatora i porównanie celu; brak dowolnego redirect parametru. Eksport .ics przez publiczny endpoint: aktualna kwalifikacja, 410 dla cancelled/ended, UTC, UTF-8 fold/escape/CRLF, no-store, import bez uprawnień do kalendarza; native otwiera attachment w OS/browser, bez deklaracji bezpośredniego zapisu. Minimalny kontrakt SEO w EVENT_DETAIL.md, runtime title/description i noindex do przygotowania serwerowego renderowania/hostingu. EN/PL, oba motywy. Bez następnej P2-I04 i płatności. Dodatkowa korekta właściciela: wizualny pill gwiazdki Articles mniejszy (36×28, ikona16), target48×44 i popover zachowane. CHANGELOG odroczony do odbioru.
 
 **Zakres zadań:**
 
-- [ ] `P2-I03-T01` Zbuduj szczegóły eventu, zasady sober, organizator, miejsce, cena i strefa czasu.
-- [ ] `P2-I03-T02` Dodaj zapisanie do kalendarza i zewnętrzny link zakupu.
-- [ ] `P2-I03-T03` Zaimplementuj deep linki i bezpieczną walidację redirectów.
-- [ ] `P2-I03-T04` Ustal minimalne wymagania SEO publicznych stron.
+- [ ] `P2-I03-T01` Zbuduj szczegóły: nazwa, zdjęcie, opis, kraj/miasto i ewentualne miejsce/adres, typ, data/godzina/strefa, kryteria sober i link do strony organizatora. Cena i rozbudowany profil organizatora nie są wymagane w etapie 1.
+- [ ] `P2-I03-T02` **ODŁOŻONE:** zapisanie do kalendarza i dedykowany zewnętrzny checkout. W tym etapie wystarcza link do strony organizatora (T05).
+- [ ] `P2-I03-T03` Zaimplementuj deep linki, bezpieczne linki zewnętrzne i obsługę eventów niedostępnych/usuniętych bez ujawniania szkiców.
+- [ ] `P2-I03-T04` Ustal minimalne wymagania SEO publicznych stron bez deklarowania niewykonanego indeksowania.
+- [ ] `P2-I03-T05` Udostępnij zwalidowany link HTTPS do strony organizatora z jasną informacją o opuszczeniu Soberity. W szczegółach przewidź akcję „Dołączam” i opis jej wyłącznie wewnętrznego znaczenia; rzeczywisty zapis i stan dostarcza P2-I05, bez atrapy działającego zapisu.
 
 **Weryfikacja:**
 
-- [ ] `P2-I03-V01` E2E lista→szczegóły→link organizatora.
-- [ ] `P2-I03-V02` Test błędnych i wygasłych linków.
+- [ ] `P2-I03-V01` E2E katalog/bilet Home → szczegóły → strona organizatora.
+- [ ] `P2-I03-V02` Test błędnych i wygasłych linków, usuniętych eventów, walidacji URL oraz zgodności pól ze wpisem admina; EN/PL, oba motywy, a11y i dostępne platformy.
 
-**Definition of Done:** Szczegóły wydarzenia i zewnętrzny zakup są czytelne i bezpieczne. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Szczegóły pokazują pełny podstawowy wpis admina i bezpiecznie prowadzą na stronę organizatora. Każdy obowiązkowy punkt ma dowód i zapisane wyniki testów.
 
-## P2-I04 — Organizer identity & moderation portal
+## P2-I04 — Admin event creation & deletion
 
 **Status:** IN_PROGRESS — częściowy zakres panelu na polecenie właściciela; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00/P2-I01 pozostają NOT VERIFIED; właściciel zlecił ręczne dodawanie eventów z panelu podobnego do artykułów.  
+**Zależności iteracji:** P2-I00 DONE dla etapu 1 (2026-11-05), P2-I01 nadal NOT VERIFIED. Historyczne zlecenie ręcznego panelu z 2026-11-04; dostosowanie do admin-only i globalnej lokalizacji wymaga P2-I01 oraz osobnego polecenia P2-I04.
 **Dowód:** `apps/consumer/src/events/EventEditorScreen.web.tsx`, `eventEditorApi.ts`, route `editorial-events`, wejście Profil, EN/PL; V18, EventInputs/Service/Catalog, member-only venue GET, formatowanie w EventDetailScreen; `backend/EVENT_EDITOR.md`.  
-**Blokery:** V17/V18 i backend wymagają aktywacji. Bez testów/buildów/typecheck, API/UI/migracji/restartów na polecenie właściciela. Publiczny profil organizatora i UI moderacji nie są wykonane w tym zawężonym zadaniu; istniejące API moderacji pozostaje. Checkboxy otwarte.
+**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** V17/V18 i backend wymagają aktywacji. Bez testów/buildów/typecheck, API/UI/migracji/restartów na polecenie właściciela. Publiczny profil organizatora i UI moderacji nie są wykonane w tym zawężonym zadaniu; istniejące API moderacji pozostaje. Checkboxy otwarte.
 
 **Implementacja 2026-11-04:** webowy panel Profil → Panel wydarzeń z własnymi organizatorami i biblioteką wydarzeń, tworzeniem/edycją szkiców, opisem Tiptap, zdjęciem/alt i HTTPS URL organizatora. Metadane katalogowe i zasady w osobnych grupach; bez fikcyjnych wartości. Wysłanie do weryfikacji zgodnie z aktualnym ACL/niezależną moderacją. V18 zapisuje dokument opisu i organizer_url w niezmiennych rewizjach; serwer waliduje treść istniejącym BlogDocument, publiczny reader RichDocument z fallbackiem plain. Paginacja50, expectedVersion, prywatne preview i revoke object URL, exact owned venue lookup. Część T02/T04 przygotowana; T01/T03 i pełny DoD niezaliczone. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I04-T01` Zbuduj publiczny profil organizatora.
-- [ ] `P2-I04-T02` Dodaj formularz zgłaszania wydarzeń i panel kuratorski.
-- [ ] `P2-I04-T03` Moderacja zatwierdź/odrzuć/ukryj z audytem.
-- [ ] `P2-I04-T04` Zachowaj kontrolę roli ORGANIZER po stronie backendu.
+- [ ] `P2-I04-T01` **ODŁOŻONE:** publiczny profil organizatora.
+- [ ] `P2-I04-T02` Dostosuj istniejący panel do dodawania i publikowania eventów przez admina: nazwa, lokalizacja, opis, link do strony organizatora, zdjęcie, data/godzina/strefa i typ. Bez wymogu osobnego konta/organizacji i wieloetapowego zgłaszania do moderacji.
+- [ ] `P2-I04-T03` **ODŁOŻONE:** osobny portal moderacji zatwierdź/odrzuć/ukryj zgłoszeń organizatorów. Audyt adminowego dodania/usunięcia pozostaje obowiązkowy w T05.
+- [ ] `P2-I04-T04` **ODŁOŻONE:** samoobsługa roli ORGANIZER. Uprawnienia nowego panelu i API admina egzekwuj przez T07, niezależnie od dotychczasowego organizer ACL.
+- [ ] `P2-I04-T05` Dodaj listę eventów i usunięcie konkretnego wpisu przez admina z potwierdzeniem i audytem. Po usunięciu odśwież listę i unieważnij dane katalogu, Home, szczegółów oraz Joined.
+- [ ] `P2-I04-T06` Użyj dwóch pól pełnotekstowych kraj → miasto z globalnej bazy (P2-I01-T05), bez zapisu dowolnego stringa. Pokaż region rozróżniający miasta, walidację pary, stany braku wyników/błędu i dostępne wybieranie klawiaturą. Nie wymagaj ręcznych współrzędnych miasta; dokładniejsze miejsce/adres pozostają opcjonalne.
+- [ ] `P2-I04-T07` Zapewnij admin-only dostęp w UI i backendzie, walidację wszystkich wymaganych pól, zdjęcia i URL, obsługę błędów oraz EN/PL i tokeny Ocean. Istniejące endpointy organizatorów nie mogą umożliwiać obejścia admin-only publikacji/usuwania w etapie 1.
 
 **Weryfikacja:**
 
-- [ ] `P2-I04-V01` Testy nieautoryzowanej edycji, ukrytych eventów i eskalacji roli.
+- [ ] `P2-I04-V01` Testy nieautoryzowanego dodawania/publikacji/usuwania, ukrytych eventów i eskalacji roli; także przez dotychczasowe API organizatorów.
+- [ ] `P2-I04-V02` E2E admin → wybór kraju/miasta → uzupełnienie wymaganych pól → publikacja → widoczność w katalogu/szczegółach → usunięcie → brak wpisu w katalogu/Home i obsługa starego linku (Joined sprawdzane w P2-I05/P2-I06). Sprawdź walidację, EN/PL, a11y i responsywność panelu web; publiczny odczyt także na dostępnych platformach natywnych.
 
-**Definition of Done:** Zweryfikowany organizator może zgłosić wydarzenie, moderator je zatwierdza. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Administrator dodaje i publikuje podstawowy sober event oraz usuwa wybrany wpis; zwykły użytkownik nie ma tych uprawnień. Globalna lokalizacja i wymagane pola działają bez procesu samoobsługi organizatorów. Każdy obowiązkowy punkt ma dowód.
 
-## P2-I05 — Organizer inquiries & saved events
+## P2-I05 — Private join intent & Joined filter
 
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P2-I03, P2-I04  
+**Zależności iteracji:** P2-I01, P2-I02, P2-I03, P2-I04
+
 **Dowód:** —  
 **Blokery:** —
 
 **Zakres zadań:**
 
-- [ ] `P2-I05-T01` Dodaj formularz kontaktowy z antyspamem, rate limit i bezpieczną zgodą na kontakt.
-- [ ] `P2-I05-T02` Zaimplementuj powiadomienie i możliwość odpowiedzi bez ujawniania prywatnego e-maila, jeśli to możliwe.
-- [ ] `P2-I05-T03` Dodaj ulubione/My Events i kontrolę prywatności.
-- [ ] `P2-I05-T04` Udokumentuj retencję zapytań.
+- [ ] `P2-I05-T01` **ODŁOŻONE:** formularz kontaktowy z antyspamem, rate limit i zgodą na kontakt.
+- [ ] `P2-I05-T02` **ODŁOŻONE:** powiadomienie organizatora i możliwość odpowiedzi bez ujawniania prywatnego e-maila.
+- [ ] `P2-I05-T03` **ODŁOŻONE:** ulubione/My Events jako odrębna funkcja; nie utożsamiaj ulubionych z deklaracją Dołączam.
+- [ ] `P2-I05-T04` **ODŁOŻONE:** retencja zapytań kontaktowych. Retencję deklaracji Dołączam realizuje T08.
+- [ ] `P2-I05-T05` Dodaj prywatną relację użytkownik–event z unikalną parą ID oraz idempotentne API dołączenia/cofnięcia. Autoryzowany użytkownik zarządza wyłącznie własną deklaracją; dołączenie tylko do istniejącego, opublikowanego nadchodzącego eventu.
+- [ ] `P2-I05-T06` Udostępnij w szczegółach „Dołączam / Join” i „Cofnij / Leave”, stan zapisany między sesjami, loading/error/retry i jasny opis: „Tylko informacja w Soberity — bez rezerwacji ani biletu”. Gość otrzymuje wejście do logowania; nie zapisuj pozornego sukcesu lokalnie.
+- [ ] `P2-I05-T07` Dodaj w Sober Events filtr „Dołączone / Joined” dla zalogowanego użytkownika, łączony z nazwą, typem, krajem/miastem i datą przed paginacją. Stan i wyniki nie przechodzą między kontami; po wylogowaniu brak prywatnych danych. Usunięty event nie pojawia się w Joined; odbyte wpisy dostępne tylko zgodnie z jawnie określonym zakresem dat.
+- [ ] `P2-I05-T08` Ogranicz dane do ID użytkownika/eventu i czasu deklaracji, określ retencję oraz usuwanie przy cofnięciu, usunięciu konta/eventu. Bez publicznej listy, przekazywania organizatorowi, wiadomości, rezerwacji, płatności i QR.
 
 **Weryfikacja:**
 
-- [ ] `P2-I05-V01` Testy antyspam, ACL wiadomości, idempotencji ulubionych.
-- [ ] `P2-I05-V02` E2E pytanie→odpowiedź.
+- [ ] `P2-I05-V01` **ODŁOŻONE:** testy antyspam, ACL wiadomości i idempotencji osobnych ulubionych.
+- [ ] `P2-I05-V02` **ODŁOŻONE:** E2E pytanie → odpowiedź.
+- [ ] `P2-I05-V03` Testy ACL własnych/cudzych deklaracji, idempotencji i współbieżnych ponowień, trwałości między sesjami, wylogowania/zmiany konta i usuwania relacji. Joined nie ujawnia prywatnych danych w publicznym API/cache.
+- [ ] `P2-I05-V04` E2E wyszukanie → szczegóły → Dołączam → Joined z łączonymi filtrami → ponowne logowanie → cofnięcie; usunięcie eventu/konta i próba dołączenia do niedostępnego wydarzenia. EN/PL, web/iOS/Android zgodnie z rzeczywiście wykonanym zakresem.
 
-**Definition of Done:** Kontakt z organizatorem i zapisane eventy działają end-to-end. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Użytkownik może zapisać/cofnąć prywatny zamiar udziału i odfiltrować własne Joined. Stan jest trwały i izolowany między kontami, bez skutków poza Soberity. Każdy obowiązkowy punkt ma dowód; kontakt i ulubione pozostają odłożone.
 
 ## P2-I06 — Curated events & Phase 2 acceptance
 
 **Status:** TODO  
 **Started:** —  
 **Finished:** —  
-**Zależności iteracji:** P2-I01–P2-I05, P1-I06, P0-I03A
+**Zależności iteracji:** P2-I00–P2-I05 (obowiązkowy zakres etapu 1), P0-I03A. P1-I06 / Myth Battle pozostaje PARKED decyzją właściciela; nie jest zależnością odbioru tego zawężonego etapu Events ani nie zalicza bramki Phase 1.
 **Dowód:** —  
 **Blokery:** —
 
 **Zakres zadań:**
 
-- [ ] `P2-I06-T01` Dodaj pierwsze realne, legalnie pozyskane/zweryfikowane wydarzenia.
-- [ ] `P2-I06-T02` Zadbaj o status anulowane/zmienione/odbyte.
-- [ ] `P2-I06-T03` Przeprowadź smoke na web/iOS/Android i kontrolę stref czasowych.
-- [ ] `P2-I06-T04` Zweryfikuj konwersję event→external checkout oraz jakość katalogu.
-
-- [ ] `P2-I06-T05` Przeprowadź wspólny przegląd spójności wizualnej całego zakresu publicznego MVP: Home, Auth/profil, Science i Events, na podstawie wzorca zaakceptowanego w P0-I03A i aktualnego `docs/BRANDING.md`. Usuń rozbieżności komponentów, typografii, spacingu, nawigacji i stanów; większe zmiany kierunku przedstaw do akceptacji właściciela.
+- [ ] `P2-I06-T01` Dodaj pierwsze realne, legalnie pozyskane/zweryfikowane wydarzenia przez panel admina, z rekordami globalnej bazy krajów/miast i kompletem wymaganych danych.
+- [ ] `P2-I06-T02` Zadbaj o spójne stany usunięte/niedostępne/odbyte; brak przeszłych/usuniętych eventów w pobliskich na Home i brak usuniętych w Joined. Istniejący stan anulowania pokazuj jednoznacznie.
+- [ ] `P2-I06-T03` Przeprowadź smoke na web/iOS/Android, kontrolę stref/DST, zgód lokalizacyjnych i działania katalogu bez GPS.
+- [ ] `P2-I06-T04` Zweryfikuj jakość katalogu i ścieżkę event → strona organizatora oraz Dołączam → Joined → cofnięcie. Konwersja do dedykowanego checkoutu **ODŁOŻONA**.
+- [ ] `P2-I06-T05` Przeprowadź wspólny przegląd spójności wizualnej publicznego MVP: Home, Auth/profil, Science i Events według P0-I03A i aktualnego docs/BRANDING.md. Zachowaj obecny styl biletów Home; sprawdź ukrytą sekcję bez zgody, pusty promień i link do katalogu. Większe zmiany kierunku wymagają akceptacji właściciela.
 
 **Weryfikacja:**
 
-- [ ] `P2-I06-V01` E2E wyszukanie→kontakt→zapisanie→zewnętrzny link.
-- [ ] `P2-I06-V02` Audit brak fikcyjnych eventów.
-- [ ] `P2-I06-V03` Zapisz końcowy odbiór wizualny MVP przez właściciela oraz regresję EN/PL, responsywności i a11y na web/iOS/Android. Udokumentuj wyniki i nierozwiązane braki; bez odbioru i obowiązkowych testów nie uznawaj UI MVP za gotowe do publikacji.
+- [ ] `P2-I06-V01` E2E admin dodaje event z globalną lokalizacją → użytkownik wyszukuje z łączonymi filtrami → szczegóły/link organizatora → Dołączam → Joined → cofnięcie → admin usuwa event. Oddzielnie Home: zgoda i pobliskie bilety, pusty promień z linkiem, odmowa/cofnięcie z ukrytą sekcją, brak pozycji jako osobny stan.
+- [ ] `P2-I06-V02` Audyt: brak fikcyjnych eventów i dowolnych tekstowych miast, pełne wymagane pola, admin-only zapisy/usuwanie, prywatne Joined i brak śledzenia lokalizacji.
+- [ ] `P2-I06-V03` Zapisz końcowy odbiór wizualny MVP przez właściciela oraz regresję EN/PL, obu motywów, responsywności i a11y na web/iOS/Android. Udokumentuj wyniki i nierozwiązane braki; bez odbioru i obowiązkowych testów UI nie jest gotowe do publikacji.
 
-**Definition of Done:** Działa katalog wiarygodnych wydarzeń i kontakt bez własnych płatności. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
+**Definition of Done:** Działa pierwszy etap: admin dodaje/usuwa sober events, kraj/miasto pochodzą z globalnej bazy, Home respektuje zgodę i promień, katalog obsługuje wymagane filtry, a Dołączam/Joined pozostają prywatną informacją Soberity. Każdy obowiązkowy punkt ma dowód; funkcje odłożone nie są uznane za ukończone.
 
 ### Gate — Phase 2
 
 - [ ] Przed publicznym MVP ukończono wspólny przegląd UI z P2-I06-T05/V03 i zapisano akceptację właściciela; ten odbiór nie stanowi zgody na deployment ani publikację sklepową.
 
-- [ ] Wszystkie obowiązkowe iteracje Phase 2 mają status `DONE` oraz dowody wykonania i testów.
+- [ ] Wszystkie iteracje Phase 2 mają status `DONE` dla obowiązkowego zakresu etapu 1 oraz dowody wykonania i testów; jawnie odłożone zadania pozostają niezaznaczone i nie blokują tego odbioru.
+- [ ] Potwierdzono globalny słownik i dwa wyszukiwalne pola kraj/miasto, admin-only dodanie/usunięcie, Home z rzeczywistymi biletami wyłącznie po zgodzie, pusty promień z linkiem do katalogu, filtry nazwa/typ/lokalizacja/od–do/Joined i prywatny trwały zapis Dołączam bez rezerwacji/biletów.
 - [ ] Zrealizowano regresję odpowiednią do fazy, testy bezpieczeństwa, a tam gdzie dotyczy — potwierdzono web/iOS/Android.
 - [ ] Rozwiązano krytyczne blokery, uzupełniono dokumentację, zaktualizowano statusy i `CHANGELOG.md` dla istotnych rezultatów.
 - [ ] Właściciel projektu potwierdził przejście do kolejnej fazy lub udokumentował świadome odstępstwo.
@@ -2183,12 +2221,13 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Bieżąca iteracja (2026-11-04):** `P2-I04` — częściowy panel ręcznego dodawania/edycji eventów, IN_PROGRESS / NOT VERIFIED. Tiptap, zdjęcie i URL organizatora, własna biblioteka i wysłanie do recenzji przygotowane; pełny portal moderacji/publiczny profil organizatora pozostają niewykonane.
-- **Priorytet właściciela:** Myth Battle PARKED; rozwój Events. Poprzednie P2-I00–P2-I03 i bramki Phase 0/1 nie są automatycznie zaliczone.
-- **Aktywna faza:** Phase 2 — IN_PROGRESS, 0/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal13/15 DONE.
-- **Następny krok:** aktywacja V17/V18 i backendu, odbiór panelu przez właściciela według `backend/EVENT_EDITOR.md`. Reszta P2-I04 wymaga dalszego polecenia; P2-I05 nierozpoczęte.
-- **Weryfikacja:** bez testów/buildów/typecheck, migracji/restartów i wywołań API/UI. Zapis szkicu wymaga rzeczywistych pól istniejącego modelu, publikacja nadal przez niezależną moderację.
-- **Dokumentacja:** EVENT_EDITOR.md, EVENTS_API/README, branding i tracker. CHANGELOG odroczony do odbioru.
+- **Ostatnio ukończona iteracja (2026-11-05):** `P2-I00` — DONE dla obowiązkowego zakresu etapu 1. T01/T03–T06/V01–V02 zweryfikowane; T02 (samoobsługa organizatorów) pozostaje odłożone.
+- **Wynik:** reguły kwalifikacji sober i adminowego cyklu, globalny GeoNames/CC BY 4.0 z aliasami EN/PL, promień 100 km (konfiguracja 1–500 km), zgody i stany Home, brak trwałych współrzędnych użytkownika, prywatne Joined i retencja. Bez wdrażania importera, API, migracji lub UI.
+- **Weryfikacja:** `cd backend && ./mvnw --batch-mode test` — exit 0, 31/31 unit/architecture PASS (18 Events), scenariusze Q01–Q11/D01–D07 i przegląd polityki W01–W10 w `backend/EVENTS_POLICY_SCENARIOS.md`. Runtime web/iOS/Android i DB/API nie były testowane; nie należą do odbioru czystych reguł P2-I00.
+- **Priorytet właściciela:** Events według zakresu 2026-11-05; Myth Battle PARKED. Phase 2 — IN_PROGRESS, 1/7 DONE; Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE. Zdalny P0-I13 i bramki Phase 0/1 pozostają otwarte.
+- **Stan wcześniejszego kodu:** P2-I01–P2-I04 IN_PROGRESS / NOT VERIFIED, P2-I05/P2-I06 TODO. Dotychczasowy panel P2-I04 i API używają szerszego modelu organizatorów/moderacji; nie są dowodem wykonania nowego etapu 1.
+- **Następny krok po osobnym poleceniu:** `P2-I01` — dostosować model/API i globalny słownik do zakończonej polityki P2-I00; nie uruchomiono tej pracy w bieżącej sesji.
+- **CHANGELOG.md:** wpis 2026-11-05 dla zweryfikowanej polityki i reguł domenowych.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2607,3 +2646,11 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-04 | Articles — oznaczenie tygodnia bez zmiany wymiarów karty | NOT VERIFIED | Usunięto dodatkowy marginTop i paddingTop zależne od gwiazdki w PublicationCard. Badge pozostaje absolutną nakładką przy górnym prawym obrysie, lekko nad treścią; wspólny padding kart12, target i popover zachowane. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. Status P2-I03 bez zmian; CHANGELOG odroczony do odbioru. |
 
 | 2026-11-04 | Ręczny panel Events — częściowy P2-I04 | IN_PROGRESS / NOT VERIFIED | Na polecenie właściciela Profil → Panel wydarzeń, własne organizacje/biblioteka50, Tiptap, obraz/alt, organizer URL, metadane i zasady, zapis/edycja/submission z ACL, V18 rich JSON+URL i rich reader, prywatne owned venue GET. | Bez testów/buildów/weryfikacji/migracji/restartów. Publiczny profil i moderacja UI pozostają niewykonane; V17/V18 do aktywacji, pełny DoD niezaliczony. CHANGELOG odroczony. |
+
+| 2026-11-04 | Menu — About us / O nas | NOT VERIFIED | Dodano ostatnią pozycję menu z istniejącą ilustracją ludzi light/dark, trasą /about i krótkim ekranem misji Science/Community EN/PL. Wspólne komponenty i tokeny, bez nowych dependencies. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. Bieżąca P2-I04 bez zmiany statusu; CHANGELOG odroczony do odbioru. |
+
+| 2026-11-04 | O nas — ikona pytajnika | NOT VERIFIED | Zamieniono grafikę ludzi przy About us na istniejący SettingsIcon question28 w primary, zachowując rozmiar slotu i etykietę dostępności menu. | Bez testów i dodatkowej weryfikacji na polecenie właściciela. CHANGELOG odroczony do odbioru; status iteracji bez zmian. |
+
+| 2026-11-05 | Phase 2 — aktualizacja zakresu etapu 1 | Plan zaktualizowany; statusy implementacji bez zmian | Wyłącznie PHASES.md: globalna baza kraj/miasto i dwa pola pełnotekstowe, admin dodaje/publikuje/usuwa, pobliskie bilety Home za zgodą i pusty promień z linkiem, katalog z nazwą/typem/lokalizacją/datami/Joined, prywatne Dołączam/cofnięcie. Zachowano ID, historyczne dowody i wcześniejsze wpisy dziennika; odłożono szerszy portal/kontakt. | Kontrola dokumentacyjna i diff; bez testów aplikacji. CHANGELOG bez wpisu (plan). Następne zlecenie: P2-I00; żadna iteracja nie została rozpoczęta ani zamknięta. |
+
+| 2026-11-05 | P2-I00 — polityka etapu 1 | DONE; T01/T03–T06/V01–V02, T02 odłożone | EventPolicy + CuratedEventPolicy, 18 nowych testów Events; wersjonowane backend/EVENTS_POLICY.md i EVENTS_POLICY_SCENARIOS.md, README, lokalne docs/policies i addendum ADR-010, PHASES i CHANGELOG. `./mvnw --batch-mode test` exit 0: 31/31 unit/architecture PASS, Q01–Q11/D01–D07; W01–W10 przegląd polityki PASS. GeoNames, CC BY 4.0, pełny słownik/aliasy, promień 100 km, admin-only cykl, zgody/Joined/retencja. | Bez blokera P2-I00; wyjątek lokalny P0-I13 zachowany. Nie uruchamiano DB/API/migracji/restartów/UI ani natywnych runtime. Rzeczywiste ACL/import/zgody/retencja pozostają do weryfikacji w kolejnych iteracjach. Następna P2-I01 wyłącznie na polecenie. |

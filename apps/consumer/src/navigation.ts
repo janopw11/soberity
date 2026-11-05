@@ -49,6 +49,14 @@ export const navigationItems = [
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
     imageDark: require('../assets/images/myths-icon-dark.png') as number,
   },
+  {
+    id: 'about',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- reuse the established people illustration
+    image: require('../assets/images/community-icon-light.png') as number,
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- matching dark-theme illustration
+    imageDark: require('../assets/images/community-icon-dark.png') as number,
+    href: '/about',
+  },
 ] as const;
 
 /** Expandable subsections beneath Science & Discover in the shared menu. */

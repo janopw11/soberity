@@ -1,3 +1,7 @@
+## 2026-11-05
+
+- P2-I00 — ukończono politykę pierwszego etapu Sober Events: kwalifikacja bezalkoholowych wydarzeń, cykl publikacji/usunięcia przez admina, GeoNames jako źródło krajów/miast, domyślny promień 100 km, zgody lokalizacyjne oraz prywatność i retencja Joined. Dodano czyste reguły domenowe i scenariusze; Maven: 31 testów unit/architektury PASS, w tym 18 Events, oraz przegląd polityki. Bez wdrażania importera, API, migracji i UI; istniejące implementacje Events wymagają dostosowania w kolejnych iteracjach.
+
 ## 2026-11-04
 
 - P1-I04 — Flashcards & quizzes: zamknięto pełną checklistę na podstawie odbioru i polecenia właściciela. Fiszki z recenzowanymi wyjaśnieniami i źródłami, quizy trzech typów, automatyczny zapis i wznowienie quizów, wyniki i powtórki. Dopracowano kategorie, miniatury kart, interaktywny przebieg z paskiem postępu i źródłami oraz ekran wyniku; usunięto błąd payloadu Finish. Bez nowych testów agenta przy zamknięciu; wcześniejsze dowody i ograniczenia platformowe zachowano w PHASES.md.

@@ -407,7 +407,8 @@
       "community": "Soberity (community)",
       "map": "World Map",
       "brain": "Brain Lab",
-      "myths": "Myth Buster"
+      "myths": "Myth Buster",
+      "about": "About us"
     },
     "open": "Open menu",
     "close": "Close menu",
@@ -1057,5 +1058,15 @@
       "VERIFIED": "Verified",
       "SUSPENDED": "Suspended"
     }
+  },
+  "about": {
+    "title": "About us",
+    "mission": "A clearer life, together.",
+    "description": "Soberity brings together science-based education and alcohol-free experiences to support life without alcohol.",
+    "scienceTitle": "Understand the science",
+    "science": "Explore articles, quizzes and flashcards grounded in verifiable sources.",
+    "communityTitle": "Connect through experiences",
+    "community": "Discover sober parties, raves and everyday activities that bring people together.",
+    "approach": "Evidence first. Support without judgment."
   }
 }

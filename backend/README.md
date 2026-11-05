@@ -79,11 +79,14 @@ No additional tests or API/UI verification performed.
 
 ### Sober Events — P2-I00 foundation
 
-The owner parked Myth Battle and started local Events policy work. See
-[EVENTS_POLICY.md](EVENTS_POLICY.md) for taxonomy, preliminary domain policy,
-moderation/verification boundaries and acceptance scenarios. No Events API,
-migration or real catalog is introduced yet. P2-I00 remains NOT VERIFIED;
-tests/builds and extra verification were omitted at the owner’s request.
+P2-I00 stage-one policy completed 2026-11-05. See
+[EVENTS_POLICY.md](EVENTS_POLICY.md) for sober qualification, admin lifecycle,
+GeoNames country/city source, the 100 km default nearby radius, consent and
+private Joined retention. [Acceptance evidence](EVENTS_POLICY_SCENARIOS.md):
+31 unit/architecture tests PASS, including 18 Events tests; documented policy
+walkthrough complete. Pure policy only: no new API, migration, importer or UI.
+Earlier 2026-11-04 “no tests” notes are historical. Existing implementations
+below still require adaptation/verification against the approved stage-one scope.
 
 ### Sober Events — P2-I01 data and APIs
 
