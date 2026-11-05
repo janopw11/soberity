@@ -10,6 +10,7 @@ import { setAccountLanguage } from '../profile/accountLanguage';
 import { readAccountLocale } from '../profile/accountLocale';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { Alert, Screen, SettingsGroup, SettingsRow } from '../ui';
+import { EventLocationSettings } from '../events/EventLocationSettings';
 import { LanguageSelect } from './LanguageSelect';
 
 type Notice = {
@@ -107,6 +108,7 @@ export default function PreferencesScreen() {
           }
         />
       </SettingsGroup>
+      <EventLocationSettings />
       {localePending ? (
         <Text
           style={{

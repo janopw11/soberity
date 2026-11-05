@@ -1,86 +1,35 @@
-# P2-I02 — Event discovery handoff
+# P2-I02 — Event discovery, first-stage contract
 
-Prepared 2026-11-04, **NOT VERIFIED**. No tests, build, typecheck, browser,
-simulator, API requests, backend restart or migration execution were performed
-at the owner's request. P2-I01 and V17 remain prerequisites, not automatically
-accepted or applied by implementing this screen.
+Updated 2026-11-05. This supersedes the unverified 2026-11-04 handoff. Backend prerequisites P2-I00/P2-I01 are complete; UI verification and limitations are recorded in [EVENT_DISCOVERY_RESULTS.md](EVENT_DISCOVERY_RESULTS.md).
 
-## Scope
+## Catalog
 
-`/events` now renders the shared Expo/React Native discovery screen on web,
-iOS and Android instead of UnavailableScreen. Existing menu/header navigation
-is retained. Data comes exclusively from the public Events API. No seeded events,
-fictional dates/prices or extension of the Home preview are introduced.
+`/events` uses the shared Expo screen on web/iOS/Android. Two searchable record pickers use the global GeoNames dictionary through `/api/v1/locations/countries` and `/cities`: localized labels, country-scoped cities, region/district/source ID disambiguation, pagination and attribution. Selecting another country clears the city. Typed search text never substitutes for a selected database ID. Empty or unavailable dictionaries show honest empty/error states; no bundled mock cities.
 
-- City, category, inclusive calendar-day date range and explicit alcohol-policy
-  selector; extra filters for region/country, price kind, ISO currency and maximum
-  amount, venue accessibility and optional radius.
-- Apply button validates and resets pagination. Reset clears all filters, sorting
-  and the in-memory search point. Filter edits do not silently change displayed
-  results until applied; the screen explains this behavior.
-- Server-side start-date ordering (ascending/descending),12 items/page, bounded
-  requests, retry, initial loading, empty search, out-of-range-page recovery,
-  stale-response cancellation and refetch on screen focus.
-- Locale-aware dates in each event's IANA timezone, start/end shown even across
-  midnight, price display honoring currency minor units, category/strict-friendly
-  badges, organizer/venue, availability and known accessibility. Sober party/rave
-  category badges have stronger brand emphasis. Missing/failed images use a quiet
-  calendar fallback. Event language differing from UI language is identified;
-  interface language does not filter out events or pretend to translate content.
-- Responsive wrapping grid/filter rows, semantic Ocean tokens in both themes,
-  existing Screen/TextField/Button/Dialog/SettingsGroup/SettingsRow/Pagination.
-  Filter menus use dialogs with existing keyboard/Back/Escape behavior.
+Apply combines event name, category, country/city IDs and inclusive calendar-day dates. The final day becomes the next local midnight, preserving 23/25-hour DST days. Invalid/reversed dates are rejected. Clear resets filters and pagination. Public results use the backend's fixed soonest-first ordering, 12 per page; no unsupported sort/price/region query parameters. UI language localizes dictionary labels and dates without filtering out events in other languages. Requests have deadlines, cancellation and stale-response guards. Loading, empty and network failure are separate states.
 
-Cards are informational summaries in this iteration: event-detail navigation,
-calendar export and ticket links belong to **P2-I03**, not fake disabled actions.
-No changes to unrelated Home sections or new dependencies.
+Cards retain existing Ocean tokens, sober party/rave categories, real covers or neutral fallback, event timezone and detail links. Optional end date and missing organizer/price are supported. Joined belongs to P2-I05; the broader detail/organizer experience remains P2-I03.
 
-## Backend additions
+## Nearby Home tickets and consent
 
-`GET /api/v1/events` additionally accepts `region` (case-insensitive exact match)
-and `sort=START_ASC|START_DESC|PRICE_ASC` (default START_ASC). Ordering occurs
-before pagination, with ID tie-breakers. PRICE_ASC requires a valid ISO currency,
-avoiding comparisons of different currencies; UI currently offers date ordering.
-Existing public eligibility rules and projection remain unchanged. No additional
-migration is needed beyond the pending V17 from P2-I01.
+Preferences → Events near you provides an explicit opt-in and an immediate off action. Consent is held only in memory for the current trusted sign-in session. Reload, sign-out and account switch reset it. Merely visiting Home never requests permission. Without consent the complete nearby section is absent, while the catalog remains available.
 
-## Date and location privacy
+Native adapters use `expo-location` foreground permission and one balanced-accuracy fix; no background permission, service, watch or tracking is requested. Web asks permission through one explicit geolocation call; the resulting point is discarded. Home then obtains a fresh point only after checking the browser permission is already granted. Browsers without the Permissions API conservatively show unavailable rather than prompting automatically on Home. System permission changes and foreground return recheck authorization. Turning the feature off or leaving Home cancels requests and ignores late callbacks; backgrounding clears results.
 
-From/through fields use calendar days in the viewer's device timezone, identified
-in the form. The client converts local midnight to UTC and advances the end by
-one calendar day with Date.setDate, rather than adding a fixed24 hours across
-DST. Backend start-inclusive/end-exclusive filtering and ended-event exclusion
-remain authoritative. Changing UI language does not reinterpret dates.
+A point exists only as a local variable and the JSON body of `POST /api/v1/events/nearby` (page 0, size 3, no-store). It never enters URLs, profile/storage, query keys, analytics or logs. The backend controls radius and distance ordering; the UI displays its radius, defaults neither to distant events nor demo tickets. City-centroid distances are explicitly approximate. Empty supply shows “No events nearby — check out the event base” / “Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń” with a catalog link. Position failure and API failure have separate messages and retries.
 
-Radius search is opt-in. Manual coordinates work on all platforms, without
-permissions; web additionally offers an explicit one-shot browser geolocation
-button when supported. The browser may request foreground permission after that
-click. No automatic request on mount, location watcher, native background/device
-permission or storage dependency. In Expo native, this iteration uses manual
-coordinates; automatic native GPS is not provided. Denied/unavailable browser
-location leaves city/manual search usable. Unmounted or cleared requests are
-ignored. Coordinates are kept only in component memory and sent as search query
-parameters when applied; they are not put into navigation URLs/profile/storage.
-Venue records without coordinates cannot match a radius query.
+Tickets preserve the approved image and right stub layout, real date/time and timezone, category and city, full-card navigation, keyboard focus and the first-ticket 1500 ms animation with reduced-motion handling. Expo Router requires a flattened static style for its Slot child; press state is maintained explicitly. Existing Dialog also handles Escape from focused web content.
 
-## Owner acceptance — NOT EXECUTED
+## Local verification
 
-After V17/backend activation and publication of a real reviewed event:
+```sh
+pnpm --filter @soberity/consumer typecheck
+pnpm --filter @soberity/consumer test:unit --runInBand --watchman=false src/events/EventLocationContext.test.tsx src/events/eventFilters.test.ts src/events/location.test.ts src/preferences/themes.test.ts
+pnpm --filter @soberity/consumer exec playwright test --config playwright.events.config.ts
+pnpm --filter @soberity/consumer build
+pnpm --filter @soberity/consumer export:native
+```
 
-1. Open `/events` from the Sober Events menu on web/iOS/Android. Check real data,
-   loading/failure/retry/empty states and both EN/PL themes.
-2. Apply city, region/country, category, free/paid/unknown, maximum price with
-   currency and accessibility. Check reset and validation. Strict is default;
-   friendly appears only after explicit selection, without silent fallback.
-3. Page and change ordering/filters; ensure server-wide order and page reset.
-   Check an event removed between page fetches and return to the first page.
-4. Check midnight crossings, event vs viewer timezone, inclusive final day,
-   leap/invalid dates, DST boundaries and non-two-decimal currencies.
-5. Enable nearby only explicitly; deny browser permission, enter manual valid
-   and invalid coordinates/radius, clear during an in-flight request, navigate
-   away and return. Confirm no prompt occurs by merely opening the screen.
-6. Check320px/large-font/mobile/tablet/desktop layouts, image failures, long
-   titles/translations, keyboard focus and modal dismissal, VoiceOver/TalkBack,
-   screen-reader labels and contrast. These are not yet verified.
+Playwright mocks the public backend and Firebase REST boundary explicitly; its fixtures are never imported by product code. Native acceptance uses the separate loopback-only `apps/consumer/tests/fixtures/events-server.mjs`, a synthetic Firebase Auth emulator account and a native Metro instance configured for these loopback services. `POST /__fixture/mode` accepts results/empty/error; `GET` exposes only mode/request count, never coordinates. Test authentication is not production authorization. Backend ACL, dictionary search/import, distance calculations and real database ordering are covered separately by P2-I01 integration tests.
 
-CHANGELOG entry deferred until actual verification; PHASES checkboxes remain open.
+The application database and global GeoNames dump were not changed in this iteration. Before real use, follow [LOCATIONS_IMPORT.md](LOCATIONS_IMPORT.md), publish admin events, and rebuild native clients after adding `expo-location`. No deployment, production writes or full P2-I03/P2-I04/P2-I05 acceptance is implied.

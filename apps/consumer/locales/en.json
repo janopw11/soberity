@@ -1,0 +1,5 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Allow Soberity to find nearby alcohol-free events during your visit. Your coordinates are not saved."
+  }
+}

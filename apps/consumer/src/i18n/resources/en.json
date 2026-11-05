@@ -140,7 +140,7 @@
     "any": "Any",
     "city": "City",
     "region": "Region",
-    "country": "Country (ISO code)",
+    "country": "Country",
     "category": "Category",
     "from": "From date",
     "to": "Through date",
@@ -190,7 +190,7 @@
     "locationError": "Location could not be obtained. Enter coordinates or search by city instead.",
     "locationInvalid": "Enter latitude −90 to 90, longitude −180 to 180 and radius 0.1 to 250 km.",
     "countryError": "Enter a two-letter country code, for example PL or AT.",
-    "dateError": "Use valid YYYY-MM-DD dates. The end date must follow the start and cannot be entirely in the past.",
+    "dateError": "Use valid YYYY-MM-DD dates, with the start on or before the end. For past dates, enter a start date.",
     "priceError": "Use a valid currency code and a non-negative amount with the correct number of decimal places.",
     "upcoming": "Upcoming events",
     "sort": "Sort by",
@@ -247,6 +247,38 @@
       "externalTitle": "Open external website",
       "externalHost": "Continue to {{host}}",
       "continue": "Continue ↗"
+    },
+    "searchName": "Event name",
+    "resultsTitle": "Events",
+    "locations": {
+      "chooseCountry": "Choose country",
+      "chooseCity": "Choose city",
+      "countryFirst": "Choose a country first",
+      "searchCountries": "Search countries",
+      "searchCities": "Search cities",
+      "loading": "Searching locations…",
+      "error": "Locations could not be loaded. Please try again.",
+      "empty": "No matching locations. Try another name.",
+      "attribution": "Location data: GeoNames, CC BY 4.0; filtered and normalized by Soberity."
+    },
+    "locationSettings": {
+      "title": "Events near you",
+      "description": "Choose to use your location for nearby events on Home. One foreground lookup per visit, with no location history or saved coordinates. This choice lasts for this signed-in session. You can browse the event base without it.",
+      "enabled": "Nearby events are enabled for this session.",
+      "disabled": "Nearby events are hidden on Home.",
+      "enable": "Use my location for nearby events",
+      "disable": "Turn off nearby events",
+      "declined": "Location permission was declined or revoked. Home will hide nearby events. You can still search the event base.",
+      "system": "Open device settings"
+    },
+    "nearby": {
+      "empty": "No events nearby — check out the event base",
+      "browse": "Browse the event base",
+      "unavailable": "Location unavailable. Try again or search the event base.",
+      "loading": "Finding events near you…",
+      "radius": "Events within {{radius}} km, nearest first",
+      "distance": "Approx. {{distance}} km away",
+      "cityDistance": "Approx. {{distance}} km to the city"
     }
   },
   "account": {

@@ -1,0 +1,5 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Pozwól Soberity wyszukać bezalkoholowe wydarzenia w pobliżu podczas wizyty. Twoje współrzędne nie są zapisywane."
+  }
+}

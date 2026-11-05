@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I00/P2-I01 DONE (polityka i backend etapu 1, 2026-11-05), P2-I02–P2-I04 nadal IN_PROGRESS / NOT VERIFIED, 2/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I00–P2-I02 DONE (polityka, backend i discovery etapu 1, 2026-11-05; dalszy odbiór Androida pominięty na polecenie właściciela), P2-I03/P2-I04 nadal IN_PROGRESS / NOT VERIFIED, 3/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -74,7 +74,7 @@ Blockers: opis lub —
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 6 | 4/6 | IN_PROGRESS |
-| Phase 2 | Sober Events — katalog admina, lokalizacja i Dołączam (etap 1) | 7 | 2/7 | IN_PROGRESS |
+| Phase 2 | Sober Events — katalog admina, lokalizacja i Dołączam (etap 1) | 7 | 3/7 | IN_PROGRESS |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
 | Phase 5 | Community — grupy, posty, interakcje i moderacja | 7 | 0/7 | TODO |
@@ -824,27 +824,36 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I02 — Event search & nearby tickets on Home
 
-**Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
-**Started:** 2026-11-04  
-**Finished:** —  
-**Zależności iteracji:** P2-I01 DONE dla backendu etapu 1 (2026-11-05); historyczny start P2-I02 z 2026-11-04 nie zalicza nowego UI. Wymaga dostosowania do ID kraj/miasto, POST nearby i aktualnego kontraktu po osobnym poleceniu.
-**Dowód:** `apps/consumer/app/events.tsx`, `apps/consumer/src/events/{EventsScreen,EventCard,EventSelect}.tsx`, `eventsApi.ts`, `location.ts` / `location.web.ts`, EN/PL resources, `EventCatalog.java`, `EventPublicController.java`, `backend/EVENT_DISCOVERY.md`.  
-**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** backend/V17 z P2-I01 muszą zostać uruchomione i odebrane; katalog wymaga prawdziwych zatwierdzonych danych. Zgodnie z poleceniem właściciela nie uruchamiano testów/buildów/typecheck, migracji/restartów, API, przeglądarki ani symulatorów. T01–T04/V01 pozostają niezaliczone do odbioru.
+**Status:** DONE — zakres etapu 1 odebrany 2026-11-05; dalsze testy Androida pominięte na wyraźne polecenie właściciela.
+
+**Started:** 2026-11-04
+
+**Finished:** 2026-11-05
+
+**Zależności iteracji:** P2-I00/P2-I01 DONE; klient dostosowany do ID kraj/miasto i POST nearby.
+
+**Dowód:** `backend/EVENT_DISCOVERY.md`, `backend/EVENT_DISCOVERY_RESULTS.md`; `src/events/{EventsScreen,LocationSelect,EventLocationContext,EventLocationSettings,NearbyEvents,EventTicket}.tsx`, adaptery web/native, kontrakt i EN/PL. Web 24/24, nowe unit 16/16, kontrast 2/2, typecheck, lint zmienionych źródeł, eksporty web/iOS/Android i natywny build iOS PASS. Runtime iOS: zgoda/odmowa/cofnięcie, bilety, szczegóły, kraj/miasto, pusty promień i link PASS.
+
+**Ograniczenia odbioru:** właściciel 2026-11-05 polecił przerwać testy Androida i zamknąć iterację na podstawie pozostałych wyników. Android: potwierdzono uruchomienie, zgodę systemową/odmowę/ukrycie Home i unavailable; poprawny fix i pełny przebieg pobliskich **NOT VERIFIED**, nie są deklarowane jako PASS. Brak pozycji/timeout i anulowanie zweryfikowane w unit i web; próba wymuszenia timeoutu iOS przez wyczyszczenie pozycji symulatora zwróciła poprawny punkt z cache, więc ten wymuszony scenariusz runtime nie jest zaliczany. Pełny klient: 95 PASS / 14 wcześniejszych FAIL (czysty HEAD: 79 PASS / te same 14 FAIL); lint repo: 4 wcześniejsze błędy (HEAD: 5), bez nowych. Szczegóły w raporcie wyników. Baza aplikacji/globalny dump/produkcja niezmienione.
+
+**Implementacja i odbiór 2026-11-05:** dwa wyszukiwalne pola globalnego słownika i połączone filtry nazwa/typ/lokalizacja/daty, DST, stała kolejność soonest-first, paginacja i stany błędów. Dobrowolna zgoda w preferencjach, jednorazowa pozycja foreground bez historii i storage, unieważnianie po cofnięciu/zmianie konta/background. Rzeczywiste bilety Home według obecnego stylu, promień/odległość z API, osobne empty/unavailable/error, link katalogu i szczegółów. Expo Location, lokalizowane opisy iOS EN/PL, bez uprawnień background/Always. Małe konieczne poprawki: kompatybilność szczegółów z nullable ends_at i wydarzeniami admina, Escape w Dialog, typ zdarzenia IconHint. Nie zamknięto P2-I03 ani następnej iteracji.
 
 **Implementacja 2026-11-04:** `/events` zastępuje UnavailableScreen wspólnym katalogiem Expo web/iOS/Android. Filtry miasto/region/kraj/data/kategoria/cena/waluta/accessibility, jawny strict/friendly, zastosowanie i czyszczenie filtrów, sortowanie dat serwerowe i paginacja12. Ocean light/dark, EN/PL, responsywny grid, rzeczywiste zdjęcia lub neutralny fallback, silniejsza etykieta sober party/rave, data/czas w strefie wydarzenia, cena z jednostek najmniejszych. Dni zakresu w strefie użytkownika, koniec przez następny dzień kalendarzowy (DST). Obsługa loading/error/retry/empty i anulowania starych zapytań. Opcjonalny promień: ręczne współrzędne na każdej platformie, jednorazowa geolokalizacja przeglądarki dopiero po kliknięciu; bez zapisu w profilu/storage i śledzenia. Automatyczny GPS native nie jest dostarczony, pozostaje tryb ręczny. API rozszerzone o region i bezpieczny enum sort przed paginacją; bez nowej migracji. Nie rozpoczęto szczegółów/biletów/kalendarza P2-I03 ani nie zmieniano Home. CHANGELOG odroczony do weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I02-T01` Zbuduj katalog Sober Events z łączonymi filtrami: nazwa, typ, kraj/miasto i data od–do. Kraje i miasta wybieraj w dwóch polach z wyszukiwaniem pełnotekstowym; miasto jest ograniczone do kraju, zmiana kraju czyści niepasujące miasto. Katalog działa bez udostępniania pozycji urządzenia. Dodatkowe filtry ceny/regionu/dostępności **ODŁOŻONE**.
-- [ ] `P2-I02-T02` Dodaj sortowanie, paginację, czyszczenie filtrów i stany loading/error/retry/empty. Zakres dat uwzględnia cały dzień końcowy i strefę użytkownika, odrzuca od > do; pusta lista nie jest błędem sieci.
-- [ ] `P2-I02-T03` Zachowaj czytelne typy wydarzeń, w tym sober party/rave, oraz istniejący styl biletów na Home według docs/BRANDING.md, bez tworzenia nowego wzorca kart.
-- [ ] `P2-I02-T04` Dodaj dobrowolną zgodę na lokalizację i jednorazowe pobranie pozycji na web/iOS/Android, bez lokalizacji w tle i śledzenia. Wejście do ustawień zgody poza ukrytą sekcją Home; nie wywołuj systemowego pytania automatycznie po otwarciu Home. Odmowa/cofnięcie zgody ukrywa całą sekcję pobliskich na Home i czyści bieżącą pozycję oraz wyniki; nie blokuje katalogu.
-- [ ] `P2-I02-T05` Po zgodzie i otrzymaniu pozycji podłącz rzeczywiste nadchodzące eventy w promieniu do biletów Home, od najbliższego. Brak pobliskich: „No events nearby — check out the event base” / „Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń” i działający link do katalogu, bez odległego fallbacku i danych demo. Zgoda z timeoutem/niedostępną pozycją: osobny stan niedostępnej lokalizacji z ponowieniem i linkiem do katalogu. Bilet otwiera szczegóły eventu.
+- [x] `P2-I02-T01` Zbuduj katalog Sober Events z łączonymi filtrami: nazwa, typ, kraj/miasto i data od–do. Kraje i miasta wybieraj w dwóch polach z wyszukiwaniem pełnotekstowym; miasto jest ograniczone do kraju, zmiana kraju czyści niepasujące miasto. Katalog działa bez udostępniania pozycji urządzenia. Dodatkowe filtry ceny/regionu/dostępności **ODŁOŻONE**.
+- [x] `P2-I02-T02` Dodaj sortowanie, paginację, czyszczenie filtrów i stany loading/error/retry/empty. Zakres dat uwzględnia cały dzień końcowy i strefę użytkownika, odrzuca od > do; pusta lista nie jest błędem sieci.
+- [x] `P2-I02-T03` Zachowaj czytelne typy wydarzeń, w tym sober party/rave, oraz istniejący styl biletów na Home według docs/BRANDING.md, bez tworzenia nowego wzorca kart.
+- [x] `P2-I02-T04` Dodaj dobrowolną zgodę na lokalizację i jednorazowe pobranie pozycji na web/iOS/Android, bez lokalizacji w tle i śledzenia. Wejście do ustawień zgody poza ukrytą sekcją Home; nie wywołuj systemowego pytania automatycznie po otwarciu Home. Odmowa/cofnięcie zgody ukrywa całą sekcję pobliskich na Home i czyści bieżącą pozycję oraz wyniki; nie blokuje katalogu.
+- [x] `P2-I02-T05` Po zgodzie i otrzymaniu pozycji podłącz rzeczywiste nadchodzące eventy w promieniu do biletów Home, od najbliższego. Brak pobliskich: „No events nearby — check out the event base” / „Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń” i działający link do katalogu, bez odległego fallbacku i danych demo. Zgoda z timeoutem/niedostępną pozycją: osobny stan niedostępnej lokalizacji z ponowieniem i linkiem do katalogu. Bilet otwiera szczegóły eventu.
 
 **Weryfikacja:**
 
-- [ ] `P2-I02-V01` Test filtrów (po Joined także regresja w P2-I05), dat/DST, dwóch wyszukiwalnych pól kraj/miasto, a11y, EN/PL, obu motywów i responsywności.
-- [ ] `P2-I02-V02` Web/iOS/Android: zgoda, odmowa, cofnięcie, brak wsparcia/timeout, pusty promień i kolejność rzeczywistych biletów. Potwierdź całkowicie ukrytą sekcję bez zgody, dostępny katalog i działający link pustego stanu; niedostępne platformy oznacz NOT VERIFIED.
+- [x] `P2-I02-V01` Test filtrów (po Joined także regresja w P2-I05), dat/DST, dwóch wyszukiwalnych pól kraj/miasto, a11y, EN/PL, obu motywów i responsywności.
+- [x] `P2-I02-V02` Web/iOS/Android: zgoda, odmowa, cofnięcie, brak wsparcia/timeout, pusty promień i kolejność rzeczywistych biletów. Potwierdź całkowicie ukrytą sekcję bez zgody, dostępny katalog i działający link pustego stanu; niedostępne platformy oznacz NOT VERIFIED.
+
+**Odstępstwo odbioru V02:** Android pozostaje częściowo NOT VERIFIED; dalsze testy przerwano i odstąpiono od ich wymagania do zamknięcia tej iteracji na polecenie właściciela z 2026-11-05. Checkbox oznacza odbiór w tym zaakceptowanym zakresie, nie zaliczenie niewykonanych testów Androida.
 
 **Definition of Done:** Użytkownik wyszukuje eventy bez GPS; Home pokazuje bilety najbliższych wyłącznie za zgodą i z poprawnie uzyskaną pozycją. Stany braku wydarzeń i braku pozycji są rozróżnione. Wszystkie obowiązkowe zadania mają dowody.
 
@@ -853,7 +862,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I01 DONE dla backendu etapu 1 (2026-11-05), P2-I02 nadal NOT VERIFIED. Historyczne szczegóły organizatora/checkout z 2026-11-04 wymagają dostosowania do aktualnego kontraktu po osobnym poleceniu.
+**Zależności iteracji:** P2-I01 DONE dla backendu etapu 1 (2026-11-05), P2-I02 DONE (2026-11-05, z zaakceptowanym odstępstwem Android). Historyczne szczegóły organizatora/checkout z 2026-11-04 wymagają dostosowania do aktualnego kontraktu po osobnym poleceniu.
 **Dowód:** `apps/consumer/app/events/{_layout,index,[id]}.tsx`, `apps/consumer/src/events/EventDetailScreen.tsx`, `EventCard.tsx`, `eventsApi.ts`, `calendarDownload.ts`/`.web.ts`, `EventMetadata.tsx`/`.web.ts`, EN/PL, `EventCalendar.java`, publiczny kontroler/SecurityConfig, `backend/EVENT_DETAIL.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
 
@@ -2224,14 +2233,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Ostatnio ukończona iteracja (2026-11-05):** `P2-I01` — DONE dla obowiązkowego backendu etapu 1; T01–T07/V01–V03 zweryfikowane. P2-I00 nadal DONE; odłożone punkty organizatorów nie są uznane za wykonane.
-- **Wynik:** globalne Country/City i importer GeoNames z atomową aktualizacją, V19/V20 bez utraty starych danych, admin-only dodanie/publikacja/edycja/usunięcie, publiczne wyszukiwanie po ID i POST nearby 100 km bez trwałej pozycji. Zmiany dotyczą backendu, nie UI.
-- **Weryfikacja:** pełne `./backend/mvnw --batch-mode -f backend/pom.xml verify` na izolowanym PostgreSQL 17.11 — 34 unit/architecture + 104 IT PASS, exit 0; w tym 3 nowe unit i 16 IT. `backend/EVENTS_API_RESULTS.md` opisuje migrację V18→V20, ACL, DST, import/rollback, filtry/odległości, concurrency i prywatność logów. Końcowy package i offline CLI help PASS.
-- **Aktywna faza:** Phase 2 — IN_PROGRESS, 2/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE. Myth Battle PARKED; P0-I13 remote/staging i bramki Phase 0/1 pozostają otwarte.
-- **Konfiguracja rzeczywistego użycia:** baza aplikacji nie była migrowana/restartowana, pełny globalny dump nie był pobrany/załadowany; operator stosuje V19/V20, import i grant admina według `backend/LOCATIONS_IMPORT.md`. Fixture geograficzny użyty wyłącznie w izolowanej bazie testowej; przed importem słownik uczciwie pokazuje unavailable/empty.
-- **Stan pozostałego kodu:** P2-I02–P2-I04 IN_PROGRESS / NOT VERIFIED, P2-I05/P2-I06 TODO. Starsze filtry tekstowe, edytor organizatora i szczegóły wymagają aktualnego kontraktu `backend/EVENTS_API.md`; wdrożenia Joined ani runtime web/iOS/Android nie deklarowano.
-- **Następny krok po osobnym poleceniu:** `P2-I02` — dwa pola wyszukiwania kraj/miasto po ID i katalog według nowego kontraktu; dobrowolna lokalizacja i rzeczywiste bilety Home. Nie rozpoczęto tej iteracji w bieżącej sesji.
-- **CHANGELOG.md:** wpis P2-I01 pod 2026-11-05 dla zweryfikowanego modelu, API i importera.
+- **Ostatnio ukończona iteracja (2026-11-05):** `P2-I02` — DONE; T01–T05/V01–V02 odebrane z jawnym odstępstwem dla dalszych testów Androida na polecenie właściciela. P2-I00/P2-I01 pozostają DONE.
+- **Wynik:** katalog nazwa/typ/kraj–miasto/data bez GPS, globalne pickery po ID, zgoda sesyjna i foreground location, rzeczywiste pobliskie bilety Home, brak zgody ukrywa całą sekcję, empty/unavailable/error i link katalogu.
+- **Weryfikacja:** web 24/24 EN/PL light/dark desktop/mobile, nowe unit 16/16, kontrast 2/2, typecheck, lint zmienionych źródeł i eksporty PASS; build i runtime iOS PASS. Android częściowo NOT VERIFIED, dalsze testy pominięte zgodnie z poleceniem. Pełna regresja ma te same 14 wcześniejszych FAIL, lint repo 4 wcześniejsze błędy. Dowody: `backend/EVENT_DISCOVERY_RESULTS.md`.
+- **Aktywna faza:** Phase 2 — IN_PROGRESS, 3/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE. Żadna bramka fazy nie została zamknięta.
+- **Konfiguracja rzeczywistego użycia:** aktualny backend/dump według `backend/LOCATIONS_IMPORT.md` i publikacja wydarzeń przez admina. W tej iteracji nie migrowano bazy aplikacji ani nie importowano pełnego dumpa. Testy używały wyłącznie jawnych fixture; native wymaga przebudowy klienta z expo-location.
+- **Stan pozostałego kodu:** P2-I03/P2-I04 IN_PROGRESS / NOT VERIFIED, P2-I05/P2-I06 TODO. Joined i pełny odbiór szczegółów/panelu admina nie są zaliczone.
+- **Następny krok po osobnym poleceniu:** `P2-I03` — dostosowanie i odbiór szczegółów oraz linku do organizatora; nie rozpoczęto tej iteracji w tej sesji.
+- **CHANGELOG.md:** wpis P2-I02 pod 2026-11-05, z wynikami oraz ograniczeniem Androida.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2660,3 +2669,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | P2-I00 — polityka etapu 1 | DONE; T01/T03–T06/V01–V02, T02 odłożone | EventPolicy + CuratedEventPolicy, 18 nowych testów Events; wersjonowane backend/EVENTS_POLICY.md i EVENTS_POLICY_SCENARIOS.md, README, lokalne docs/policies i addendum ADR-010, PHASES i CHANGELOG. `./mvnw --batch-mode test` exit 0: 31/31 unit/architecture PASS, Q01–Q11/D01–D07; W01–W10 przegląd polityki PASS. GeoNames, CC BY 4.0, pełny słownik/aliasy, promień 100 km, admin-only cykl, zgody/Joined/retencja. | Bez blokera P2-I00; wyjątek lokalny P0-I13 zachowany. Nie uruchamiano DB/API/migracji/restartów/UI ani natywnych runtime. Rzeczywiste ACL/import/zgody/retencja pozostają do weryfikacji w kolejnych iteracjach. Następna P2-I01 wyłącznie na polecenie. |
 
 | 2026-11-05 | P2-I01 — backend katalogu admina i globalnych lokalizacji | DONE; T01–T07/V01–V03 | V19/V20, importer GeoNames/offline CLI/downloader, Country/City API, admin-only event/media/publish/delete z audytem/wersją, publiczne filtry i POST nearby 100 km, nowe bezpieczeństwo/bezpieczne logowanie. Backend docs API/import/results, README/policy, PHASES i CHANGELOG. Pełne Maven verify exit 0: 34 unit/architecture + 104 IT PASS na izolowanym PostgreSQL 17.11; nowe 3 unit + 16 IT. Końcowy package, packaged CLI help, Python help/syntax i diff check PASS. | Brak blokera backendowego DoD. Baza aplikacji/staging/produkcja nie były migrowane ani restartowane; pełny globalny dump wymaga jawnego importu według LOCATIONS_IMPORT.md. Tylko testowy fixture; bez UI/native runtime/Joined. P2-I02 dopiero po kolejnym poleceniu. |
+
+| 2026-11-05 | P2-I02 — katalog i pobliskie bilety Home | DONE; T01–T05/V01–V02, odstępstwo Android | Globalne pickery kraj/miasto po ID, filtry nazwa/typ/daty i DST, zgoda sesyjna foreground, POST nearby i prawdziwe bilety bez mocka Home. Nowe unit 16/16, kontrast 2/2, web 24/24 EN/PL light/dark desktop/mobile, typecheck, lint zmian, eksporty i build iOS PASS; runtime iOS katalog/zgoda/odmowa/cofnięcie/bilety/szczegóły/empty-link PASS. Zaktualizowano BRANDING, backend handoff/results, PHASES i CHANGELOG. | Na polecenie właściciela przerwano Android i zamknięto iterację bez jego pełnego odbioru; fix/pobliskie Android NOT VERIFIED. Próba timeoutu iOS nie wymusiła braku pozycji; gałęzie błędów unit/web PASS. Cały klient 95 PASS/14 wcześniejszych FAIL, lint repo 4 wcześniejsze błędy; porównano czysty HEAD. Bez deploymentu/migracji aplikacji/pełnego globalnego importu/commit/push; P2-I03 nie rozpoczęto. |

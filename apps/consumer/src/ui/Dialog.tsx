@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import {
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -64,6 +65,20 @@ export function Dialog({
           onPress={onClose}
         />
         <View
+          {...(Platform.OS === 'web'
+            ? {
+                onKeyUp: (event: {
+                  key?: string;
+                  nativeEvent?: { key?: string };
+                  stopPropagation: () => void;
+                }) => {
+                  if ((event.key ?? event.nativeEvent?.key) === 'Escape') {
+                    event.stopPropagation();
+                    onClose();
+                  }
+                },
+              }
+            : {})}
           accessibilityRole="none"
           accessibilityViewIsModal
           testID={testID}

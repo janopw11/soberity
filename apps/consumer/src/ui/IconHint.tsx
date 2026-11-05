@@ -31,8 +31,8 @@ export function IconHint({ text, children, pill = false }: IconHintProps) {
     onLongPress={() => { setDismissed(false); setPinned(true); }}
     {...(Platform.OS === 'web' ? {
       'aria-describedby': visible ? id : undefined,
-      onKeyDown: (event: { key: string; stopPropagation: () => void }) => {
-        if (event.key === 'Escape') { setDismissed(true); setPinned(false); event.stopPropagation(); }
+      onKeyDown: (event: { nativeEvent?: { key?: string }; key?: string; stopPropagation: () => void }) => {
+        if ((event.key ?? event.nativeEvent?.key) === 'Escape') { setDismissed(true); setPinned(false); event.stopPropagation(); }
       },
     } : {})}
     style={[

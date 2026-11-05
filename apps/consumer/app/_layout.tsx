@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 
 import '../src/i18n';
+import { EventLocationProvider } from '../src/events/EventLocationContext';
 import {
   AuthStatusProvider,
   useAuthStatus,
@@ -83,7 +84,9 @@ export default function RootLayout() {
   return (
     <ThemePreferencesProvider>
       <AuthStatusProvider>
-        <RootNavigator />
+        <EventLocationProvider>
+          <RootNavigator />
+        </EventLocationProvider>
       </AuthStatusProvider>
     </ThemePreferencesProvider>
   );

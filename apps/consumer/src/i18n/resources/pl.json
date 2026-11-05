@@ -140,7 +140,7 @@
     "any": "Dowolne",
     "city": "Miasto",
     "region": "Region",
-    "country": "Kraj (kod ISO)",
+    "country": "Kraj",
     "category": "Kategoria",
     "from": "Data od",
     "to": "Data do",
@@ -190,7 +190,7 @@
     "locationError": "Nie udało się pobrać lokalizacji. Wpisz współrzędne lub szukaj po mieście.",
     "locationInvalid": "Podaj szerokość od −90 do 90, długość od −180 do 180 i promień od 0,1 do 250 km.",
     "countryError": "Wpisz dwuliterowy kod kraju, np. PL lub AT.",
-    "dateError": "Podaj poprawne daty RRRR-MM-DD. Data końcowa musi następować po początkowej i nie może w całości należeć do przeszłości.",
+    "dateError": "Podaj poprawne daty RRRR-MM-DD; początek nie może być po końcu. Dla dat przeszłych podaj datę początkową.",
     "priceError": "Podaj poprawny kod waluty i nieujemną kwotę z odpowiednią liczbą miejsc po przecinku.",
     "upcoming": "Nadchodzące wydarzenia",
     "sort": "Sortowanie",
@@ -249,6 +249,38 @@
       "externalTitle": "Otwórz stronę zewnętrzną",
       "externalHost": "Przejdź do {{host}}",
       "continue": "Przejdź ↗"
+    },
+    "searchName": "Nazwa wydarzenia",
+    "resultsTitle": "Wydarzenia",
+    "locations": {
+      "chooseCountry": "Wybierz kraj",
+      "chooseCity": "Wybierz miasto",
+      "countryFirst": "Najpierw wybierz kraj",
+      "searchCountries": "Szukaj kraju",
+      "searchCities": "Szukaj miasta",
+      "loading": "Wyszukiwanie lokalizacji…",
+      "error": "Nie udało się pobrać lokalizacji. Spróbuj ponownie.",
+      "empty": "Brak pasujących lokalizacji. Spróbuj innej nazwy.",
+      "attribution": "Dane lokalizacji: GeoNames, CC BY 4.0; filtrowanie i normalizacja: Soberity."
+    },
+    "locationSettings": {
+      "title": "Wydarzenia w pobliżu",
+      "description": "Możesz używać lokalizacji do wyszukiwania wydarzeń w pobliżu na stronie głównej. Jednorazowy odczyt podczas wizyty, bez historii i zapisywania współrzędnych. Wybór obowiązuje w bieżącej sesji zalogowania. Baza wydarzeń działa również bez lokalizacji.",
+      "enabled": "Wydarzenia w pobliżu są włączone w tej sesji.",
+      "disabled": "Wydarzenia w pobliżu są ukryte na stronie głównej.",
+      "enable": "Używaj lokalizacji do wydarzeń w pobliżu",
+      "disable": "Wyłącz wydarzenia w pobliżu",
+      "declined": "Odmówiono lub cofnięto dostęp do lokalizacji. Sekcja na stronie głównej będzie ukryta. Nadal możesz przeszukiwać bazę wydarzeń.",
+      "system": "Otwórz ustawienia urządzenia"
+    },
+    "nearby": {
+      "empty": "Brak wydarzeń w pobliżu — sprawdź bazę wydarzeń",
+      "browse": "Przejdź do bazy wydarzeń",
+      "unavailable": "Lokalizacja niedostępna. Spróbuj ponownie lub przeszukaj bazę wydarzeń.",
+      "loading": "Wyszukiwanie wydarzeń w pobliżu…",
+      "radius": "Wydarzenia w promieniu {{radius}} km, od najbliższych",
+      "distance": "Około {{distance}} km od Ciebie",
+      "cityDistance": "Około {{distance}} km do miasta"
     }
   },
   "account": {

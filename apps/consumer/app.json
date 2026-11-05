@@ -8,7 +8,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.soberity.app.dev",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleLocalizations": ["en", "pl"]
+      }
     },
     "android": {
       "package": "com.soberity.app.dev"
@@ -27,7 +30,24 @@
           }
         }
       ],
-      "expo-dev-client"
-    ]
+      "expo-dev-client",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Soberity to find nearby alcohol-free events during your visit. Your coordinates are not saved.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false,
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": false,
+          "isAndroidMotionActivityEnabled": false
+        }
+      ]
+    ],
+    "locales": {
+      "en": "./locales/en.json",
+      "pl": "./locales/pl.json"
+    }
   }
 }
