@@ -15,17 +15,33 @@ export type LocationRecord = {
   district?: string | null;
 };
 export type LocationPage = Page<LocationRecord>;
-export type NearbyPage = Page<DiscoveryEvent> & { radiusKm: number };
-export async function locationsGet(
+export type CityLocationRecord = LocationRecord & {
+  country_id: string;
+  country_name: string;
+  country_label_en: string;
+  country_label_pl: string;
+};
+export type NearbyPlace = {
+  city_id: string;
+  label_en: string;
+  label_pl: string;
+  country_label_en: string;
+  country_label_pl: string;
+};
+export type NearbyPage = Page<DiscoveryEvent> & {
+  radiusKm: number;
+  location?: NearbyPlace | null;
+};
+export async function locationsGet<T extends LocationRecord = LocationRecord>(
   path: string,
   signal: AbortSignal,
-): Promise<LocationPage> {
+): Promise<Page<T>> {
   const response = await fetch(
     `${readBackendApiUrl()}/api/v1/locations${path}`,
     { signal, cache: 'no-store' },
   );
   if (!response.ok) throw new EventRequestError(response.status);
-  return response.json() as Promise<LocationPage>;
+  return response.json() as Promise<Page<T>>;
 }
 /** Coordinates exist only in this request body; never URL, storage, logs or a query cache key. */
 export async function nearbyEvents(

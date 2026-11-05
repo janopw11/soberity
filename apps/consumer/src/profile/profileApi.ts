@@ -18,9 +18,11 @@ export type Profile = {
   interests: ProfileInterest[];
   locale: ProfileLocale | null;
   updatedAt: string;
+  eventLocationConsent?: boolean;
 };
 
 export type ProfilePatch = {
+  eventLocationConsent?: boolean;
   displayName?: string;
   city?: string;
   interests?: ProfileInterest[];

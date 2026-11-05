@@ -62,7 +62,14 @@ class GeoNamesImportIT extends AbstractIntegrationTest {
         Files.writeString(directory.resolve("countryInfo.txt"),"corrupted");
         assertThatThrownBy(()->importer.importDirectory(directory,1,1)).isInstanceOf(java.io.UncheckedIOException.class);
         assertThatThrownBy(()->catalog.selected(GeoNamesFixture.country(1),GeoNamesFixture.city(102))).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
-        assertThatThrownBy(()->catalog.cities(null,"","en",0,20)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+        var global=catalog.cities(null,"wieden","pl",0,20);
+        assertThat(global.get("total")).isEqualTo(1L);
+        var globalRows=(List<?>)global.get("items");
+        var globalCity=(Map<?,?>)globalRows.getFirst();
+        assertThat(globalCity.get("country_id")).isEqualTo(GeoNamesFixture.country(1));
+        assertThat(globalCity.get("country_label_en")).isEqualTo("Austria");
+        assertThat(globalCity.get("country_label_pl")).isEqualTo("Austria");
+        assertThat(catalog.cities(null,"Springfield","en",0,20).get("total")).isEqualTo(2L);
         assertThat(catalog.cities(GeoNamesFixture.country(1),"%_","en",0,20).get("total")).isEqualTo(0L);
     }
 }

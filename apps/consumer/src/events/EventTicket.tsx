@@ -30,10 +30,16 @@ export function EventTicket({
   event,
   reveal,
   animationPlayed,
+  showPreview = false,
+  compactBadges = false,
+  testID = 'nearby-ticket',
 }: {
   event: DiscoveryEvent;
   reveal: boolean;
   animationPlayed: RefObject<boolean>;
+  showPreview?: boolean;
+  compactBadges?: boolean;
+  testID?: string;
 }) {
   const { t, i18n } = useTranslation();
   const photograph = event.cover_id
@@ -48,6 +54,35 @@ export function EventTicket({
     timeStyle: 'short',
     timeZone: event.timezone,
   }).format(new Date(event.starts_at));
+  const dateParts = new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: event.timezone,
+  }).formatToParts(new Date(event.starts_at));
+  const datePart = (type: Intl.DateTimeFormatPartTypes) =>
+    dateParts.find((part) => part.type === type)?.value ?? '';
+  const currentYear = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    timeZone: event.timezone,
+  }).format(new Date());
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone: event.timezone,
+  }).format(new Date(event.starts_at));
+  const compactDate = `${datePart('day')} ${datePart('month').replace(/\./g, '').toLocaleUpperCase(locale)}${datePart('year') === currentYear ? '' : ` ${datePart('year')}`} · ${time}`;
+  const accessibleDate = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+    timeZone: event.timezone,
+  }).format(new Date(event.starts_at));
+  const status = event.status ?? (showPreview ? 'PREVIEW' : 'PUBLISHED');
   const city =
     i18n.resolvedLanguage === 'pl'
       ? (event.city_pl ?? event.city)
@@ -91,6 +126,7 @@ export function EventTicket({
     )
       return;
     played.current = true;
+    progress.setValue(0);
     const animation = Animated.sequence([
       Animated.timing(progress, {
         toValue: 0.5,
@@ -156,25 +192,13 @@ export function EventTicket({
         accessibilityRole="link"
         accessibilityLabel={[
           event.title,
-          date,
-          event.timezone,
+          compactBadges ? accessibleDate : date,
+          compactBadges ? t(`events.badgeStatus.${status}`) : event.timezone,
           city,
-          event.distance_km === undefined
-            ? ''
-            : t(
-                event.coordinate_source === 'CITY'
-                  ? 'events.nearby.cityDistance'
-                  : 'events.nearby.distance',
-                {
-                  distance: new Intl.NumberFormat(locale, {
-                    maximumFractionDigits: 1,
-                  }).format(event.distance_km),
-                },
-              ),
         ]
           .filter(Boolean)
           .join(', ')}
-        testID="nearby-ticket"
+        testID={testID}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onPressIn={() => setPressed(true)}
@@ -200,6 +224,7 @@ export function EventTicket({
         <View
           style={[
             styles.main,
+            compactBadges && styles.mainWithoutStub,
             { borderColor: colors.border, backgroundColor: colors.surfaceAlt },
           ]}
         >
@@ -218,12 +243,53 @@ export function EventTicket({
               { backgroundColor: colors.eventImageScrim },
             ]}
           >
-            <View
-              style={[styles.category, { backgroundColor: colors.primary }]}
-            >
-              <Text style={[styles.categoryText, { color: colors.onPrimary }]}>
-                {t(`events.categories.${event.category_code}`)}
-              </Text>
+            <View style={compactBadges ? styles.badgeRow : undefined}>
+              <View
+                style={[styles.category, { backgroundColor: colors.primary }]}
+              >
+                <Text
+                  style={[styles.categoryText, { color: colors.onPrimary }]}
+                >
+                  {t(`events.categories.${event.category_code}`)}
+                </Text>
+              </View>
+              {compactBadges ? (
+                <>
+                  <View
+                    style={[
+                      styles.dateBadge,
+                      { backgroundColor: colors.surfaceAlt },
+                    ]}
+                  >
+                    <Text
+                      accessibilityLabel={accessibleDate}
+                      style={[styles.dateText, { color: colors.primary }]}
+                    >
+                      {compactDate}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: colors.surface },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        {
+                          color:
+                            status === 'CANCELLED'
+                              ? colors.danger
+                              : colors.textMuted,
+                        },
+                      ]}
+                    >
+                      {t(`events.badgeStatus.${status}`)}
+                    </Text>
+                  </View>
+                </>
+              ) : null}
             </View>
             {!photograph || failed ? (
               <View accessible={false}>
@@ -246,74 +312,74 @@ export function EventTicket({
                   .filter(Boolean)
                   .join(' · ')}
               </Text>
-              {event.distance_km !== undefined ? (
+              {showPreview && !compactBadges ? (
                 <Text
                   style={[styles.location, { color: colors.eventImageText }]}
                 >
-                  {t(
-                    event.coordinate_source === 'CITY'
-                      ? 'events.nearby.cityDistance'
-                      : 'events.nearby.distance',
-                    {
-                      distance: new Intl.NumberFormat(locale, {
-                        maximumFractionDigits: 1,
-                      }).format(event.distance_km),
-                    },
-                  )}
+                  {date} · {event.timezone}
                 </Text>
               ) : null}
             </View>
           </View>
         </View>
-        <Animated.View
-          onLayout={(event) => setStubWidth(event.nativeEvent.layout.width)}
-          style={[
-            styles.stub,
-            { borderColor: colors.border, backgroundColor: colors.surfaceAlt },
-            animatedStyle,
-          ]}
-        >
-          {size.width > 0 && photograph && !failed ? (
-            <Image
-              onError={() => setFailed(true)}
-              source={photograph}
-              resizeMode="cover"
-              accessible={false}
-              style={[
-                styles.photo,
-                {
-                  left: -(size.width - stubWidth),
-                  width: size.width,
-                  height: size.height,
-                },
-              ]}
-            />
-          ) : null}
-          <View
-            pointerEvents="none"
+        {compactBadges ? null : (
+          <Animated.View
+            onLayout={(event) => setStubWidth(event.nativeEvent.layout.width)}
             style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: colors.eventImageScrim },
-            ]}
-          />
-          <View
-            style={[
-              styles.stubContent,
-              { backgroundColor: colors.eventImageScrim },
+              styles.stub,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surfaceAlt,
+              },
+              animatedStyle,
             ]}
           >
+            {size.width > 0 && photograph && !failed ? (
+              <Image
+                onError={() => setFailed(true)}
+                source={photograph}
+                resizeMode="cover"
+                accessible={false}
+                style={[
+                  styles.photo,
+                  {
+                    left: -(size.width - stubWidth),
+                    width: size.width,
+                    height: size.height,
+                  },
+                ]}
+              />
+            ) : null}
             <View
-              style={[styles.stamp, { borderColor: colors.eventImageText }]}
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: colors.eventImageScrim },
+              ]}
+            />
+            <View
+              style={[
+                styles.stubContent,
+                { backgroundColor: colors.eventImageScrim },
+              ]}
             >
-              <Text style={[styles.preview, { color: colors.eventImageText }]}>
-                {date}
-              </Text>
+              <View
+                style={[styles.stamp, { borderColor: colors.eventImageText }]}
+              >
+                <Text
+                  style={[styles.preview, { color: colors.eventImageText }]}
+                >
+                  {showPreview ? t('events.ticketPreview') : date}
+                </Text>
+              </View>
+              {showPreview ? null : (
+                <Text style={[styles.zone, { color: colors.eventImageText }]}>
+                  {event.timezone}
+                </Text>
+              )}
             </View>
-            <Text style={[styles.zone, { color: colors.eventImageText }]}>
-              {event.timezone}
-            </Text>
-          </View>
-        </Animated.View>
+          </Animated.View>
+        )}
       </Pressable>
     </Link>
   );
@@ -335,6 +401,32 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   photo: { position: 'absolute', left: 0, top: 0 },
+  mainWithoutStub: {
+    borderRightWidth: 1,
+    borderTopRightRadius: radii.sm,
+    borderBottomRightRadius: radii.sm,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: spacing.space8,
+  },
+  dateBadge: {
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.space8,
+    paddingVertical: spacing.space4,
+    maxWidth: '100%',
+  },
+  dateText: { ...typography.caption, fontWeight: '600' },
+  statusBadge: {
+    marginLeft: 'auto',
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.space8,
+    paddingVertical: spacing.space4,
+    maxWidth: '100%',
+  },
+  statusText: { ...typography.caption },
   mainContent: {
     flex: 1,
     padding: spacing.space16,

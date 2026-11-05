@@ -1,25 +1,63 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
-import { Alert, Button, LoadingState, Screen, TextField } from '../ui';
+import {
+  Alert,
+  Button,
+  LoadingState,
+  Screen,
+  SettingsIcon,
+  TextField,
+} from '../ui';
 import { Pagination } from '../ui/Pagination';
-import { EventSelect } from './EventSelect';
 import { EventCard } from './EventCard';
-import { LocationSelect } from './LocationSelect';
-import type { LocationRecord } from './discoveryApi';
-import { CATEGORY_CODES, eventsGet, type EventPage } from './eventsApi';
-import { eventFilterQuery, initialEventFilters } from './eventFilters';
+import { CurrentEventLocation } from './CurrentEventLocation';
+import { useEventLocation } from './EventLocationContext';
+import { EventFiltersSheet } from './EventFiltersSheet';
+import { EventCategoryChips } from './EventCategoryChips';
+import { EventDateFilter } from './EventDateFilter';
+import { EventLocationSearch, type EventLocation } from './EventLocationSearch';
+import { eventsGet, type EventPage } from './eventsApi';
+import {
+  eventFilterQuery,
+  initialEventFilters,
+  prepareEventFilters,
+  type EventFilters,
+} from './eventFilters';
+
+type AppliedFilters = {
+  query: string;
+  values: EventFilters;
+  location: EventLocation | null;
+};
+const emptyAppliedFilters: AppliedFilters = {
+  query: eventFilterQuery(initialEventFilters),
+  values: initialEventFilters,
+  location: null,
+};
 
 export default function EventsScreen() {
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
+  const { enterEvents, leaveEvents } = useEventLocation();
+  useFocusEffect(
+    useCallback(() => {
+      enterEvents();
+      return leaveEvents;
+    }, [enterEvents, leaveEvents]),
+  );
   const [draft, setDraft] = useState(initialEventFilters);
-  const [country, setCountry] = useState<LocationRecord | null>(null),
-    [city, setCity] = useState<LocationRecord | null>(null);
-  const [applied, setApplied] = useState(''),
+  const [location, setLocation] = useState<EventLocation | null>(null);
+  const [locationPending, setLocationPending] = useState(false);
+  const [invalidLocation, setInvalidLocation] = useState(false);
+  const [locationRevision, setLocationRevision] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterButtonFocused, setFilterButtonFocused] = useState(false);
+  const [filterButtonHovered, setFilterButtonHovered] = useState(false);
+  const [applied, setApplied] = useState(emptyAppliedFilters),
     [page, setPage] = useState(0),
     [attempt, retry] = useState(0),
     [invalid, setInvalid] = useState(false);
@@ -28,79 +66,162 @@ export default function EventsScreen() {
     data: EventPage | null;
     error: boolean;
   } | null>(null);
-  const query = `${applied}${applied ? '&' : ''}page=${page}&size=12`;
+  const appliedFilterCount = [
+    applied.values.name.trim(),
+    applied.values.category,
+    applied.values.countryId || applied.values.cityId,
+    applied.values.from || applied.values.to,
+  ].filter(Boolean).length;
+  const query = `${applied.query}${applied.query ? '&' : ''}page=${page}&size=12`;
   const data = result?.key === query ? result.data : null,
     error = result?.key === query && result.error;
   useFocusEffect(
     useCallback(() => {
-      retry((value) => value + 1);
-    }, []),
+      const controller = new AbortController();
+      setResult(null);
+      const timeout = setTimeout(() => {
+        setResult({ key: query, data: null, error: true });
+        controller.abort();
+      }, 20000);
+      void eventsGet<EventPage>(`?${query}`, controller.signal)
+        .then((data) => {
+          if (!controller.signal.aborted)
+            setResult({ key: query, data, error: false });
+        })
+        .catch(() => {
+          if (!controller.signal.aborted)
+            setResult({ key: query, data: null, error: true });
+        })
+        .finally(() => clearTimeout(timeout));
+      return () => {
+        clearTimeout(timeout);
+        controller.abort();
+      };
+    }, [query, attempt]),
   );
-  useEffect(() => {
-    const controller = new AbortController();
-    setResult(null);
-    const timeout = setTimeout(() => {
-      setResult({ key: query, data: null, error: true });
-      controller.abort();
-    }, 20000);
-    void eventsGet<EventPage>(`?${query}`, controller.signal)
-      .then((data) => {
-        if (!controller.signal.aborted)
-          setResult({ key: query, data, error: false });
-      })
-      .catch(() => {
-        if (!controller.signal.aborted)
-          setResult({ key: query, data: null, error: true });
-      })
-      .finally(() => clearTimeout(timeout));
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [query, attempt]);
-  const clear = () => {
+  const resetDraft = () => {
     setDraft(initialEventFilters);
-    setCountry(null);
-    setCity(null);
-    setApplied('');
-    setPage(0);
+    setLocation(null);
+    setLocationPending(false);
+    setInvalidLocation(false);
+    setLocationRevision((value) => value + 1);
     setInvalid(false);
-    retry((value) => value + 1);
   };
   const apply = () => {
+    if (locationPending) {
+      setInvalidLocation(true);
+      return;
+    }
     try {
-      const query = eventFilterQuery(draft);
-      setApplied(query);
+      const values = prepareEventFilters(draft);
+      const query = eventFilterQuery(values);
+      setApplied({ query, values, location });
+      setFiltersOpen(false);
       setPage(0);
       setInvalid(false);
-      retry((value) => value + 1);
     } catch {
       setInvalid(true);
     }
   };
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return (
     <Screen maxWidth={1040} avoidKeyboard>
-      <View style={styles.intro}>
-        <Text
-          accessibilityRole="header"
-          style={[styles.heading, { color: colors.primary }]}
+      <View style={styles.toolbar}>
+        <EventCategoryChips
+          value={applied.values.category}
+          onChange={(category) => {
+            if (category === applied.values.category) return;
+            const values = { ...applied.values, category };
+            setApplied({ ...applied, values, query: eventFilterQuery(values) });
+            setDraft(values);
+            setPage(0);
+            setInvalid(false);
+          }}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('events.openFilters')}
+          accessibilityState={{ expanded: filtersOpen }}
+          accessibilityValue={{
+            text: t('events.appliedFilters', { count: appliedFilterCount }),
+          }}
+          testID="events-open-filters"
+          onFocus={() => setFilterButtonFocused(true)}
+          onBlur={() => setFilterButtonFocused(false)}
+          onHoverIn={() => setFilterButtonHovered(true)}
+          onHoverOut={() => setFilterButtonHovered(false)}
+          onPress={() => {
+            setDraft(applied.values);
+            setLocation(applied.location);
+            setLocationPending(false);
+            setInvalidLocation(false);
+            setInvalid(false);
+            setFiltersOpen(true);
+          }}
+          style={({ pressed }) => [
+            styles.filterButton,
+            {
+              backgroundColor:
+                pressed || filterButtonHovered
+                  ? colors.surfaceAlt
+                  : 'transparent',
+            },
+          ]}
         >
-          {t('events.discoverTitle')}
-        </Text>
-        <Text style={[styles.body, { color: colors.textSecondary }]}>
-          {t('events.discoverDescription')}
-        </Text>
+          <View
+            style={[
+              styles.filterFace,
+              {
+                backgroundColor: colors.listSurface,
+                borderColor: filterButtonFocused
+                  ? colors.focusRing
+                  : 'transparent',
+              },
+            ]}
+          >
+            <SettingsIcon name="filter" color={colors.primary} size={18} />
+          </View>
+          {appliedFilterCount > 0 ? (
+            <View
+              pointerEvents="none"
+              style={[styles.filterCount, { backgroundColor: colors.primary }]}
+            >
+              <Text
+                style={[styles.filterCountLabel, { color: colors.onPrimary }]}
+              >
+                {appliedFilterCount}
+              </Text>
+            </View>
+          ) : null}
+        </Pressable>
       </View>
-      <View
-        style={[
-          styles.filters,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}
+      <CurrentEventLocation />
+      <EventFiltersSheet
+        visible={filtersOpen}
+        title={t('events.filtersTitle')}
+        closeLabel={t('events.close')}
+        onClose={() => setFiltersOpen(false)}
+        footer={
+          <View style={styles.actions}>
+            <Button
+              label={t('events.resetDraft')}
+              variant="tertiary"
+              onPress={resetDraft}
+              style={styles.resetButton}
+            />
+            <Button
+              label={t('events.apply')}
+              onPress={apply}
+              style={styles.actionButton}
+            />
+          </View>
+        }
       >
         <TextField
-          accentLabel
+          compact
+          variant="soft"
+          leadingIcon="search"
           label={t('events.searchName')}
+          placeholder={t('events.searchPlaceholder')}
           maxLength={200}
           value={draft.name}
           onChangeText={(name) =>
@@ -109,142 +230,68 @@ export default function EventsScreen() {
           returnKeyType="search"
           onSubmitEditing={apply}
         />
-        <View style={styles.row}>
-          <View style={styles.field}>
-            <LocationSelect
-              kind="countries"
-              value={country}
-              onChange={(value) => {
-                setCountry(value);
-                setCity(null);
-                setDraft((previous) => ({
-                  ...previous,
-                  countryId: value?.id ?? '',
-                  cityId: '',
-                }));
-              }}
-            />
-          </View>
-          <View style={styles.field}>
-            <LocationSelect
-              kind="cities"
-              countryId={country?.id}
-              value={city}
-              onChange={(value) => {
-                setCity(value);
-                setDraft((previous) => ({
-                  ...previous,
-                  cityId: value?.id ?? '',
-                }));
-              }}
-            />
-          </View>
-        </View>
-        <EventSelect
-          label={t('events.category')}
-          value={draft.category}
-          options={[
-            { value: '', label: t('events.any') },
-            ...CATEGORY_CODES.map((code) => ({
-              value: code,
-              label: t(`events.categories.${code}`),
-            })),
-          ]}
-          onChange={(category) =>
-            setDraft((previous) => ({ ...previous, category }))
-          }
+        <EventLocationSearch
+          key={`${filtersOpen ? 'location-open' : 'location-closed'}-${locationRevision}`}
+          value={location}
+          onPendingChange={setLocationPending}
+          onChange={(value) => {
+            setInvalidLocation(false);
+            setLocation(value);
+            setDraft((previous) => ({
+              ...previous,
+              countryId: value
+                ? value.kind === 'country'
+                  ? value.record.id
+                  : value.record.country_id
+                : '',
+              cityId: value?.kind === 'city' ? value.record.id : '',
+            }));
+          }}
         />
-        <View style={styles.row}>
-          {(['from', 'to'] as const).map((key) => (
-            <View key={key} style={styles.field}>
-              <TextField
-                accentLabel
-                label={t(`events.${key}`)}
-                value={draft[key]}
-                placeholder="YYYY-MM-DD"
-                maxLength={10}
-                autoCorrect={false}
-                onChangeText={(value) =>
-                  setDraft((previous) => ({ ...previous, [key]: value }))
-                }
-              />
-            </View>
-          ))}
-        </View>
-        <Text style={[styles.caption, { color: colors.textMuted }]}>
-          {t('events.dateHint', { zone })}
-        </Text>
+        {invalidLocation ? (
+          <Alert
+            variant="danger"
+            message={t('events.locations.selectSuggestion')}
+          />
+        ) : null}
+        <EventDateFilter
+          value={draft}
+          onChange={(dates) => {
+            setDraft((previous) => ({ ...previous, ...dates }));
+            setInvalid(false);
+          }}
+        />
         {invalid ? (
           <Alert variant="danger" message={t('events.dateError')} />
         ) : null}
-        <View style={styles.actions}>
-          <Button label={t('events.apply')} onPress={apply} />
-          <Button
-            label={t('events.reset')}
-            variant="tertiary"
-            onPress={clear}
-          />
-        </View>
-      </View>
-      <View style={styles.intro}>
-        <Text
-          accessibilityRole="header"
-          style={[styles.subheading, { color: colors.textPrimary }]}
-        >
-          {t('events.resultsTitle')}
-        </Text>
-        <Text style={[styles.caption, { color: colors.textMuted }]}>
-          {t('events.sortValues.START_ASC')}
-        </Text>
-        {applied ? (
-          <Text style={[styles.caption, { color: colors.textMuted }]}>
-            {t('events.appliedFilters')}
-          </Text>
-        ) : null}
-      </View>
+      </EventFiltersSheet>
       {error ? (
-        <View style={styles.intro}>
-          <Alert variant="danger" message={t('events.error')} />
-          <Button
-            variant="secondary"
-            label={t('events.retry')}
-            onPress={() => retry((value) => value + 1)}
-          />
-        </View>
+        <EventLoadError onRetry={() => retry((value) => value + 1)} />
       ) : !data ? (
         <LoadingState label={t('events.loading')} />
       ) : !data.items.length ? (
-        <View style={[styles.empty, { backgroundColor: colors.surfaceAlt }]}>
+        <View
+          style={[
+            styles.empty,
+            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+          ]}
+        >
           <Text
-            accessibilityRole="header"
-            style={[styles.subheading, { color: colors.textPrimary }]}
+            accessibilityLiveRegion="polite"
+            style={[styles.emptyLabel, { color: colors.primary }]}
           >
             {t('events.emptyTitle')}
           </Text>
-          <Text style={[styles.body, { color: colors.textSecondary }]}>
-            {t('events.emptyDescription')}
+          <Text style={[styles.emptyDescription, { color: colors.textMuted }]}>
+            {t('events.emptyHint')}
           </Text>
-          <Button
-            variant="tertiary"
-            label={t(page > 0 ? 'events.firstPage' : 'events.reset')}
-            onPress={page > 0 ? () => setPage(0) : clear}
-          />
         </View>
       ) : (
         <>
-          <Text
-            accessibilityLiveRegion="polite"
-            style={[styles.small, { color: colors.textSecondary }]}
-          >
-            {t('events.results', { count: data.total })}
-          </Text>
           <View style={styles.grid}>
             {data.items.map((event) => (
               <View key={event.id} style={styles.cardSlot}>
-                <EventCard
-                  event={event}
-                  category={t(`events.categories.${event.category_code}`)}
-                />
+                <EventCard event={event} />
               </View>
             ))}
           </View>
@@ -253,7 +300,7 @@ export default function EventsScreen() {
             size={data.size}
             total={data.total}
             onPageChange={setPage}
-            label={t('discover.page', {
+            label={t('events.page', {
               page: data.page + 1,
               pages: Math.max(1, Math.ceil(data.total / data.size)),
               count: data.total,
@@ -264,27 +311,136 @@ export default function EventsScreen() {
     </Screen>
   );
 }
+function EventLoadError({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  const [focused, setFocused] = useState(false);
+  return (
+    <View
+      accessibilityLiveRegion="polite"
+      style={[styles.error, { backgroundColor: colors.listSurface }]}
+    >
+      <View style={styles.errorIcon}>
+        <SettingsIcon name="alert" color={colors.textMuted} size={22} />
+      </View>
+      <View style={styles.errorCopy}>
+        <Text style={[styles.errorTitle, { color: colors.textPrimary }]}>
+          {t('events.loadErrorTitle')}
+        </Text>
+        <Text
+          style={[styles.errorDescription, { color: colors.textSecondary }]}
+        >
+          {t('events.loadErrorDescription')}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('events.retry')}
+          onPress={onRetry}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={({ pressed }) => [
+            styles.retry,
+            {
+              backgroundColor: pressed ? colors.surfaceAlt : 'transparent',
+              borderColor: focused ? colors.focusRing : 'transparent',
+            },
+          ]}
+        >
+          <SettingsIcon name="refresh" color={colors.primary} size={16} />
+          <Text style={[styles.retryLabel, { color: colors.primary }]}>
+            {t('events.retry')}
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
 const styles = StyleSheet.create({
-  intro: { gap: spacing.space8 },
-  heading: { ...typography.h2 },
-  subheading: { ...typography.h3 },
-  body: { ...typography.body },
-  small: { ...typography.small },
-  caption: { ...typography.caption },
-  filters: {
-    padding: spacing.space16,
+  toolbar: {
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: spacing.space4,
+  },
+  filterButton: {
+    width: 48,
+    height: 48,
+    flexShrink: 0,
+    borderRadius: radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterFace: {
+    width: 36,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderRadius: radii.lg,
-    gap: spacing.space12,
   },
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space12 },
-  field: { flexGrow: 1, flexBasis: 240, minWidth: 0 },
-  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space8 },
+  filterCount: {
+    position: 'absolute',
+    top: spacing.space4,
+    right: 0,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: spacing.space4,
+    borderRadius: radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterCountLabel: { ...typography.caption },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.space8,
+    flexWrap: 'wrap',
+  },
+  actionButton: { flexGrow: 1, flexBasis: 140 },
+  resetButton: {
+    flexGrow: 0,
+    flexBasis: 88,
+    paddingHorizontal: spacing.space12,
+  },
+  error: {
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    gap: spacing.space12,
+    padding: spacing.space16,
+    borderRadius: radii.lg,
+  },
+  errorIcon: { paddingTop: spacing.space4 },
+  errorCopy: { flex: 1, minWidth: 0, gap: spacing.space4 },
+  errorTitle: { ...typography.bodyStrong },
+  errorDescription: { ...typography.small },
+  retry: {
+    minHeight: 48,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.space8,
+    borderWidth: 1,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.space8,
+  },
+  retryLabel: { ...typography.small, fontWeight: '600' },
   empty: {
-    padding: spacing.space24,
-    borderRadius: radii.lg,
-    gap: spacing.space12,
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 800,
+    paddingVertical: spacing.space8,
+    paddingHorizontal: spacing.space16,
+    borderRadius: 0,
+    borderWidth: 1,
+    gap: spacing.space4,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space16 },
-  cardSlot: { flexGrow: 1, flexBasis: 300, minWidth: 0, maxWidth: '100%' },
+  emptyLabel: { ...typography.small, textAlign: 'center' },
+  emptyDescription: { ...typography.caption, textAlign: 'center' },
+  grid: { alignItems: 'center', gap: spacing.space16 },
+  cardSlot: { width: '100%', maxWidth: 800, minWidth: 0 },
 });

@@ -106,6 +106,37 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         mvc.perform(get("/api/v1/events").param("city","Wien")).andExpect(status().isBadRequest());
         mvc.perform(get("/api/v1/events").param("latitude","61.12345678")).andExpect(status().isBadRequest());
     }
+    @Test void categorySetsAndStructuredCountryCombineBeforePaginationAndIgnoreBlankFilters()throws Exception {
+        String prefix="FilterSet-"+UUID.randomUUID();
+        var rave=input(prefix+" RAVE");published(rave);
+        var coffee=input(prefix+" Coffee");coffee.put("track","SOBER_LIFESTYLE");coffee.put("category","COFFEE_MEETUP");published(coffee);
+        create(input(prefix+" private draft"));
+        mvc.perform(get("/api/v1/events").param("q","  "+prefix.toLowerCase()+"  ").param("countryId",GeoNamesFixture.country(1).toString())
+            .param("category","SOBER_RAVE,COFFEE_MEETUP").param("size","1").param("page","1"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2)).andExpect(jsonPath("$.items.length()").value(1));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("category","SOBER_RAVE","COFFEE_MEETUP"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("countryId",GeoNamesFixture.country(2).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("category","").param("countryId","").param("cityId","").param("from","").param("to",""))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2));
+        for(var invalid:List.of(Map.of("category","MUSIC"),Map.of("dateScope","INVALID"),Map.of("from","not-a-date"),Map.of("cityId","invalid"),Map.of("countryId",UUID.randomUUID().toString())))
+            for(var entry:invalid.entrySet())mvc.perform(get("/api/v1/events").param(entry.getKey(),entry.getValue())).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/locations/cities").param("q","wieden").param("locale","en"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].label_en").value("Vienna")).andExpect(jsonPath("$.items[0].country_label_en").value("Austria"));
+    }
+    @Test void dateWindowIncludesTheEntireFinalLocalDayAndExcludesNextMidnightAcrossDst()throws Exception {
+        String prefix="InclusiveDst-"+UUID.randomUUID();
+        for(String starts:List.of("2029-03-24T23:59:59+01:00","2029-03-25T00:00:00+01:00","2029-03-25T23:59:59+02:00","2029-03-26T00:00:00+02:00")) {
+            var body=input(prefix+" "+starts);body.put("startsAt",starts);published(body);
+        }
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("from","2029-03-24T23:00:00Z").param("to","2029-03-25T22:00:00Z"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("from","2029-03-25T22:00:00Z").param("to","2029-03-25T22:00:00Z"))
+            .andExpect(status().isBadRequest());
+        assertThat(jdbc.queryForList("SELECT indexname FROM pg_indexes WHERE indexname IN ('events_revision_title_search','events_venue_location')"))
+            .hasSize(2);
+    }
     @Test void validatesGlobalSelectionsCoordinatesRightsLinksAndClassification()throws Exception {
         var body=input("Validation");
         for(var change:List.of(Map.of("cityId",GeoNamesFixture.city(102)),Map.of("latitude",91.0,"longitude",0.0),Map.of("latitude",0.0),
@@ -170,6 +201,8 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         String id=published(body);
         Thread.sleep(5200);
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString())).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("dateScope","ANY"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("from",java.time.Instant.now().minusSeconds(86400).toString())).andExpect(jsonPath("$.total").value(1));
         mvc.perform(post("/api/v1/events/nearby").contentType("application/json").content("{\"latitude\":48.2082,\"longitude\":16.3738}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.items[*].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem(id))));

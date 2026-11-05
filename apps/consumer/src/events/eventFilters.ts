@@ -1,4 +1,5 @@
 import { dateBoundary } from './eventsApi';
+import { presetCalendarRange, type DatePreset } from './calendarDates';
 export type EventFilters = {
   name: string;
   countryId: string;
@@ -6,6 +7,7 @@ export type EventFilters = {
   category: string;
   from: string;
   to: string;
+  datePreset?: DatePreset;
 };
 export const initialEventFilters: EventFilters = {
   name: '',
@@ -14,7 +16,35 @@ export const initialEventFilters: EventFilters = {
   category: '',
   from: '',
   to: '',
+  datePreset: 'any',
 };
+
+/** Resolve relative dates only when applying, then keep those calendar days stable across pages. */
+export function prepareEventFilters(
+  input: EventFilters,
+  now = new Date(),
+): EventFilters {
+  const datePreset =
+    input.datePreset ?? (input.from || input.to ? 'custom' : 'any');
+  if (datePreset === 'custom' && (!input.from || !input.to))
+    throw new Error('Complete custom range required');
+  const result = {
+    ...input,
+    name: input.name.trim(),
+    category: [
+      ...new Set(
+        input.category
+          .split(',')
+          .map((code) => code.trim())
+          .filter(Boolean),
+      ),
+    ].join(','),
+    datePreset,
+    ...(datePreset === 'custom' ? {} : presetCalendarRange(datePreset, now)),
+  };
+  eventFilterQuery(result);
+  return result;
+}
 /** Range is local calendar days, including the whole final day (DST-safe next midnight). */
 export function eventFilterQuery(input: EventFilters): string {
   const from = dateBoundary(input.from),
@@ -25,6 +55,7 @@ export function eventFilterQuery(input: EventFilters): string {
     throw new Error('A past range needs a start');
   if (input.cityId && !input.countryId) throw new Error('Country required');
   const params = new URLSearchParams();
+  if (!from && !to) params.set('dateScope', 'ANY');
   if (input.name.trim()) params.set('q', input.name.trim());
   if (input.countryId) params.set('countryId', input.countryId);
   if (input.cityId) params.set('cityId', input.cityId);

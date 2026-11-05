@@ -15,23 +15,28 @@ inserted by migrations.
 
 - `GET /api/v1/locations/countries?q=polska&locale=pl&page=0&size=20`
 - `GET /api/v1/locations/cities?countryId={UUID}&q=lodz&locale=pl&page=0&size=20`
+- `GET /api/v1/locations/cities?q=vienna&locale=en&page=0&size=10` (global city search)
 - `GET /api/v1/locations/metadata`
 
 Country/city responses: `items`, `total`, `page`, `size`, `attribution`.
 Items expose stable UUID `id`, `geoname_id`, source `name`, `label_en`, `label_pl`
 and effective `label`. Countries also expose `iso_code`; cities `country_id`,
-`region`, `district`, `latitude`, `longitude`, IANA `timezone` and source `version`.
+`region`, `district`, `latitude`, `longitude`, IANA `timezone` and source `version`,
+plus `country_name`, `country_label_en` and `country_label_pl` for location suggestions.
 Keep disambiguating region/district/ID in picker labels for duplicate city names.
-The city endpoint requires an active country. Both support case/diacritic-folded
+The city endpoint accepts an optional active country; omitting it searches all
+active cities with active countries. Both support case/diacritic-folded
 literal substring search over original names, ASCII/transliterated aliases and
 EN/PL alternate names; historic aliases aid search without becoming current
 labels. `%`, `_` and `!` are literal search characters, not SQL wildcards.
-Trigram indexes support substring lookup; the primary country constraint applies
+Trigram indexes support substring lookup; a supplied country constraint applies
 before pagination. Locale is `en`/`pl`, default `en`; query max 200 characters,
-page 0–100000, size 1–100. Sorting is localized label then region/district/ID.
+page 0–100000, size 1–100. City sorting is localized city label, country label,
+then region/district/ID.
 
 Only active records are offered. Client submits chosen IDs, never typed city text;
-changing country clears the previous city. The backend independently checks the
+the catalog's single Location field offers country and global city suggestions,
+displaying selected cities as city/country. The backend independently checks the
 country/city pair. No device position or provider network call is needed to browse.
 Metadata reports `available`, active snapshot counts/timestamp, source and license
 links. Before the first operator import `available=false` and lists are empty;
@@ -46,6 +51,11 @@ Importer and refresh commands: [LOCATIONS_IMPORT.md](LOCATIONS_IMPORT.md).
 
 - `GET /api/v1/events`: `q` (literal case-insensitive title substring, max 200),
   `countryId`, `cityId`, `track`, `category`, `from`, `to`, `locale`, `page`, `size`.
+
+`category` accepts one or more enum codes, comma-separated or repeated, for
+example `category=SOBER_RAVE,SOBER_PARTY`. Categories combine with OR, and the
+selected set combines with the other filters before counting and pagination.
+Omitting `category` includes all categories; unknown codes return 400.
 - `GET /api/v1/events/categories`: supported category/track labels EN/PL.
 - `GET /api/v1/events/{id}`: qualified public entry, otherwise 404.
 - `GET /api/v1/events/media/{id}`: normalized JPEG only while referenced by a
@@ -193,3 +203,25 @@ location adapter need P2-I02–P2-I04 updates to this contract. No frontend/plat
 runtime is claimed verified by this backend iteration. Joined persistence/filters
 remain P2-I05. No deployment, production migration, real event publication or
 full global dataset activation is performed by tests.
+
+### Approximate current location (P2-I02 correction, not runtime verified)
+
+The nearby response adds optional `location` (null if no match): `city_id`,
+`label_en`, `label_pl`, `country_label_en`, `country_label_pl`. It describes the
+nearest active settlement within 20 km using the local location catalog, not an
+address or a confirmed city boundary. The six-city development catalog cannot
+label all locations. No external geocoder is called. Coordinates remain in the
+existing request body; the extra response contains only public place labels.
+V22 adds an active-city coordinate index. The client displays a temporary owner-requested `Vienna, Austria` mock label
+when a place label is unavailable (never coordinates), keeps the current position only in session
+memory, and clears it when consent is revoked or the location screen scope ends.
+
+### Account location preference — V23
+
+`GET`, `POST` and `PATCH /api/v1/me` return `eventLocationConsent`.
+PATCH accepts an optional boolean; omitted/null leaves the preference unchanged.
+Existing and new accounts default to false. Ownership comes exclusively from the
+verified Firebase token. Only the preference is persisted in `user_profile`;
+coordinates and location history remain unsaved. Account deletion removes the
+preference with its profile. OS permission remains a separate requirement for
+real device location; temporary Vienna mock mode is unchanged.

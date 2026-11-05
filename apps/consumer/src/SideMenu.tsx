@@ -112,20 +112,14 @@ export default function SideMenu() {
           focused === id && styles.focused,
         ]}
       >
-        {id === 'about' ? (
-          <View style={styles.iconImage} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <SettingsIcon name="question" size={28} color={colors.primary} />
-          </View>
-        ) : (
-          <Image
-            source={image}
-            style={styles.iconImage}
-            resizeMode="contain"
-            accessibilityIgnoresInvertColors
-            accessible={false}
-            importantForAccessibility="no"
-          />
-        )}
+        <Image
+          source={image}
+          style={styles.iconImage}
+          resizeMode="contain"
+          accessibilityIgnoresInvertColors
+          accessible={false}
+          importantForAccessibility="no"
+        />
         <Text style={styles.label}>{label}</Text>
       </Pressable>
     );

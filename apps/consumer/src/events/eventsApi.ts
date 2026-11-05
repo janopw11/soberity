@@ -9,6 +9,7 @@ export type EventCategory = {
 };
 export type DiscoveryEvent = {
   id: string;
+  status?: 'PREVIEW' | 'PUBLISHED' | 'CANCELLED';
   title: string;
   locale: 'en' | 'pl';
   category_code: string;

@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
 import { useTranslation } from 'react-i18next';
+import { SettingsIcon } from '../../src/ui/SettingsIcon';
 import { useAppHeaderOptions } from '../../src/navigation/useAppHeaderOptions';
 
 export default function ScienceLayout() {
@@ -29,7 +30,10 @@ export default function ScienceLayout() {
           headerTitle: () => <ScienceTitle section="quizzes" />,
         }}
       />
-      <Stack.Screen name="weekly/[slug]" options={{ title: t('weekly.title') }} />
+      <Stack.Screen
+        name="weekly/[slug]"
+        options={{ title: t('weekly.title') }}
+      />
       <Stack.Screen name="learn" options={{ title: t('learning.title') }} />
       <Stack.Screen
         name="flashcards"
@@ -60,19 +64,18 @@ function ScienceTitle({ section }: { section: 'articles' | 'quizzes' }) {
   const { colors } = useThemePreferences();
   return (
     <View style={styles.title}>
-      <Image
-        source={
-          section === 'articles'
-            ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
-              require('../../assets/images/articles-icon-ocean.png')
-            : // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
-              require('../../assets/images/quizzes-icon-ocean.png')
-        }
-        style={styles.icon}
-        resizeMode="contain"
-        accessible={false}
-        importantForAccessibility="no"
-      />
+      {section === 'articles' ? (
+        <SettingsIcon name="book" size={24} color={colors.primary} />
+      ) : (
+        <Image
+          // eslint-disable-next-line @typescript-eslint/no-require-imports -- existing brand asset
+          source={require('../../assets/images/quizzes-icon-ocean.png')}
+          style={styles.icon}
+          resizeMode="contain"
+          accessible={false}
+          importantForAccessibility="no"
+        />
+      )}
       <Text
         accessibilityRole="header"
         style={[styles.label, { color: colors.primary }]}

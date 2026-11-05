@@ -62,3 +62,94 @@ describe('event filter contract', () => {
     expect(JSON.parse(result)).toEqual([23 * 3600000, 25 * 3600000]);
   });
 });
+
+import { prepareEventFilters } from './eventFilters';
+import { presetCalendarRange } from './calendarDates';
+
+describe('date presets and applying filter drafts', () => {
+  const friday = new Date(2026, 10, 6, 23, 30);
+  it('resolves local dates, current Saturday-Sunday and seven inclusive days', () => {
+    expect(presetCalendarRange('any', friday)).toEqual({ from: '', to: '' });
+    expect(presetCalendarRange('today', friday)).toEqual({
+      from: '2026-11-06',
+      to: '2026-11-06',
+    });
+    expect(presetCalendarRange('tomorrow', friday)).toEqual({
+      from: '2026-11-07',
+      to: '2026-11-07',
+    });
+    expect(presetCalendarRange('weekend', friday)).toEqual({
+      from: '2026-11-07',
+      to: '2026-11-08',
+    });
+    expect(presetCalendarRange('weekend', new Date(2026, 10, 8))).toEqual({
+      from: '2026-11-07',
+      to: '2026-11-08',
+    });
+    expect(presetCalendarRange('next7', friday)).toEqual({
+      from: '2026-11-06',
+      to: '2026-11-12',
+    });
+    expect(presetCalendarRange('tomorrow', new Date(2026, 11, 31))).toEqual({
+      from: '2027-01-01',
+      to: '2027-01-01',
+    });
+  });
+  it('resolves on apply, trims names, deduplicates categories and leaves the draft intact', () => {
+    const draft = {
+      ...initialEventFilters,
+      name: '  RaVe  ',
+      category: 'SOBER_RAVE, SOBER_RAVE,',
+      datePreset: 'today' as const,
+    };
+    const applied = prepareEventFilters(draft, friday);
+    expect(applied).toMatchObject({
+      name: 'RaVe',
+      category: 'SOBER_RAVE',
+      from: '2026-11-06',
+      to: '2026-11-06',
+    });
+    expect(draft.from).toBe('');
+    expect(
+      new URLSearchParams(eventFilterQuery(initialEventFilters)).get(
+        'dateScope',
+      ),
+    ).toBe('ANY');
+    expect(
+      new URLSearchParams(eventFilterQuery(applied)).has('dateScope'),
+    ).toBe(false);
+  });
+  it('requires complete valid custom bounds', () => {
+    for (const dates of [
+      { from: '', to: '' },
+      { from: '2026-11-06', to: '' },
+      { from: '2026-02-30', to: '2026-03-01' },
+      { from: '2026-11-08', to: '2026-11-06' },
+    ]) {
+      expect(() =>
+        prepareEventFilters({
+          ...initialEventFilters,
+          ...dates,
+          datePreset: 'custom',
+        }),
+      ).toThrow();
+    }
+  });
+  it('uses calendar increments across both Vienna DST transitions', () => {
+    const modulePath = pathToFileURL(
+      resolve(__dirname, 'calendarDates.ts'),
+    ).href;
+    const result = execFileSync(
+      process.execPath,
+      [
+        '--no-warnings',
+        '--experimental-strip-types',
+        '--input-type=module',
+        '-e',
+        `import {presetCalendarRange,dateBoundary} from ${JSON.stringify(modulePath)}; console.log(JSON.stringify([new Date(2029,2,25),new Date(2029,9,28)].map(now=>{const r=presetCalendarRange('today',now);return Date.parse(dateBoundary(r.to,true))-Date.parse(dateBoundary(r.from));})));`,
+      ],
+      { env: { ...process.env, TZ: 'Europe/Vienna' }, encoding: 'utf8' },
+    );
+    expect(JSON.parse(result)).toEqual([23 * 3600000, 25 * 3600000]);
+  });
+});

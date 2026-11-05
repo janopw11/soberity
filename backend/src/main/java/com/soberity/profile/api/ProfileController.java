@@ -61,7 +61,7 @@ public class ProfileController {
     public ProfileResponse update(@AuthenticationPrincipal VerifiedToken token,
             @Valid @RequestBody ProfileUpdateRequest request) {
         ProfileUpdate update = new ProfileUpdate(
-                request.displayName(), request.city(), request.interests(), request.locale());
+                request.displayName(), request.city(), request.interests(), request.locale(), request.eventLocationConsent());
         return ProfileResponse.from(profiles.update(token.uid(), update));
     }
 
@@ -99,7 +99,8 @@ public class ProfileController {
             @Size(max = 50) String displayName,
             @Size(max = 100) String city,
             @Size(max = 4) List<@Pattern(regexp = INTEREST_PATTERN) String> interests,
-            @Pattern(regexp = LOCALE_PATTERN) String locale) {
+            @Pattern(regexp = LOCALE_PATTERN) String locale,
+            Boolean eventLocationConsent) {
     }
 
     public record ProfileResponse(
@@ -108,11 +109,12 @@ public class ProfileController {
             String city,
             List<String> interests,
             String locale,
-            Instant updatedAt) {
+            Instant updatedAt,
+            boolean eventLocationConsent) {
 
         static ProfileResponse from(UserProfile profile) {
             return new ProfileResponse(profile.getId(), profile.getDisplayName(), profile.getCity(),
-                    profile.getInterests(), profile.getLocale(), profile.getUpdatedAt());
+                    profile.getInterests(), profile.getLocale(), profile.getUpdatedAt(), profile.isEventLocationConsent());
         }
     }
 }

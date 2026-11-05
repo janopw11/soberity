@@ -1,6 +1,14 @@
-import type { ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type ComponentRef,
+} from 'react';
 import {
   Modal,
+  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
@@ -13,6 +21,11 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { SettingsIcon } from './SettingsIcon';
+import {
+  DialogDropdownTouches,
+  DialogDropdownViewport,
+  type DropdownOutsideTouch,
+} from './DialogDropdown';
 
 type DialogProps = {
   visible: boolean;
@@ -22,7 +35,9 @@ type DialogProps = {
   header?: ReactNode;
   /** Accessible name of the X button in the header. */
   closeLabel: string;
+  showCloseButton?: boolean;
   onClose: () => void;
+  footer?: ReactNode;
   children: ReactNode;
   testID?: string | undefined;
 };
@@ -33,12 +48,32 @@ export function Dialog({
   title,
   header,
   closeLabel,
+  showCloseButton = true,
   onClose,
+  footer,
   children,
   testID,
 }: DialogProps) {
   const { colors } = useThemePreferences();
+  const dropdownViewport = useRef<ComponentRef<typeof ScrollView>>(null);
+  const dropdownTouches = useRef(new Set<DropdownOutsideTouch>());
+  const registerDropdownTouch = useCallback((handler: DropdownOutsideTouch) => {
+    dropdownTouches.current.add(handler);
+    return () => {
+      dropdownTouches.current.delete(handler);
+    };
+  }, []);
   const styles = createStyles(colors);
+  const [visibleHeight, setVisibleHeight] = useState<number | undefined>();
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !visible) return;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const update = () => setVisibleHeight(viewport.height);
+    update();
+    viewport.addEventListener('resize', update);
+    return () => viewport.removeEventListener('resize', update);
+  }, [visible]);
 
   let headerContent: ReactNode = <View style={styles.spacer} />;
   if (header) {
@@ -58,7 +93,23 @@ export function Dialog({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        enabled={Platform.OS !== 'web'}
+        style={[
+          styles.backdrop,
+          visibleHeight === undefined
+            ? undefined
+            : { maxHeight: visibleHeight },
+        ]}
+        onStartShouldSetResponderCapture={(event) => {
+          if (Platform.OS !== 'web') {
+            const { pageX, pageY } = event.nativeEvent;
+            dropdownTouches.current.forEach((handler) => handler(pageX, pageY));
+          }
+          return false;
+        }}
+      >
         <Pressable
           accessible={false}
           style={StyleSheet.absoluteFill}
@@ -67,7 +118,7 @@ export function Dialog({
         <View
           {...(Platform.OS === 'web'
             ? {
-                onKeyUp: (event: {
+                onKeyDown: (event: {
                   key?: string;
                   nativeEvent?: { key?: string };
                   stopPropagation: () => void;
@@ -81,31 +132,42 @@ export function Dialog({
             : {})}
           accessibilityRole="none"
           accessibilityViewIsModal
+          onAccessibilityEscape={onClose}
           testID={testID}
           style={styles.card}
         >
           <View style={styles.header}>
             {headerContent}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={closeLabel}
-              onPress={onClose}
-              hitSlop={8}
-              style={styles.close}
-              testID={testID ? `${testID}-close` : undefined}
-            >
-              <SettingsIcon
-                name="close"
-                color={colors.textSecondary}
-                size={22}
-              />
-            </Pressable>
+            {showCloseButton ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={closeLabel}
+                onPress={onClose}
+                hitSlop={8}
+                style={styles.close}
+                testID={testID ? `${testID}-close` : undefined}
+              >
+                <SettingsIcon
+                  name="close"
+                  color={colors.textSecondary}
+                  size={22}
+                />
+              </Pressable>
+            ) : null}
           </View>
-          <ScrollView keyboardShouldPersistTaps="handled">
-            <View style={styles.content}>{children}</View>
+          <ScrollView
+            ref={dropdownViewport}
+            keyboardShouldPersistTaps="handled"
+          >
+            <DialogDropdownViewport.Provider value={dropdownViewport}>
+              <DialogDropdownTouches.Provider value={registerDropdownTouch}>
+                <View style={styles.content}>{children}</View>
+              </DialogDropdownTouches.Provider>
+            </DialogDropdownViewport.Provider>
           </ScrollView>
+          {footer}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -82,6 +82,9 @@ public class ProfileService {
         if (update.locale() != null) {
             profile.setLocale(update.locale());
         }
+        if (update.eventLocationConsent() != null) {
+            profile.setEventLocationConsent(update.eventLocationConsent());
+        }
         return profile;
     }
 
@@ -91,6 +94,9 @@ public class ProfileService {
     }
 
     /** Values supplied by the client; {@code null} means "not changed". */
-    public record ProfileUpdate(String displayName, String city, List<String> interests, String locale) {
+    public record ProfileUpdate(String displayName, String city, List<String> interests, String locale, Boolean eventLocationConsent) {
+        public ProfileUpdate(String displayName, String city, List<String> interests, String locale) {
+            this(displayName, city, interests, locale, null);
+        }
     }
 }

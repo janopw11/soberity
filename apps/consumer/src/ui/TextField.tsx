@@ -11,7 +11,7 @@ import {
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
-import { SettingsIcon } from './SettingsIcon';
+import { SettingsIcon, type SettingsIconName } from './SettingsIcon';
 
 type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
@@ -24,7 +24,8 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
   showPasswordLabel?: string;
   hidePasswordLabel?: string;
   /** `grouped` drops the box so the field sits inside a SettingsGroup row. */
-  variant?: 'boxed' | 'grouped';
+  variant?: 'boxed' | 'grouped' | 'soft';
+  leadingIcon?: SettingsIconName;
   /** Renders the label in the primary accent colour. */
   accentLabel?: boolean;
   /** Inline control at the trailing edge of the input, e.g. a Save action. */
@@ -45,6 +46,7 @@ export function TextField({
   variant = 'boxed',
   accentLabel = false,
   accessory,
+  leadingIcon,
   onFocus,
   onBlur,
   testID,
@@ -59,10 +61,19 @@ export function TextField({
 
   return (
     <View
-      style={[grouped ? styles.groupedContainer : styles.container, compact && styles.compactContainer]}
+      style={[
+        grouped ? styles.groupedContainer : styles.container,
+        compact && styles.compactContainer,
+      ]}
       testID={testID}
     >
-      <Text style={[styles.label, compact && styles.compactLabel, accentLabel && { color: colors.primary }]}>
+      <Text
+        style={[
+          styles.label,
+          compact && styles.compactLabel,
+          accentLabel && { color: colors.primary },
+        ]}
+      >
         {label}
       </Text>
       <View
@@ -71,9 +82,21 @@ export function TextField({
           isFocused &&
             (grouped ? styles.groupedInputRowFocused : styles.inputRowFocused),
           compact && styles.compactRow,
+          variant === 'soft' && styles.softRow,
+          variant === 'soft' &&
+            isFocused && { borderWidth: 1, borderColor: colors.focusRing },
           hasError && !grouped && styles.inputRowError,
         ]}
       >
+        {leadingIcon ? (
+          <View style={styles.leadingIcon}>
+            <SettingsIcon
+              name={leadingIcon}
+              color={colors.textMuted}
+              size={18}
+            />
+          </View>
+        ) : null}
         <TextInput
           {...inputProps}
           accessibilityLabel={label}
@@ -156,6 +179,14 @@ function createStyles(
       paddingHorizontal: spacing.space16,
     },
     inputRowFocused: { borderColor: colors.focusRing, borderWidth: 2 },
+    softRow: {
+      minHeight: 48,
+      backgroundColor: colors.listSurface,
+      borderColor: 'transparent',
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.space12,
+    },
+    leadingIcon: { paddingRight: spacing.space8 },
     inputRowError: { borderColor: colors.danger },
     groupedContainer: {
       paddingHorizontal: spacing.space16,

@@ -32,6 +32,13 @@ public class UserProfile {
     @Column(name = "city", length = 100)
     private String city;
 
+    @Column(name = "event_location_consent", nullable = false)
+    private boolean eventLocationConsent;
+
+    public boolean isEventLocationConsent() { return eventLocationConsent; }
+
+    public void setEventLocationConsent(boolean consent) { this.eventLocationConsent = consent; }
+
     @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "interests", nullable = false)
     private String[] interests = new String[0];

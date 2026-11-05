@@ -1,5 +1,39 @@
 # GeoNames operator import and refresh
 
+## Owner-approved local subset — 2026-11-05
+
+For the local application database only, the owner explicitly replaced the slow
+first global import with two countries (PL/AT) and six selected cities: Wrocław,
+Warszawa, Koszalin, Szczecin, Vienna/Wiedeń and Graz. These are actual source
+records extracted from the previously downloaded `allCountries.zip` and
+`countryInfo.txt`, not fabricated city fixtures. UUIDs follow the existing
+GeoNames identity scheme; EN/PL labels, source aliases, coordinates, regions,
+timezones and source modification dates are retained/normalized.
+
+The active snapshot records `scope=owner-selected-local-subset`,
+`globalCoverage=false`, country_count=2 and city_count=6, with the existing
+download provenance and CC BY 4.0. This is an explicit local exception to the
+global coverage policy below, not a change to the CLI's global minimums or a
+claim of complete country/city coverage. The previous global import was no
+longer active and the dictionary was empty when this subset was inserted.
+
+A later full import can reuse the deterministic IDs. Before retrying it,
+address the slow alias normalization stage: staging tables are created without
+an index on `id`, yet the current implementation updates search text per row
+using `WHERE id=?`. Indexing this lookup and batching writes remain outstanding;
+no importer code was changed in this session.
+
+The same local session added one explicitly fictional, published preview event:
+`Vienna Sober Rave`, ID `0c931e23-9c40-4826-94ca-90231af10b1d`,
+2026-11-06 19:00 Europe/Vienna. Its English description and entry
+rules clearly mark it as test data; the venue display label was changed to
+`Vienna City Centre` on owner request using a new immutable revision; the existing Vienna preview photograph is
+illustrative and no real venue, tickets or organizer are asserted. This entry
+must not be treated as verified real-world event supply.
+
+Both writes committed successfully. No tests, UI/API checks, migrations or
+application restarts were performed.
+
 The P2-I00 policy selects the [GeoNames global dump](https://download.geonames.org/export/dump/readme.txt)
 under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). P2-I01 implements
 the importer and lookup APIs. No provider account/key or on-search external
