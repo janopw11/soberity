@@ -2237,6 +2237,16 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+Decyzja właściciela: tymczasowo ukryte Flashcards w menu Science i link na LearningScreen; widoczne opisy bez promowania fiszek. Implementacja, trasa, treść i postęp pozostają zachowane. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
+About us — usunięta końcowa sekcja Understand more / Experience more na polecenie właściciela. Pozostały Kim jesteśmy? i rozwijane założenia. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
+About us — cztery założenia jako niezależnie rozwijane sekcje z krótkimi opisami EN/PL, chevron i stanem expanded, widoczny fokus i target48. Domyślnie zwinięte. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
+About us — korekta właściciela: pierwsza sekcja Kim jesteśmy?, druga Główne założenia Soberity z czterema zasadami (nauka, trzeźwe życie, społeczność, brak przymusu/hejtu). Usunięta stopka GeoNames z tego ekranu na wyraźne polecenie; kafle nawigacyjne zachowane. EN/PL. NOT VERIFIED, bez testów i dodatkowych kontroli.
+
+About us — skrócona wersja na polecenie właściciela: mocny krótki hero, dwa bezpośrednie kafle Science/Events i jedna zasada marki. Bez rozwijanych opisów, dodatkowych CTA i animacji clarity. GeoNames/CC BY zachowane. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
 Korekta Quizzes: bez Explore topics/count i strzałek na kartach; tytuły kategorii w semantic primary Ocean. Pozostały projekt i zachowanie zachowane. NOT VERIFIED; bez testów i dodatkowych kontroli.
 
 Quizzes — redesign wyboru kategorii według załącznika: Explore topics/count z QUIZ_CATEGORIES, kompaktowa neutralna siatka2 kolumny, małe ikony, strzałki i opisy EN/PL, delikatne stany hover/press/focus bez animacji ruchu. Brak hero/bannerów, ID/routing/API i quizy bez zmian. NOT VERIFIED; bez testów i dodatkowych kontroli.
@@ -2821,3 +2831,21 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | Quizzes — kompaktowy wybór kategorii | Implementacja / NOT VERIFIED | QuizCategoryGrid: heading i dynamiczny count, neutralne karty2 kolumny, małe ikony primary, opis i arrow, usunięte pastelowe tła/dekoracyjne koła. EN/PL. Wysokość elastyczna dla długich etykiet. | Bez testów i dodatkowych kontroli na polecenie właściciela. Brak nowych zależności/backend changes. CHANGELOG odroczony: brak odbioru UI. Następny krok: odbiór Quizzes. |
 
 | 2026-11-05 | Quizzes — uproszczenie kart | Implementacja / NOT VERIFIED | QuizCategoryGrid: usunięte heading/count i arrowUpRight; tytuły primary Ocean. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta bez weryfikacji. Następny krok: odbiór Quizzes. |
+
+| 2026-11-05 | About us — zwięzła kompozycja | Implementacja / NOT VERIFIED | AboutScreen i EN/PL: krótszy hero, dwa bezpośrednie linki z jednozdaniowym opisem, jedna linia wartości; usunięte długie sekcje i interakcja clarity. Atrybucja zachowana. | Bez testów i dodatkowych kontroli. CHANGELOG odroczony: brak odbioru UI. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — tożsamość i założenia | Implementacja / NOT VERIFIED | AboutScreen i EN/PL: sekcja Kim jesteśmy?, cztery zwięzłe zasady; usunięta atrybucja z About zgodnie z decyzją właściciela. | Bez testów i dodatkowych kontroli. CHANGELOG odroczony: brak weryfikacji UI. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — rozwijane założenia | Implementacja / NOT VERIFIED | PrincipleSection w AboutScreen: niezależny toggle każdego rozdziału, opisy EN/PL, dostępne przyciski i focus. | Bez testów i dodatkowych kontroli. CHANGELOG odroczony: brak weryfikacji UI. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — pozytywna komunikacja wolności wyboru | Implementacja / NOT VERIFIED | Zatwierdzony tekst Bez przymusu i hejtu: edukacja bez zakazów, samodzielne decyzje i wsparcie; wersje PL/EN. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna zmiana copy. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — usunięcie końcowych kafli | Implementacja / NOT VERIFIED | AboutScreen: usunięte ExploreArea, linki i nieużywane style. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — nagłówek Ocean z ikoną | Implementacja / NOT VERIFIED | Authenticated layout: headerTitle AboutTitle z people24 i tytułem primary/h3, zgodny z pozostałymi sekcjami. Nawigacja bez zmian. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — wspólna typografia nagłówków | Implementacja / NOT VERIFIED | Who are we i What Soberity stands for korzystają z jednego sectionTitle/h3. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta. Następny krok: odbiór About us. |
+
+| 2026-11-05 | About us — ikona zgodna z menu | Implementacja / NOT VERIFIED | Nagłówek pobiera ilustrację About z navigationItems, wraz z wariantem light/dark, zamiast ikony liniowej. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta. Następny krok: odbiór About us. |
+
+| 2026-11-05 | Flashcards — tymczasowe ukrycie | Implementacja / NOT VERIFIED | navigation: usunięta pozycja menu; LearningScreen: usunięty kafel/link fiszek; EN/PL bez promocji fiszek i sugestii w empty quizów. Kod, API i dane zachowane. | Bez testów i dodatkowych kontroli. CHANGELOG odroczony: brak weryfikacji UI. Następny krok: odbiór nawigacji. |

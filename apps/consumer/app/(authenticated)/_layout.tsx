@@ -1,6 +1,10 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AppLogo } from '../../src/ui';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { spacing, typography } from '@soberity/design-tokens';
+import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
+import { navigationItems } from '../../src/navigation';
 import { useAppHeaderOptions } from '../../src/navigation/useAppHeaderOptions';
 
 export default function AuthenticatedLayout() {
@@ -27,7 +31,7 @@ export default function AuthenticatedLayout() {
         name="editorial"
         options={{ title: t('editorial.title') }}
       />
-      <Stack.Screen name="about" options={{ title: t('about.title') }} />
+      <Stack.Screen name="about" options={{ title: t('about.title'), headerTitle: () => <AboutTitle /> }} />
       <Stack.Screen name="account" options={{ title: t('account.title') }} />
       <Stack.Screen
         name="account-personal-data"
@@ -45,3 +49,29 @@ export default function AuthenticatedLayout() {
   );
 }
 
+
+function AboutTitle() {
+  const { t } = useTranslation();
+  const { colors, theme } = useThemePreferences();
+  const aboutItem = navigationItems.find(item => item.id === 'about')!;
+  return (
+    <View style={styles.aboutTitle}>
+      <Image
+        source={theme === 'dark' ? aboutItem.imageDark : aboutItem.image}
+        style={styles.aboutIcon}
+        resizeMode="contain"
+        accessible={false}
+        importantForAccessibility="no"
+        accessibilityIgnoresInvertColors
+      />
+      <Text accessibilityRole="header" style={[styles.aboutLabel, { color: colors.primary }]}>
+        {t('about.title')}
+      </Text>
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  aboutTitle: { flexDirection: 'row', alignItems: 'center', gap: spacing.space8 },
+  aboutIcon: { width: 32, height: 32 },
+  aboutLabel: { ...typography.h3, flexShrink: 1 },
+});

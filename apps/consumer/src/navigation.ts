@@ -75,12 +75,4 @@ export const scienceNavigationItems = [
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
     image: require('../assets/images/quizzes-icon-ocean.png') as number,
   },
-  {
-    id: 'flashcards',
-    href: '/science/flashcards',
-    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
-    image: require('../assets/images/flashcards-icon-light.png') as number,
-    // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
-    imageDark: require('../assets/images/flashcards-icon-dark.png') as number,
-  },
 ] as const;

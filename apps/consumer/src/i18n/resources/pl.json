@@ -129,7 +129,7 @@
   },
   "science": {
     "title": "Nauka",
-    "description": "Planowane: artykuły oparte na źródłach, fiszki i quizy z jasnymi wyjaśnieniami i ograniczeniami."
+    "description": "Planowane: artykuły oparte na źródłach i quizy z jasnymi wyjaśnieniami i ograniczeniami."
   },
   "events": {
     "title": "Sober Events",
@@ -981,7 +981,7 @@
     "noQuizzes": "Brak quizów",
     "title": "Ucz się na podstawie dowodów",
     "intro": "Poznawaj recenzowane badania we własnym tempie. Bez limitu czasu, serii i kar.",
-    "openLearning": "Fiszki i quizy",
+    "openLearning": "Quizy",
     "flashcards": "Fiszki",
     "quizzes": "Quizy",
     "flashcardIntro": "Przeczytaj recenzowaną tezę, odkryj wyjaśnienie, a następnie poznaj źródła i ograniczenia.",
@@ -992,7 +992,7 @@
     "questionCount_few": "{{count}} pytania",
     "questionCount_many": "{{count}} pytań",
     "questionCount_other": "{{count}} pytania",
-    "emptyQuizzes": "Nie opublikowano jeszcze quizów w tym języku. Możesz w tym czasie poznawać fiszki.",
+    "emptyQuizzes": "Nie opublikowano jeszcze quizów w tym języku.",
     "emptyCards": "Nie opublikowano jeszcze recenzowanych kart dowodów w tym języku.",
     "loadError": "Nie udało się wczytać materiałów. Spróbuj ponownie.",
     "unavailable": "Quiz jest niedostępny lub zmieniły się jego dowody. Wczytaj ponownie aktualne materiały.",
@@ -1200,7 +1200,7 @@
     "mission": "Życie z jasnym umysłem. Razem.",
     "description": "Soberity łączy edukację opartą na nauce z doświadczeniami bez alkoholu, wspierając życie bez picia.",
     "scienceTitle": "Poznaj naukę",
-    "science": "Odkrywaj artykuły, quizy i fiszki oparte na weryfikowalnych źródłach.",
+    "science": "Odkrywaj artykuły i quizy oparte na weryfikowalnych źródłach.",
     "communityTitle": "Łącz się przez doświadczenia",
     "community": "Odkrywaj sober parties, rave’y i codzienne aktywności, które łączą ludzi.",
     "approach": "Rzetelne źródła. Wsparcie bez oceniania.",
@@ -1214,7 +1214,7 @@
       "science": {
         "title": "Odkrywaj naukę",
         "summary": "Zrozum więcej. Wybieraj świadomie.",
-        "details": "Poznaj artykuły, quizy i fiszki oparte na źródłach. Przyglądaj się dowodom i ich ograniczeniom. Zostaw miejsce na ciekawość."
+        "details": "Poznaj artykuły i quizy oparte na źródłach. Przyglądaj się dowodom i ich ograniczeniom. Zostaw miejsce na ciekawość."
       },
       "events": {
         "title": "Łącz się przez doświadczenia",
@@ -1250,6 +1250,40 @@
       "science": "Odkrywaj naukę",
       "events": "Znajdź wydarzenia"
     },
-    "creditsTitle": "Dane i podziękowania"
+    "creditsTitle": "Dane i podziękowania",
+    "concise": {
+      "headline": "Więcej życia.",
+      "accent": "Bez alkoholu.",
+      "intro": "Poznaj fakty. Znajdź wydarzenia. Odkryj swój sposób na życie bez alkoholu.",
+      "science": {
+        "title": "Zrozum więcej",
+        "copy": "Nauka w artykułach i quizach.",
+        "action": "Odkrywaj naukę"
+      },
+      "events": {
+        "title": "Przeżyj więcej",
+        "copy": "Imprezy, sport i spotkania bez alkoholu.",
+        "action": "Znajdź wydarzenia"
+      },
+      "promise": "Dowody. Wsparcie. Bez oceniania.",
+      "promiseCopy": "Rzetelna wiedza, otwartość na pytania i wolność wyboru."
+    },
+    "identity": {
+      "title": "Kim jesteśmy?",
+      "copy": "Soberity łączy rzetelną wiedzę z wydarzeniami bez alkoholu. Tworzymy przestrzeń dla ciekawych świata i ludzi, którzy chcą żyć trzeźwo — na własnych zasadach.",
+      "principlesTitle": "Główne założenia Soberity",
+      "values": {
+        "science": "Fakty potwierdzone naukowo",
+        "sober": "Promowanie trzeźwego życia",
+        "community": "Budowanie społeczności",
+        "respect": "Bez przymusu i hejtu"
+      },
+      "valueDescriptions": {
+        "science": "Opieramy treści na wiarygodnych badaniach. Podajemy źródła i jasno mówimy, czego jeszcze nie wiemy.",
+        "sober": "Pokazujemy, jak wiele można odkryć bez alkoholu — od codziennych aktywności po imprezy i rave’y.",
+        "community": "Łączymy ludzi przez wydarzenia, sport i spotkania. Tworzymy przestrzeń do wspólnych doświadczeń.",
+        "respect": "Nie jesteśmy tu, żeby czegokolwiek zakazywać. Dzielimy się wiedzą i pokazujemy możliwości życia bez alkoholu. Co z tym zrobisz? Wybór należy do Ciebie — my kibicujemy świadomym decyzjom. :)"
+      }
+    }
   }
 }

@@ -129,7 +129,7 @@
   },
   "science": {
     "title": "Science",
-    "description": "Planned: source-based articles, flashcards and quizzes with clear explanations and limitations."
+    "description": "Planned: source-based articles and quizzes with clear explanations and limitations."
   },
   "events": {
     "title": "Sober Events",
@@ -969,7 +969,7 @@
     "noQuizzes": "No quizzes",
     "title": "Learn with evidence",
     "intro": "Explore reviewed research at your own pace. No timer, streak or penalties.",
-    "openLearning": "Flashcards & quizzes",
+    "openLearning": "Quizzes",
     "flashcards": "Flashcards",
     "quizzes": "Quizzes",
     "flashcardIntro": "Read a reviewed claim, reveal its explanation, then explore the evidence and limitations.",
@@ -978,7 +978,7 @@
     "back": "Back to learning",
     "questionCount_one": "{{count}} question",
     "questionCount_other": "{{count}} questions",
-    "emptyQuizzes": "No quizzes are published in this language yet. You can explore flashcards in the meantime.",
+    "emptyQuizzes": "No quizzes are published in this language yet.",
     "emptyCards": "No reviewed evidence cards are published in this language yet.",
     "loadError": "We could not load learning content. Please try again.",
     "unavailable": "This quiz is unavailable or its evidence has changed. Reload to see current material.",
@@ -1180,7 +1180,7 @@
     "mission": "A clearer life, together.",
     "description": "Soberity brings together science-based education and alcohol-free experiences to support life without alcohol.",
     "scienceTitle": "Understand the science",
-    "science": "Explore articles, quizzes and flashcards grounded in verifiable sources.",
+    "science": "Explore articles and quizzes grounded in verifiable sources.",
     "communityTitle": "Connect through experiences",
     "community": "Discover sober parties, raves and everyday activities that bring people together.",
     "approach": "Evidence first. Support without judgment.",
@@ -1194,7 +1194,7 @@
       "science": {
         "title": "Discover the science",
         "summary": "Understand more. Make your own choices.",
-        "details": "Explore source-based articles, quizzes and flashcards. Follow the evidence, consider its limits, and make room for a little curiosity."
+        "details": "Explore source-based articles and quizzes. Follow the evidence, consider its limits, and make room for a little curiosity."
       },
       "events": {
         "title": "Connect through experiences",
@@ -1230,6 +1230,40 @@
       "science": "Explore Science",
       "events": "Discover Events"
     },
-    "creditsTitle": "Data & acknowledgments"
+    "creditsTitle": "Data & acknowledgments",
+    "concise": {
+      "headline": "More life.",
+      "accent": "Alcohol-free.",
+      "intro": "Discover the facts. Find experiences. Explore your own way to live alcohol-free.",
+      "science": {
+        "title": "Understand more",
+        "copy": "Science through articles and quizzes.",
+        "action": "Explore Science"
+      },
+      "events": {
+        "title": "Experience more",
+        "copy": "Alcohol-free parties, sport and meetups.",
+        "action": "Discover Events"
+      },
+      "promise": "Evidence. Support. No judgment.",
+      "promiseCopy": "Credible knowledge, room for questions and freedom to choose."
+    },
+    "identity": {
+      "title": "Who are we?",
+      "copy": "Soberity brings credible knowledge and alcohol-free experiences together. A space for curious people who want to live alcohol-free — on their own terms.",
+      "principlesTitle": "What Soberity stands for",
+      "values": {
+        "science": "Scientifically supported facts",
+        "sober": "Promoting alcohol-free living",
+        "community": "Building community",
+        "respect": "No pressure. No hate."
+      },
+      "valueDescriptions": {
+        "science": "We build our content on credible research, share sources and make uncertainty clear.",
+        "sober": "We show how much there is to discover without alcohol — from everyday activities to parties and raves.",
+        "community": "We bring people together through events, sport and meetups, making room for shared experiences.",
+        "respect": "We’re not here to tell you what you can’t do. We share knowledge and show what alcohol-free living can offer. What you do with it is up to you — we’re cheering you on as you make your own informed choices. :)"
+      }
+    }
   }
 }

@@ -97,16 +97,6 @@ function LearningCatalog({ quizzesOnly }: { quizzesOnly: boolean }) {
           </>
         ) : null}
         {!quizzesOnly ? (
-          <ReadingCard>
-            <ReadingText heading>{t('learning.flashcards')}</ReadingText>
-            <ReadingText>{t('learning.flashcardIntro')}</ReadingText>
-            <Button
-              label={t('learning.openCards')}
-              onPress={() => router.push('/science/flashcards')}
-            />
-          </ReadingCard>
-        ) : null}
-        {!quizzesOnly ? (
           <ReadingText heading>{t('learning.quizzes')}</ReadingText>
         ) : null}
         {quizzesOnly && category ? (
