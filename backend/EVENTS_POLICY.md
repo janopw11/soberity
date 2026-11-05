@@ -155,7 +155,7 @@ consent adapter, database erasure or backup operation is delivered in P2-I00.
 Default radius: **100 km**, inclusive. Deployment configuration for P2-I01:
 `SOBERITY_EVENTS_NEARBY_RADIUS_KM`, finite value from **1 to 500 km**, default 100;
 invalid values must fail configuration validation, not silently change distance.
-This iteration supplies the constant/validator, not Spring configuration wiring.
+P2-I00 supplies the constant/validator; P2-I01 now wires this Spring configuration (see EVENTS_API.md).
 API and UI must share the effective radius; include it in query results/UI copy.
 No automatic radius expansion, remote fallback or friendly-event substitution.
 
@@ -253,8 +253,9 @@ Domain implementation: `events/domain/{EventPolicy,CuratedEventPolicy}.java`.
 Tests: `src/test/java/com/soberity/events/EventPolicyTest.java`.
 
 P2-I00 defines and verifies policy, not the later location database/importer,
-admin ACL/API, permission runtime, Joined persistence or Home UI. Those existing
-implementations remain NOT VERIFIED against the new stage-one requirements.
+admin ACL/API, permission runtime, Joined persistence or Home UI. P2-I01 now implements and verifies the backend contract, dictionary importer,
+admin API and public search: see EVENTS_API.md and EVENTS_API_RESULTS.md.
+Consumer adapters/UI, real snapshot activation and Joined remain later work.
 P0-I13 remote/staging gate remains open under ADR-010's local-work exception.
 The new instruction to implement P2-I00 includes its required verification;
 historical “no tests” notes describe 2026-11-04, not this execution.

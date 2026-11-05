@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+@io.swagger.v3.oas.annotations.Hidden
 @RestController
 @RequestMapping("/api/v1/organizer")
 public class EventOrganizerController {

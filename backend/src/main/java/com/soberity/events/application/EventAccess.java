@@ -22,6 +22,11 @@ public class EventAccess {
         if(Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM deleted_account WHERE firebase_uid=?)",Boolean.class,actor.uid())))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Account unavailable.");
     }
+    public void admin(VerifiedToken actor) {
+        verified(actor);
+        if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_admin WHERE firebase_uid=? AND active)",Boolean.class,actor.uid())))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Events administrator required.");
+    }
     public void member(VerifiedToken actor,UUID organizerId) {
         verified(actor);
         if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_membership WHERE organizer_id=? AND firebase_uid=?)",Boolean.class,organizerId,actor.uid())))

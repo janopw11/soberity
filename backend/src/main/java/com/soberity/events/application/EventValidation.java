@@ -56,6 +56,15 @@ final class EventValidation {
             if(!value.getOffset().equals(ZoneOffset.UTC) && !zone.getRules().getOffset(value.toInstant()).equals(value.getOffset()))
                 throw bad("Date offset does not match the event timezone (check DST).");
     }
+    static void curatedDates(OffsetDateTime start,OffsetDateTime end,String timezone) {
+        if(start==null || (end!=null && !end.toInstant().isAfter(start.toInstant()))) throw bad("Offset-aware start and optional later end required.");
+        if(timezone==null || !ZoneId.getAvailableZoneIds().contains(timezone)) throw bad("IANA timezone required.");
+        var zone=ZoneId.of(timezone);
+        for(var value:new OffsetDateTime[]{start,end}) {
+            if(value!=null && !value.getOffset().equals(ZoneOffset.UTC) && !zone.getRules().getOffset(value.toInstant()).equals(value.getOffset()))
+                throw bad("Date offset does not match event timezone (check DST).");
+        }
+    }
     static void price(PriceKind kind,Long minor,String currency) {
         if(kind==null) throw bad("Explicit FREE, PAID or UNKNOWN price required.");
         boolean valid=switch(kind) {

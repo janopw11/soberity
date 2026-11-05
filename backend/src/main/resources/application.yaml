@@ -4,6 +4,8 @@ spring:
   threads:
     virtual:
       enabled: true
+  mvc:
+    log-request-details: false
   servlet:
     multipart:
       max-file-size: 5MB
@@ -45,6 +47,16 @@ springdoc:
     path: /swagger-ui.html
 
 logging:
+  level:
+    org.springframework.jdbc.core: INFO
+    org.springframework.web.servlet.mvc.method.annotation: INFO
+    org.springframework.web.servlet.DispatcherServlet: INFO
+    org.springframework.web.method.HandlerMethod: INFO
   structured:
     format:
       console: ecs
+
+# Nearby coordinates are accepted only in POST bodies; no request/body/SQL bind logging.
+soberity:
+  events:
+    nearby-radius-km: ${SOBERITY_EVENTS_NEARBY_RADIUS_KM:100}

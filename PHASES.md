@@ -1,7 +1,7 @@
 # Soberity — PHASES.md
 
 **Wersja:** 2.1 — 2026-11-01
-**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I00 DONE (polityka etapu 1, 2026-11-05), P2-I01–P2-I04 nadal IN_PROGRESS / NOT VERIFIED, 1/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
+**Status globalny:** IN_PROGRESS — aktywna Phase 2: P2-I00/P2-I01 DONE (polityka i backend etapu 1, 2026-11-05), P2-I02–P2-I04 nadal IN_PROGRESS / NOT VERIFIED, 2/7 DONE. Phase 1: P1-I00–P1-I02 i P1-I04 DONE (4/6), P1-I03 IN_PROGRESS, P1-I06 TODO / Myth Battle PARKED na polecenie właściciela. Phase 0: 13/15 DONE; P0-I03A IN_PROGRESS i P0-I13 BLOCKED pozostają otwarte.
 **Źródło wymagań:** [`Soberity_raport_produktowo_techniczny.md`](./Soberity_raport_produktowo_techniczny.md)  
 **Zasady Codex:** [`AGENTS.md`](./AGENTS.md)  
 **Historia wdrożeń:** [`CHANGELOG.md`](./CHANGELOG.md)
@@ -74,7 +74,7 @@ Blockers: opis lub —
 |---|---|---:|---:|---|
 | Phase 0 | Foundation — Expo, Spring Boot, Firebase Auth i profil | 15 | 13/15 | IN_PROGRESS |
 | Phase 1 | Science & Discover MVP | 6 | 4/6 | IN_PROGRESS |
-| Phase 2 | Sober Events — katalog admina, lokalizacja i Dołączam (etap 1) | 7 | 1/7 | IN_PROGRESS |
+| Phase 2 | Sober Events — katalog admina, lokalizacja i Dołączam (etap 1) | 7 | 2/7 | IN_PROGRESS |
 | Phase 3 | Retention, gry, personalizacja i powiadomienia | 7 | 0/7 | TODO |
 | Phase 4 | Organizer marketplace, bilety, płatności i QR | 9 | 0/9 | TODO |
 | Phase 5 | Community — grupy, posty, interakcje i moderacja | 7 | 0/7 | TODO |
@@ -83,7 +83,7 @@ Blockers: opis lub —
 | Phase 8 | AI Myth Buster & evidence-grounded search | 6 | 0/6 | TODO |
 | Phase 9 | Global launch, City Guides i skalowanie | 7 | 0/7 | TODO |
 
-**Łącznie:** 78 iteracji agentowych; wykonane: **18/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web; 2026-11-05: P2-I00 DONE po testach reguł domenowych i przeglądzie polityki etapu 1).
+**Łącznie:** 78 iteracji agentowych; wykonane: **19/78** (2026-10-29: P0-I00 zaakceptowane; P0-I01 i P0-I02 zweryfikowane; 2026-10-31: P0-I03 zweryfikowane; 2026-11-01: P0-I04 i P0-I05 zweryfikowane/zamknięte, P0-I06 DONE; 2026-11-02: P0-I07, P0-I08, P0-I09 i P0-I10 DONE; 2026-11-03: P0-I11 DONE według zastanego statusu właściciela; P0-I12 DONE po potwierdzeniu manualnych testów T01–T03 przez właściciela; P1-I00 DONE po migracjach i testach PostgreSQL; P1-I01 DONE po testach publicznego API i ACL; P1-I02 DONE po testach workflow, ról i panelu web; 2026-11-05: P2-I00 DONE po testach reguł domenowych i przeglądzie polityki etapu 1; P2-I01 DONE po migracjach i pełnej regresji backendu na izolowanym PostgreSQL 17.11).
 
 ### Dlaczego kolejność nie zawsze jest liniowa?
 
@@ -758,7 +758,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Odłożone poza pierwszy etap:** samoobsługa i publiczne profile organizatorów, osobny portal moderacji zgłoszeń, formularz kontaktowy i odpowiedzi/powiadomienia, ulubione jako odrębna funkcja, eksport kalendarza, dedykowany checkout oraz dodatkowe filtry ceny/dostępności/języka/regionu. Powrót wymaga osobnego polecenia; nie blokują bramki pierwszego etapu. Płatności/bilety/QR pozostają w Phase 4. Raport §3.3–§3.4 opisuje szerszy kierunek produktu; ten zatwierdzony etap zawęża jego realizację, bez zmiany raportu.
 
-**Stan kodu a nowy zakres:** istniejące opisy „Implementacja 2026-11-04” poniżej są historyczne i pozostają NOT VERIFIED. Kod używa tekstowego miasta, organizer ACL i procesu moderacji; geolokalizacja jest przeglądarkowa, native ma tylko ręczne współrzędne. Nie stanowi to dowodu wykonania globalnego słownika, admin-only dodawania/usuwania, rzeczywistych biletów Home ani Joined. Dostosowanie istniejącego modelu/API/UI wymaga kolejnego zlecenia implementacyjnego. Zachowano ID i historię; punkty oznaczone **ODŁOŻONE** są nieobowiązkowe dla tego etapu i pozostają niezaznaczone. Żadna iteracja nie została rozpoczęta ani zamknięta tą zmianą planu.
+**Historyczny stan kodu przed dostosowaniem etapu 1 (2026-11-04):** istniejące opisy „Implementacja 2026-11-04” poniżej są historyczne i pozostają NOT VERIFIED. Kod używa tekstowego miasta, organizer ACL i procesu moderacji; geolokalizacja jest przeglądarkowa, native ma tylko ręczne współrzędne. Nie stanowi to dowodu wykonania globalnego słownika, admin-only dodawania/usuwania, rzeczywistych biletów Home ani Joined. Dostosowanie istniejącego modelu/API/UI wymaga kolejnego zlecenia implementacyjnego. Zachowano ID i historię; punkty oznaczone **ODŁOŻONE** są nieobowiązkowe dla tego etapu i pozostają niezaznaczone. Żadna iteracja nie została rozpoczęta ani zamknięta tą zmianą planu.
 
 ## P2-I00 — Event policy, taxonomy & trust
 
@@ -792,30 +792,33 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I01 — Global locations, events data model & APIs
 
-**Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
+**Status:** DONE — obowiązkowy zakres backendu etapu 1 zweryfikowany 2026-11-05; pełny globalny snapshot wymaga jawnego importu operatora.
 **Started:** 2026-11-04  
-**Finished:** —  
-**Zależności iteracji:** P2-I00 DONE dla etapu 1 (2026-11-05). Historyczny start P2-I01: 2026-11-04 przed odbiorem polityki; istniejący model/API wymagają dostosowania do nowego zakresu po osobnym poleceniu. Inne bramki pozostają otwarte.
-**Dowód:** `backend/src/main/resources/db/migration/V17__events_catalog_and_moderation.sql`, `backend/src/main/java/com/soberity/events/application/`, `backend/src/main/java/com/soberity/events/api/`, `SecurityConfig.java`, `backend/EVENTS_API.md`.  
-**Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** wykonanie migracji i odbiór techniczny pozostają do wykonania. Na polecenie właściciela bez testów, kompilacji, dodatkowej weryfikacji i restartu. Checkboxy T01–T04/V01 otwarte; nie deklarowano DONE.
+**Finished:** 2026-11-05
+**Zależności iteracji:** P2-I00 DONE dla etapu 1 (2026-11-05). Historyczny start P2-I01: 2026-11-04 przed odbiorem polityki; model/API dostosowano i zweryfikowano w tej iteracji na polecenie właściciela 2026-11-05. Inne bramki pozostają otwarte.
+**Dowód:** V19/V20, `events/{locations,application,api}`, `SecurityConfig.java`, `application.yaml`, `scripts/download-geonames.py`; aktualny kontrakt `backend/EVENTS_API.md`, import `backend/LOCATIONS_IMPORT.md`, dowody `backend/EVENTS_API_RESULTS.md`. 2026-11-05: `SOBERITY_TEST_JDBC_URL=jdbc:postgresql://127.0.0.1:55439/soberity_test_p2_i01 ./backend/mvnw --batch-mode -f backend/pom.xml verify` — exit 0, BUILD SUCCESS, 34 unit/architecture + 104 IT, 0 failures/errors/skips. Nowe: 3 unit i 16 IT (CuratedEventsApiIT 10, GeoNamesImportIT 4, EventsMigrationIT 1, EventLocationPrivacyIT 1). Pełny log `/tmp/soberity-p2-i01-full-tests.log`, raporty `backend/target/{surefire-reports,failsafe-reports}/`. Końcowy package po zmianach widoczności dokumentacji/help CLI PASS; packaged CLI `--help`, Python help/syntax i diff check PASS.
+
+**Blokery:** brak dla backendowego DoD P2-I01. Docker niedostępny; testy wykonano na izolowanym natywnym PostgreSQL 17.11. Nie migrowano bazy aplikacji/staging/produkcji, nie restartowano aplikacji i nie pobrano pełnego globalnego dumpa; przed rzeczywistym użyciem wykonać kontrolowany import/grant według LOCATIONS_IMPORT.md. Globalny przebieg wielkości produkcyjnej / benchmark nie jest potwierdzony. UI, zgody urządzenia i Joined pozostają w kolejnych iteracjach; zdalny P0-I13 nadal otwarty.
+
+**Wynik 2026-11-05:** globalny lokalny słownik Country/City ze stabilnymi ID GeoNames, aliasami EN/PL/diakrytykami, regionem/dystryktem, WGS84/IANA i metadanymi licencji. Importer offline: streaming/batche, manifest SHA-256, progi pokrycia, atomowa promocja/rollback, nieaktywne tombstone i wersje materialnych zmian. Dostosowano istniejące event/venue/revision/media/audit bez wymagania konta organizatora i bez kasowania starych danych; adminowy widok nierozstrzygniętych lokalizacji, bez zgadywania miast. API admin-only tworzy szkic/publikuje/edytuje z wycofaniem/usuwaniem i wersjami/audytem; dawne zapisy organizer/moderation zablokowane. Publiczne API filtruje po nazwie/typie/ID kraj–miasto/datach przed paginacją; POST nearby z promieniem konfiguracji 100 km, kolejnością distance/start/ID i pustym wynikiem bez fallbacku. Offset wejściowy zachowany przed DST, opcjonalny end, walidacja URL/zdjęć/współrzędnych; no-store, bez trwałych pozycji/URL/logów użytkownika. T01–T07/V01–V03 zweryfikowane; Joined nie jest deklarowane jako wdrożone.
 
 **Implementacja 2026-11-04:** V17: organizatorzy i członkostwo, osobna lista moderatorów, kategorie, niezmienne lokalizacje/media, wersjonowane wydarzenia, niezależne review, audyt i schemat ContactInquiry (bez wysyłki). API organizatora tworzy/odczytuje/edytuje/zgłasza i anuluje; moderacja weryfikuje organizatora, ocenia treść i publikuje. Publiczne projekcje ograniczają pola i widoczność do zatwierdzonych danych zweryfikowanych organizatorów; strict domyślnie, friendly jawnie. Wyszukiwanie: daty, miasto/kraj, kategoria/track, cena/waluta, dostępność/availability, język i opcjonalny promień; paginacja. Daty UTC+IANA, kontrola offsetu/DST, walidacja HTTPS bez pobierania URL, normalizacja zdjęć istniejącym BlogImages. Edycja wycofuje publikację do ponownej moderacji; anulowanie udostępnia wyłącznie ostatni opublikowany snapshot. Integracja z tombstone usuwania kont. Nie dodano eventów demonstracyjnych ani interfejsu P2-I02/P2-I03. CHANGELOG odroczony do rzeczywistej weryfikacji.
 
 **Zakres zadań:**
 
-- [ ] `P2-I01-T01` Dodaj/dostosuj Event, Venue i Category do katalogu zarządzanego przez admina. Osobne konta Organizer, rozbudowana Moderation i ContactInquiry **ODŁOŻONE**; istniejące struktury nie mogą wymuszać tego procesu przy adminowym dodaniu eventu.
-- [ ] `P2-I01-T02` Implementuj API dodania/publikacji przez administratora oraz odczytu/wyszukiwania; autoryzację egzekwuj po stronie backendu.
-- [ ] `P2-I01-T03` Daty przechowuj jako UTC + IANA timezone; waliduj offset/DST i zakres od–do.
-- [ ] `P2-I01-T04` Dodaj paginację, walidację linku strony organizatora, zdjęć i współrzędnych; wymagane pola wpisu: nazwa, lokalizacja, opis, URL organizatora, zdjęcie, data/godzina/strefa i typ. Opcjonalne rozszerzenia modelu nie blokują dodania podstawowego wpisu.
-- [ ] `P2-I01-T05` Wprowadź globalny słownik Country/City zgodny z P2-I00-T06 oraz API wyszukiwania pełnotekstowego krajów i miast ograniczone do wybranego kraju. Wspieraj aliasy i znaki diakrytyczne; zwracaj region dla niejednoznacznych nazw. Zapisuj stabilne ID i waliduj relację miasto–kraj po stronie serwera; tekstowe nazwy są etykietami, nie kluczami. Zaplanuj bezpieczne dopasowanie istniejących danych bez zgadywania niejednoznacznych miast.
-- [ ] `P2-I01-T06` Dodaj wyszukiwanie po nazwie, typie, countryId/cityId i datach oraz zapytanie najbliższych nadchodzących eventów według współrzędnych i promienia. Filtry/sortowanie przed paginacją; brak wyników w promieniu zwraca pustą listę. Joined rozszerza kontrakt w P2-I05, bez publicznego ujawnienia relacji użytkownika.
-- [ ] `P2-I01-T07` Dodaj API usunięcia konkretnego eventu wyłącznie dla admina, z audytem i spójną obsługą powiązań. Usunięty wpis znika z katalogu, Home, szczegółów i Joined; określ odpowiedź dla starych linków, bez pozostawienia aktywnej kopii w cache.
+- [x] `P2-I01-T01` Dodaj/dostosuj Event, Venue i Category do katalogu zarządzanego przez admina. Osobne konta Organizer, rozbudowana Moderation i ContactInquiry **ODŁOŻONE**; istniejące struktury nie mogą wymuszać tego procesu przy adminowym dodaniu eventu.
+- [x] `P2-I01-T02` Implementuj API dodania/publikacji przez administratora oraz odczytu/wyszukiwania; autoryzację egzekwuj po stronie backendu.
+- [x] `P2-I01-T03` Daty przechowuj jako UTC + IANA timezone; waliduj offset/DST i zakres od–do.
+- [x] `P2-I01-T04` Dodaj paginację, walidację linku strony organizatora, zdjęć i współrzędnych; wymagane pola wpisu: nazwa, lokalizacja, opis, URL organizatora, zdjęcie, data/godzina/strefa i typ. Opcjonalne rozszerzenia modelu nie blokują dodania podstawowego wpisu.
+- [x] `P2-I01-T05` Wprowadź globalny słownik Country/City zgodny z P2-I00-T06 oraz API wyszukiwania pełnotekstowego krajów i miast ograniczone do wybranego kraju. Wspieraj aliasy i znaki diakrytyczne; zwracaj region dla niejednoznacznych nazw. Zapisuj stabilne ID i waliduj relację miasto–kraj po stronie serwera; tekstowe nazwy są etykietami, nie kluczami. Zaplanuj bezpieczne dopasowanie istniejących danych bez zgadywania niejednoznacznych miast.
+- [x] `P2-I01-T06` Dodaj wyszukiwanie po nazwie, typie, countryId/cityId i datach oraz zapytanie najbliższych nadchodzących eventów według współrzędnych i promienia. Filtry/sortowanie przed paginacją; brak wyników w promieniu zwraca pustą listę. Joined rozszerza kontrakt w P2-I05, bez publicznego ujawnienia relacji użytkownika.
+- [x] `P2-I01-T07` Dodaj API usunięcia konkretnego eventu wyłącznie dla admina, z audytem i spójną obsługą powiązań. Usunięty wpis znika z katalogu, Home, szczegółów i Joined; określ odpowiedź dla starych linków, bez pozostawienia aktywnej kopii w cache.
 
 **Weryfikacja:**
 
-- [ ] `P2-I01-V01` Testy migracji, ACL, timezone i łączonych parametrów wyszukiwania; zwykły użytkownik/organizator nie może dodawać, publikować ani usuwać eventów przez API admina.
-- [ ] `P2-I01-V02` Testy słownika: kraje z różnych regionów świata, aliasy/diakrytyki, miasta o tej samej nazwie, błędna para kraj–miasto i migracja niejednoznacznych nazw bez utraty danych.
-- [ ] `P2-I01-V03` Testy odległości, granicy promienia, kolejności, pustych wyników i wykluczenia przeszłych/usuniętych wpisów; brak współrzędnych użytkownika w trwałych logach. Usuwanie powiązań Joined weryfikuje P2-I05 po ich wdrożeniu.
+- [x] `P2-I01-V01` Testy migracji, ACL, timezone i łączonych parametrów wyszukiwania; zwykły użytkownik/organizator nie może dodawać, publikować ani usuwać eventów przez API admina.
+- [x] `P2-I01-V02` Testy słownika: kraje z różnych regionów świata, aliasy/diakrytyki, miasta o tej samej nazwie, błędna para kraj–miasto i migracja niejednoznacznych nazw bez utraty danych.
+- [x] `P2-I01-V03` Testy odległości, granicy promienia, kolejności, pustych wyników i wykluczenia przeszłych/usuniętych wpisów; brak współrzędnych użytkownika w trwałych logach. Usuwanie powiązań Joined weryfikuje P2-I05 po ich wdrożeniu.
 
 **Definition of Done:** API obsługuje katalog admina, globalne lokalizacje, wymagane filtry i najbliższe wydarzenia oraz bezpieczne usuwanie. Każdy obowiązkowy punkt ma dowód i zapisane wyniki testów.
 
@@ -824,7 +827,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I01 pozostaje NOT VERIFIED; start P2-I02 na wyraźne polecenie właściciela, bez automatycznego zaliczenia zależności i wykonania V17.  
+**Zależności iteracji:** P2-I01 DONE dla backendu etapu 1 (2026-11-05); historyczny start P2-I02 z 2026-11-04 nie zalicza nowego UI. Wymaga dostosowania do ID kraj/miasto, POST nearby i aktualnego kontraktu po osobnym poleceniu.
 **Dowód:** `apps/consumer/app/events.tsx`, `apps/consumer/src/events/{EventsScreen,EventCard,EventSelect}.tsx`, `eventsApi.ts`, `location.ts` / `location.web.ts`, EN/PL resources, `EventCatalog.java`, `EventPublicController.java`, `backend/EVENT_DISCOVERY.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** backend/V17 z P2-I01 muszą zostać uruchomione i odebrane; katalog wymaga prawdziwych zatwierdzonych danych. Zgodnie z poleceniem właściciela nie uruchamiano testów/buildów/typecheck, migracji/restartów, API, przeglądarki ani symulatorów. T01–T04/V01 pozostają niezaliczone do odbioru.
 
@@ -850,7 +853,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** IN_PROGRESS — implementacja przygotowana; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I01/P2-I02 pozostają NOT VERIFIED; start P2-I03 na wyraźne polecenie właściciela, bez zaliczania poprzednich iteracji.  
+**Zależności iteracji:** P2-I01 DONE dla backendu etapu 1 (2026-11-05), P2-I02 nadal NOT VERIFIED. Historyczne szczegóły organizatora/checkout z 2026-11-04 wymagają dostosowania do aktualnego kontraktu po osobnym poleceniu.
 **Dowód:** `apps/consumer/app/events/{_layout,index,[id]}.tsx`, `apps/consumer/src/events/EventDetailScreen.tsx`, `EventCard.tsx`, `eventsApi.ts`, `calendarDownload.ts`/`.web.ts`, `EventMetadata.tsx`/`.web.ts`, EN/PL, `EventCalendar.java`, publiczny kontroler/SecurityConfig, `backend/EVENT_DETAIL.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
 
@@ -876,7 +879,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Status:** IN_PROGRESS — częściowy zakres panelu na polecenie właściciela; NOT VERIFIED  
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00 DONE dla etapu 1 (2026-11-05), P2-I01 nadal NOT VERIFIED. Historyczne zlecenie ręcznego panelu z 2026-11-04; dostosowanie do admin-only i globalnej lokalizacji wymaga P2-I01 oraz osobnego polecenia P2-I04.
+**Zależności iteracji:** P2-I00/P2-I01 DONE dla etapu 1 (2026-11-05). Historyczny panel z 2026-11-04 wymaga dostosowania do nowych endpointów admin-only i globalnego wyboru kraj/miasto po osobnym poleceniu P2-I04.
 **Dowód:** `apps/consumer/src/events/EventEditorScreen.web.tsx`, `eventEditorApi.ts`, route `editorial-events`, wejście Profil, EN/PL; V18, EventInputs/Service/Catalog, member-only venue GET, formatowanie w EventDetailScreen; `backend/EVENT_EDITOR.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** V17/V18 i backend wymagają aktywacji. Bez testów/buildów/typecheck, API/UI/migracji/restartów na polecenie właściciela. Publiczny profil organizatora i UI moderacji nie są wykonane w tym zawężonym zadaniu; istniejące API moderacji pozostaje. Checkboxy otwarte.
 
@@ -2221,13 +2224,14 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
-- **Ostatnio ukończona iteracja (2026-11-05):** `P2-I00` — DONE dla obowiązkowego zakresu etapu 1. T01/T03–T06/V01–V02 zweryfikowane; T02 (samoobsługa organizatorów) pozostaje odłożone.
-- **Wynik:** reguły kwalifikacji sober i adminowego cyklu, globalny GeoNames/CC BY 4.0 z aliasami EN/PL, promień 100 km (konfiguracja 1–500 km), zgody i stany Home, brak trwałych współrzędnych użytkownika, prywatne Joined i retencja. Bez wdrażania importera, API, migracji lub UI.
-- **Weryfikacja:** `cd backend && ./mvnw --batch-mode test` — exit 0, 31/31 unit/architecture PASS (18 Events), scenariusze Q01–Q11/D01–D07 i przegląd polityki W01–W10 w `backend/EVENTS_POLICY_SCENARIOS.md`. Runtime web/iOS/Android i DB/API nie były testowane; nie należą do odbioru czystych reguł P2-I00.
-- **Priorytet właściciela:** Events według zakresu 2026-11-05; Myth Battle PARKED. Phase 2 — IN_PROGRESS, 1/7 DONE; Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE. Zdalny P0-I13 i bramki Phase 0/1 pozostają otwarte.
-- **Stan wcześniejszego kodu:** P2-I01–P2-I04 IN_PROGRESS / NOT VERIFIED, P2-I05/P2-I06 TODO. Dotychczasowy panel P2-I04 i API używają szerszego modelu organizatorów/moderacji; nie są dowodem wykonania nowego etapu 1.
-- **Następny krok po osobnym poleceniu:** `P2-I01` — dostosować model/API i globalny słownik do zakończonej polityki P2-I00; nie uruchomiono tej pracy w bieżącej sesji.
-- **CHANGELOG.md:** wpis 2026-11-05 dla zweryfikowanej polityki i reguł domenowych.
+- **Ostatnio ukończona iteracja (2026-11-05):** `P2-I01` — DONE dla obowiązkowego backendu etapu 1; T01–T07/V01–V03 zweryfikowane. P2-I00 nadal DONE; odłożone punkty organizatorów nie są uznane za wykonane.
+- **Wynik:** globalne Country/City i importer GeoNames z atomową aktualizacją, V19/V20 bez utraty starych danych, admin-only dodanie/publikacja/edycja/usunięcie, publiczne wyszukiwanie po ID i POST nearby 100 km bez trwałej pozycji. Zmiany dotyczą backendu, nie UI.
+- **Weryfikacja:** pełne `./backend/mvnw --batch-mode -f backend/pom.xml verify` na izolowanym PostgreSQL 17.11 — 34 unit/architecture + 104 IT PASS, exit 0; w tym 3 nowe unit i 16 IT. `backend/EVENTS_API_RESULTS.md` opisuje migrację V18→V20, ACL, DST, import/rollback, filtry/odległości, concurrency i prywatność logów. Końcowy package i offline CLI help PASS.
+- **Aktywna faza:** Phase 2 — IN_PROGRESS, 2/7 DONE. Phase 1 nadal 4/6 DONE; Phase 0 nadal 13/15 DONE. Myth Battle PARKED; P0-I13 remote/staging i bramki Phase 0/1 pozostają otwarte.
+- **Konfiguracja rzeczywistego użycia:** baza aplikacji nie była migrowana/restartowana, pełny globalny dump nie był pobrany/załadowany; operator stosuje V19/V20, import i grant admina według `backend/LOCATIONS_IMPORT.md`. Fixture geograficzny użyty wyłącznie w izolowanej bazie testowej; przed importem słownik uczciwie pokazuje unavailable/empty.
+- **Stan pozostałego kodu:** P2-I02–P2-I04 IN_PROGRESS / NOT VERIFIED, P2-I05/P2-I06 TODO. Starsze filtry tekstowe, edytor organizatora i szczegóły wymagają aktualnego kontraktu `backend/EVENTS_API.md`; wdrożenia Joined ani runtime web/iOS/Android nie deklarowano.
+- **Następny krok po osobnym poleceniu:** `P2-I02` — dwa pola wyszukiwania kraj/miasto po ID i katalog według nowego kontraktu; dobrowolna lokalizacja i rzeczywiste bilety Home. Nie rozpoczęto tej iteracji w bieżącej sesji.
+- **CHANGELOG.md:** wpis P2-I01 pod 2026-11-05 dla zweryfikowanego modelu, API i importera.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
 
@@ -2654,3 +2658,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | Phase 2 — aktualizacja zakresu etapu 1 | Plan zaktualizowany; statusy implementacji bez zmian | Wyłącznie PHASES.md: globalna baza kraj/miasto i dwa pola pełnotekstowe, admin dodaje/publikuje/usuwa, pobliskie bilety Home za zgodą i pusty promień z linkiem, katalog z nazwą/typem/lokalizacją/datami/Joined, prywatne Dołączam/cofnięcie. Zachowano ID, historyczne dowody i wcześniejsze wpisy dziennika; odłożono szerszy portal/kontakt. | Kontrola dokumentacyjna i diff; bez testów aplikacji. CHANGELOG bez wpisu (plan). Następne zlecenie: P2-I00; żadna iteracja nie została rozpoczęta ani zamknięta. |
 
 | 2026-11-05 | P2-I00 — polityka etapu 1 | DONE; T01/T03–T06/V01–V02, T02 odłożone | EventPolicy + CuratedEventPolicy, 18 nowych testów Events; wersjonowane backend/EVENTS_POLICY.md i EVENTS_POLICY_SCENARIOS.md, README, lokalne docs/policies i addendum ADR-010, PHASES i CHANGELOG. `./mvnw --batch-mode test` exit 0: 31/31 unit/architecture PASS, Q01–Q11/D01–D07; W01–W10 przegląd polityki PASS. GeoNames, CC BY 4.0, pełny słownik/aliasy, promień 100 km, admin-only cykl, zgody/Joined/retencja. | Bez blokera P2-I00; wyjątek lokalny P0-I13 zachowany. Nie uruchamiano DB/API/migracji/restartów/UI ani natywnych runtime. Rzeczywiste ACL/import/zgody/retencja pozostają do weryfikacji w kolejnych iteracjach. Następna P2-I01 wyłącznie na polecenie. |
+
+| 2026-11-05 | P2-I01 — backend katalogu admina i globalnych lokalizacji | DONE; T01–T07/V01–V03 | V19/V20, importer GeoNames/offline CLI/downloader, Country/City API, admin-only event/media/publish/delete z audytem/wersją, publiczne filtry i POST nearby 100 km, nowe bezpieczeństwo/bezpieczne logowanie. Backend docs API/import/results, README/policy, PHASES i CHANGELOG. Pełne Maven verify exit 0: 34 unit/architecture + 104 IT PASS na izolowanym PostgreSQL 17.11; nowe 3 unit + 16 IT. Końcowy package, packaged CLI help, Python help/syntax i diff check PASS. | Brak blokera backendowego DoD. Baza aplikacji/staging/produkcja nie były migrowane ani restartowane; pełny globalny dump wymaga jawnego importu według LOCATIONS_IMPORT.md. Tylko testowy fixture; bez UI/native runtime/Joined. P2-I02 dopiero po kolejnym poleceniu. |

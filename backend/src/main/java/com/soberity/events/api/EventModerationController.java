@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@io.swagger.v3.oas.annotations.Hidden
 @RestController
 @RequestMapping("/api/v1/moderation")
 public class EventModerationController {

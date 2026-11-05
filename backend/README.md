@@ -90,11 +90,18 @@ below still require adaptation/verification against the approved stage-one scope
 
 ### Sober Events — P2-I01 data and APIs
 
-[EVENTS_API.md](EVENTS_API.md) documents pending migration V17, organizer/member
-ACL, independent moderation, UTC/IANA dates, public search and bounded media.
-This supersedes the P2-I00 foundation-only scope above. No Events UI or inquiry
-sending is included. Implementation is NOT VERIFIED: no build, tests, migration
-execution, API checks or restart performed at the owner's request.
+Stage-one backend completed 2026-11-05: V19 global locations and V20 admin-curated
+entries, admin-only create/publish/delete, country/city lookup and combined event
+search, POST nearby with no durable user coordinates. Existing organizer data
+are preserved; deferred organizer/moderation routes are denied. See
+[EVENTS_API.md](EVENTS_API.md) for the current contract,
+[LOCATIONS_IMPORT.md](LOCATIONS_IMPORT.md) for explicit GeoNames import/admin
+setup and [EVENTS_API_RESULTS.md](EVENTS_API_RESULTS.md) for verification:
+34 unit/architecture + 104 integration tests PASS on isolated PostgreSQL 17.11.
+No real global snapshot/app DB activation or frontend runtime acceptance claimed.
+
+The following P2-I02/P2-I03/editor notes record the earlier 2026-11-04 implementation;
+their clients still need adaptation to the new stage-one backend contract.
 
 P2-I02 adds shared web/native `/events` discovery and the region/sort query
 parameters. See [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md) for scope, location

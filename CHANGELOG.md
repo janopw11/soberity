@@ -1,5 +1,7 @@
 ## 2026-11-05
 
+- P2-I01 — wdrożono backend pierwszego etapu Sober Events: globalne kraje/miasta GeoNames z aliasami EN/PL i importerem atomowych snapshotów (V19), katalog admina bez kont organizatorów (V20), API publikacji/usuwania z wersjami i audytem, filtry nazwa/typ/kraj–miasto/data oraz POST pobliskich wydarzeń z konfigurowalnym promieniem 100 km. Zachowano stare dane bez zgadywania lokalizacji; odłożone API organizatorów/moderacji zablokowano. Poprawna kontrola offsetów/DST, prywatne media do publikacji i ochrona współrzędnych przed URL/logami. Pełne Maven verify: 34 unit/architecture + 104 IT PASS na izolowanym PostgreSQL 17.11. Bez migracji bazy aplikacji, pełnego globalnego importu ani testów UI; instrukcje konfiguracji w backend/LOCATIONS_IMPORT.md.
+
 - P2-I00 — ukończono politykę pierwszego etapu Sober Events: kwalifikacja bezalkoholowych wydarzeń, cykl publikacji/usunięcia przez admina, GeoNames jako źródło krajów/miast, domyślny promień 100 km, zgody lokalizacyjne oraz prywatność i retencja Joined. Dodano czyste reguły domenowe i scenariusze; Maven: 31 testów unit/architektury PASS, w tym 18 Events, oraz przegląd polityki. Bez wdrażania importera, API, migracji i UI; istniejące implementacje Events wymagają dostosowania w kolejnych iteracjach.
 
 ## 2026-11-04

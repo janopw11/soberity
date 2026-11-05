@@ -1,176 +1,195 @@
-# Sober Events — P2-I01
+# Sober Events — P2-I01 stage-one API
 
-Implementation prepared 2026-11-04. **NOT VERIFIED**: no compilation, tests,
-API calls, backend restart or migration execution, at the owner's request.
-Migration V17 is pending. This iteration introduces the backend only; discovery
-UI belongs to P2-I02, organizer UI to P2-I03, inquiry sending to P2-I04.
-Policy: [EVENTS_POLICY.md](EVENTS_POLICY.md).
+Updated 2026-11-05. Policy: [EVENTS_POLICY.md](EVENTS_POLICY.md).
+Verification: [EVENTS_API_RESULTS.md](EVENTS_API_RESULTS.md).
 
-## Identity and access
+The first stage is an **admin-curated catalog** with a local GeoNames dictionary.
+V19 adds global locations and snapshot provenance; V20 adapts existing event,
+venue, revision/media/audit tables to curated entries without an organizer account.
+V17/V18 checksums are unchanged. All prior organizer data are retained, excluded
+from public discovery and available to admins for explicit migration decisions.
+No guessed name matching, source data, real events or administrator grants are
+inserted by migrations.
 
-Public GETs need no account. All organizer/moderation endpoints require a
-Firebase bearer token with verified email. Membership is checked against the
-requested organizer; supplying another organizer/event/media ID does not grant
-access. Deleted accounts are denied and private actions serialize with account
-erasure. No client-supplied UID or role is accepted.
+## Public location dictionary
 
-Events moderators are a separate, trusted server-side allowlist. There is no
-HTTP endpoint to grant this role. An administrator may provision an existing
-verified account after V17 using a parameterized database command:
+- `GET /api/v1/locations/countries?q=polska&locale=pl&page=0&size=20`
+- `GET /api/v1/locations/cities?countryId={UUID}&q=lodz&locale=pl&page=0&size=20`
+- `GET /api/v1/locations/metadata`
 
-```sql
-INSERT INTO events_moderator(firebase_uid) VALUES (:trusted_firebase_uid)
-ON CONFLICT(firebase_uid) DO UPDATE SET active=true;
+Country/city responses: `items`, `total`, `page`, `size`, `attribution`.
+Items expose stable UUID `id`, `geoname_id`, source `name`, `label_en`, `label_pl`
+and effective `label`. Countries also expose `iso_code`; cities `country_id`,
+`region`, `district`, `latitude`, `longitude`, IANA `timezone` and source `version`.
+Keep disambiguating region/district/ID in picker labels for duplicate city names.
+The city endpoint requires an active country. Both support case/diacritic-folded
+literal substring search over original names, ASCII/transliterated aliases and
+EN/PL alternate names; historic aliases aid search without becoming current
+labels. `%`, `_` and `!` are literal search characters, not SQL wildcards.
+Trigram indexes support substring lookup; the primary country constraint applies
+before pagination. Locale is `en`/`pl`, default `en`; query max 200 characters,
+page 0–100000, size 1–100. Sorting is localized label then region/district/ID.
+
+Only active records are offered. Client submits chosen IDs, never typed city text;
+changing country clears the previous city. The backend independently checks the
+country/city pair. No device position or provider network call is needed to browse.
+Metadata reports `available`, active snapshot counts/timestamp, source and license
+links. Before the first operator import `available=false` and lists are empty;
+no demo cities stand in for a global dataset.
+
+Required user-facing credit is supplied in metadata and list responses:
+“Location data: GeoNames, CC BY 4.0; filtered and normalized by Soberity”.
+The picker in P2-I02/P2-I04 must expose attribution/source/license links.
+Importer and refresh commands: [LOCATIONS_IMPORT.md](LOCATIONS_IMPORT.md).
+
+## Public event catalog
+
+- `GET /api/v1/events`: `q` (literal case-insensitive title substring, max 200),
+  `countryId`, `cityId`, `track`, `category`, `from`, `to`, `locale`, `page`, `size`.
+- `GET /api/v1/events/categories`: supported category/track labels EN/PL.
+- `GET /api/v1/events/{id}`: qualified public entry, otherwise 404.
+- `GET /api/v1/events/media/{id}`: normalized JPEG only while referenced by a
+  currently eligible public entry; otherwise 404.
+- `POST /api/v1/events/nearby`: coordinates **only in JSON body**, never URLs.
+
+Events are PUBLISHED curated entries, current revision, strict ALCOHOL_FREE,
+confirmed controls/rights/beverages, active country/city and matching location
+version. Organizer verification/review is not required. Source evidence, author
+references, admin identity, moderation/internal fields and Joined never appear
+in public event DTOs. Friendly supply cannot fill a strict result.
+
+Search defaults to `starts_at >= now`. `from` is inclusive and `to` exclusive,
+ISO-8601 instants; `to` must be later than `from`. A past search must supply its
+own `from`, and only retained nondeleted listings can appear. Client calendar-day
+filters should convert local midnight boundaries (including next-day exclusive
+end) with DST awareness in P2-I02. All filters combine before count/pagination;
+cityId requires its countryId. Sort is start instant ascending then event ID.
+Page/size bounds match locations. Empty results are ordinary 200 responses.
+
+The projection retains common display fields (`id`, `title`, `description`,
+`locale`, `track`, `category_code`, `starts_at`, optional `ends_at`, `timezone`,
+`alcohol_policy`, `alcohol_rules`, `beverage_notes`, `cover_id`, `cover_alt_text`,
+`organizer_url`, `venue_name`, `address`, country/city IDs/names and point provenance).
+Optional price/accessibility/availability remain UNKNOWN, never fabricated.
+There is no required `organizer_id` or public organizer account. Description is
+plain text in this stage's write API; existing rich-editor integration belongs
+to P2-I04. `coordinate_source=CITY|VENUE` lets UI describe approximate city-centroid
+distance honestly. Event points are public venue/city coordinates, not user data.
+
+Unsupported GET filters are rejected with 400, including old text `city/country`,
+`latitude/longitude/radiusKm`, price/region/availability/sort or `joined` filters.
+Joined is explicitly deferred to P2-I05, rather than silently ignored.
+
+Nearby example:
+
+```json
+{"latitude":48.2082,"longitude":16.3738,"locale":"en","page":0,"size":20}
 ```
 
-A moderator cannot verify their own organizer or approve/publish their own event
-revision, nor an organizer they currently belong to. Verification is not seller
-KYC. The server does not fetch external URLs. Two different verified identities
-are needed for the organizer and independent moderator flows.
+Latitude/longitude must be paired, finite and within geographic bounds. Optional
+locale/page/size use normal bounds. Unknown JSON fields (including client radius)
+and query parameters are rejected. The effective radius is deployment-controlled
+`SOBERITY_EVENTS_NEARBY_RADIUS_KM`, default **100 km**, finite **1–500 km**;
+invalid configuration fails startup. Response includes `radiusKm`; each item has
+approximate `distance_km`. Haversine uses radius 6371.0088 km. The boundary is
+inclusive with a 1e-7 km floating-point tolerance; display rounding never drives
+filtering. Sort **distance, start instant, ID**, before pagination. Only upcoming
+events qualify. Empty radius stays empty; no automatic expansion or remote/friendly
+fallback. Home consent/loading/error/empty/rendering belongs to P2-I02.
 
-## Public routes
+Nearby performs read-only queries and never stores a user point. Event search,
+detail, media and nearby responses are `Cache-Control: no-store`. No coordinate
+URL, provider request or user-location result cache is created. Body DTO string
+logging redacts positions; framework body, binding-error, DispatcherServlet and
+SQL bind logging are kept at safe levels. Malformed JSON returns a generic error
+without echoing values. Keep edge access/body logging and external APM capture
+disabled for this route, as in the existing staging Caddy configuration.
 
-- `GET /api/v1/events/categories`: codes, tracks and EN/PL labels.
-- `GET /api/v1/events`: `{items,page,size,total}`; page defaults0, size20 (1–100).
-- `GET /api/v1/events/{id}`: published details, or the last published snapshot
-  with CANCELLED status; unavailable records return404. Details/media expire
-  from public access12 months after the event ends.
-- `GET /api/v1/events/media/{id}`: normalized JPEG only if attached to an eligible
-  public event; no-store, rechecks publication/organizer status.
-- `GET /api/v1/organizers/{id}`: verified organizer's ID, name, description,
-  website and verification state. Never the contact email or evidence reference.
+## Administrator API
 
-Search parameters: `q` (literal title substring), `city` (case-insensitive exact),
-`country` (ISO2), `track`, `category`, `alcoholPolicy`, `priceKind`, `currency`,
-`maxPriceMinor`, `accessibility`, `availability`, `from`, `to`, `locale`,
-`latitude`, `longitude`, `radiusKm`, `page`, `size`.
-Enums are uppercase; locale is `en`/`pl`. Times are ISO UTC instants; the range
-is start-inclusive/end-exclusive. Default `from` is now; ended and cancelled
-records never appear in search. `maxPriceMinor` requires ISO currency and only
-matches known amounts in that currency (free events have no currency). Spatial
-search requires all three parameters and a radius0.1–250 km; ungeocoded venues
-are excluded, location is not stored. Stable ordering is starts_at then ID;
-items and count use a repeatable-read snapshot.
+Every route below requires a verified Firebase identity, a live account and an
+active server-managed `events_admin` grant. No automatic grant, custom client role
+or organizer/moderator membership can substitute for it. Operator grants use
+controlled SQL; revoke on account erasure is part of V20. No self-service grant API.
 
-The default policy is **ALCOHOL_FREE**. `alcoholPolicy=SOBER_FRIENDLY` is an
-explicit separate search, never a fallback. Both require a verified organizer,
-independent approval, source/rights/control/ABV verification and current published
-revision. Strict requires explicit false for sale/service/BYOB; friendly requires
-explicit alcohol-free participation. Private contact details, sources, notes,
-actor identifiers and drafts are never part of the public projection.
+Prefix `/api/v1/admin/events`:
 
-## Organizer routes
+- `POST /media`: multipart `file`, `altText`; 201 `{id}`. JPEG/PNG <=5 MB,
+  <=20 megapixels; re-encoded 1600×900 JPEG, original metadata stripped.
+- `GET /media/{id}`: administrator-only preview, no-store.
+- `POST /`: create complete DRAFT; 201 private detail with `id`, `version=1`.
+- `PUT /{id}`: complete replacement revision plus `expectedVersion`; returns
+  private detail, increments version and withdraws to DRAFT. Revalidate before
+  republishing. No PATCH allowing arbitrary state changes.
+- `POST /{id}/publish`: `{expectedVersion}`; 204, increments version. Database
+  guard checks current location/version, required fields, attestations, strict
+  controls and future start; does not require a second reviewer.
+- `DELETE /{id}?expectedVersion=N`: 204, terminal DELETED and minimized audit.
+- `GET /{id}`: current private content and audit, including source evidence.
+- `GET /?page=0&size=20`: current nondeleted entries, newest update first.
+- `GET /legacy?page=0&size=20`: preserved organizer entries and their unresolved
+  text locations. No automatic matching/republication. Admin must explicitly
+  choose source records and recheck evidence when creating a curated replacement.
 
-Prefix `/api/v1/organizer`:
+Required write fields:
 
-- `POST /organizations`: name, description, HTTPS website, contactEmail;
-  returns created private record (201), version1 and UNVERIFIED.
-- `GET /organizations?page=0`: own organizations,50/page.
-- `GET /organizations/{id}`: member-only details including current version.
-- `POST /organizations/{id}/submit`: `{expectedVersion,evidenceReference}`;
-  UNVERIFIED/REJECTED to IN_REVIEW. Suspended verification requires moderator
-  reopening. Changes return204; reread the resource to obtain the new version.
-- `POST /organizations/{id}/venues`: name, address, city, optional region,
-  countryCode and optional paired latitude/longitude; returns `{id}` (201).
-- `GET /organizations/{id}/venues?page=0`:50/page.
-- `POST /organizations/{id}/media`: multipart `file` and `altText`, returns `{id}`.
-  JPEG/PNG up to5 MB/20 megapixels; normalized to1600×900 JPEG, metadata stripped.
-- `GET /organizations/{id}/media/{mediaId}`: member-only image preview.
-- `POST /organizations/{id}/events`: event body, returns private details (201).
-- `PUT /organizations/{id}/events/{eventId}`: full new revision with
-  expectedVersion, returns private details. Venue/cover must belong to the host.
-- `GET /organizations/{id}/events?page=0`:50/page.
-- `GET /events/{id}`: own event, current content, review feedback and audit actions.
-- `POST /events/{id}/submit`, `/withdraw`, `/cancel`: `{expectedVersion}`,204.
+```json
+{
+  "countryId":"<chosen country UUID>","cityId":"<chosen city UUID>",
+  "title":"Event name","description":"Original or licensed description",
+  "locale":"en","track":"SOBER_NIGHTLIFE","category":"SOBER_RAVE",
+  "organizerUrl":"https://organizer.example/event","coverId":"<uploaded image UUID>",
+  "startsAt":"2029-11-06T20:00:00+01:00","timezone":"Europe/Vienna",
+  "alcoholRules":"No sale, service or BYOB throughout this event",
+  "controls":{"alcoholSold":false,"alcoholServed":false,"alcoholPermitted":false},
+  "beverageNotes":"Administrator confirmed 0.0% offerings",
+  "beverageRulesConfirmed":true,
+  "sourceUrl":"https://organizer.example/event",
+  "sourceReference":"Private confirmation and text/image rights reference",
+  "contentRightsAttested":true
+}
+```
 
-Event body uses dynamic real data; required fields:
-`venueId`, `title` (max300), `description` (max30000), `locale`, `track`,
-`category`, `alcoholPolicy`, `alcoholRules`, `beverageNotes`, `startsAt`, `endsAt`,
-`timezone`, `priceKind`, `accessibility`, `entryRules`, `sourceUrl`,
-`sourceReference`. Optional: `coverId`, `externalTicketUrl`, `accessibilityNotes`,
-`availability` (UNKNOWN/AVAILABLE/SOLD_OUT; defaultUNKNOWN), `controls`,
-`contentRightsAttested`, `priceMinor`, `currency`; editing requires expectedVersion.
+Optional: `venueName`, `address`, paired `latitude/longitude`, `endsAt`; edits also
+require `expectedVersion`. There is no separate venue/organizer-creation step.
+No exact venue coordinates means the selected city's point, marked CITY. A partial
+or invalid exact point is rejected, not silently replaced. New entries must be
+future, classified sober and have complete rights/source/beverage confirmation;
+unverified organizer accounts, price/currency/accessibility forms and a fabricated
+end time are not required.
 
-`controls` has nullable `alcoholSold`, `alcoholServed`, `alcoholPermitted`,
-`explicitAlcoholFreeParticipation`; missing facts are unknown, not false.
-Source URL/reference and content rights attestation remain private. Approval
-requires the attestation and a human verification of all four checks.
+Input dates retain original offsets during JSON parsing. Nonzero offsets must
+agree with the named IANA zone, including repeated hours; invalid/missing spring
+hours fail. `Z` explicitly supplies a UTC instant. Persist UTC `timestamptz` plus
+the IANA zone; optional end must be later than start. Source checked time is
+assigned by the server when the authorized admin confirms the current evidence.
 
-Dates must contain an offset and a later end; stored as UTC timestamptz plus
-IANA timezone. `Z` is an absolute UTC instant; nonzero offsets must agree with
-the named zone at that instant, including DST. Prices use integer minor units:
-FREE requires0/null currency, PAID positive amount and ISO currency, UNKNOWN
-requires null amount/currency. Accessibility: UNKNOWN/ACCESSIBLE/PARTIAL/
-NOT_ACCESSIBLE. Venues/media and content revisions are immutable snapshots;
-create replacements and reference them in a new revision when changes are needed.
+A country/city refresh invalidates public visibility when a record is removed,
+moved or materially revised. A new admin revision with current selection is
+required; do not silently reuse an old city point/version. Publication and edits
+serialize against snapshot promotion; event row/version locks reject concurrent
+stale writes. Deletion hides all public snapshots and image access immediately;
+old event links return 404. An already authorized in-flight read may complete;
+subsequent requests cannot serve an active stale snapshot. Minimal tombstone/audit
+and private evidence follow policy retention; cleanup jobs are not delivered here.
+Joined relations do not exist yet: P2-I05 must connect relation erasure to this
+same deletion transaction and verify it there. No Join API/counter is fabricated.
 
-Edits to published/approved content invalidate approval and move the event to
-IN_REVIEW, hiding it until independently reviewed and published again. DRAFT and
-CHANGES_REQUESTED can be edited; revisions are append-only. A reviewed revision
-cannot be reviewed twice: after changes are requested, edit to a new revision
-before resubmitting. Submitted records can be withdrawn to DRAFT. An event that
-was published then edited and cancelled exposes only its last published snapshot.
+Failures: anonymous 401, unverified/non-admin/deleted account 403, unavailable
+public/private IDs 404, stale version or database state conflict 409, invalid
+fields/range/image/URL/location 400. Errors use Problem Details without internal
+SQL, input secrets or raw location values. Validation never fetches submitted URLs.
 
-## Moderation routes
+## Compatibility and scope
 
-Prefix `/api/v1/moderation`:
+Previous `/api/v1/organizer/**` and `/api/v1/moderation/**` routes are denied,
+including for admins; dormant controllers are hidden from OpenAPI. Public
+organizer profiles/calendar/checkout routes are outside stage one and not offered.
+Their implementation/history remains in source. V17/V18 organizer rows are not
+deleted, implicitly verified or converted to curated identity mode.
 
-- `GET /organizers?page=0`: verification queue and verified/suspended hosts,50/page.
-- `POST /organizers/{id}/decision`: expectedVersion, decision, notes,
-  authorityConfirmed. VERIFIED/REJECTED require IN_REVIEW; verification requires
-  confirmed authority, private evidence reference and contact email. SUSPENDED
-  is allowed from VERIFIED; IN_REVIEW reopens a suspended host.
-- `GET /events?page=0`: IN_REVIEW/APPROVED/PUBLISHED,50/page.
-- `GET /events/{id}`: private evidence, current content and review/audit.
-- `GET /events/media/{id}`: authenticated moderator image preview.
-- `POST /events/{id}/review`: expectedVersion, decision
-  (APPROVED/CHANGES_REQUESTED/REJECTED), notes, checks. Only IN_REVIEW is accepted.
-  Checks: sourceVerified, contentRightsVerified, alcoholControlsVerified,
-  beverageAbvVerified; all must be explicitly true for approval.
-- `POST /events/{id}/publish`: expectedVersion; only independently approved,
-  current, not-ended content with a currently verified host can publish.
-- `POST /events/{id}/cancel`, `/archive`: expectedVersion, guarded state transition.
-
-Mutations return204 unless described otherwise. Missing/inaccessible private
-resources404; missing role403; stale expectedVersion409; invalid input400.
-Database constraints additionally guard reviews, snapshots and publication.
-An organization suspended or left without members immediately disappears from
-public reads. Account erasure removes membership/moderator access, clears inquiry
-PII and organizer contact/evidence owned by that account, and suspends orphaned
-organizations. Immutable audit uses pseudonymous SHA-256 actor references;
-retention jobs and inquiry dispatch are not implemented by this iteration.
-
-## Acceptance handoff — NOT EXECUTED
-
-Owner verification should cover V17 on the existing V16 database and a fresh
-schema; organizer/member/moderator/anonymous/unverified/deleted-account ACL;
-self-review rejection; concurrent stale version writes; draft/media privacy;
-edit/review/publish/cancel and suspension visibility; timezone/DST and ambiguous
-local times; strict/friendly/unknown controls; date/price/accessibility/geo filters,
-page boundaries, invalid links/images and cross-organizer venue/cover IDs;
-account erasure and cancellation snapshot behavior. No real events are seeded.
-
-### P2-I02 discovery extension — NOT VERIFIED
-
-Search additionally accepts `region` (case-insensitive exact venue region) and
-`sort=START_ASC|START_DESC|PRICE_ASC`, default START_ASC. Sort is applied before
-pagination with deterministic ID tie-breakers. PRICE_ASC requires one ISO
-currency. Shared web/native discovery, date semantics and owner acceptance are
-in [EVENT_DISCOVERY.md](EVENT_DISCOVERY.md). No additional migration beyond V17.
-
-### P2-I03 — public calendar and details
-
-`GET /api/v1/events/{id}/calendar.ics`: public eligible event → escaped/folded
-UTF-8 ICS attachment, no-store; cancelled/ended410, unavailable404.
-See [EVENT_DETAIL.md](EVENT_DETAIL.md) for app routes, external links, calendar
-import limitations and minimum production SEO requirements. NOT VERIFIED;
-no migration beyond V17, no build/restart performed.
-
-### Manual event editor — V18 (pending, NOT VERIFIED)
-
-Organizer event input accepts optional `descriptionDocument` (allowlisted Tiptap
-JSON, no inline images) and `organizerUrl` (HTTPS). Stored per immutable revision;
-public details return `description_document` and `organizer_url`; legacy records
-fall back to plain description/organization website. Private owned venue lookup:
-`GET /api/v1/organizer/organizations/{id}/venues/{venueId}`. Web entry and scope
-are documented in [EVENT_EDITOR.md](EVENT_EDITOR.md). No migration/restart run.
+The consumer's old text filters, organizer-dependent editor/detail flow and native
+location adapter need P2-I02–P2-I04 updates to this contract. No frontend/platform
+runtime is claimed verified by this backend iteration. Joined persistence/filters
+remain P2-I05. No deployment, production migration, real event publication or
+full global dataset activation is performed by tests.
