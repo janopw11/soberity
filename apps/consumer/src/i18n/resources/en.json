@@ -1174,6 +1174,53 @@
     "science": "Explore articles, quizzes and flashcards grounded in verifiable sources.",
     "communityTitle": "Connect through experiences",
     "community": "Discover sober parties, raves and everyday activities that bring people together.",
-    "approach": "Evidence first. Support without judgment."
+    "approach": "Evidence first. Support without judgment.",
+    "kicker": "THE SOBERITY WAY",
+    "heroTitle": "A clearer mind.\nA fuller life.",
+    "heroCopy": "Discover the science, explore new experiences, and find people who believe life doesn’t need alcohol to be extraordinary.",
+    "scienceTag": "Curiosity & discovery",
+    "eventsTag": "Connection & experiences",
+    "pillars": {
+      "title": "Two worlds. One mission.",
+      "science": {
+        "title": "Discover the science",
+        "summary": "Understand more. Make your own choices.",
+        "details": "Explore source-based articles, quizzes and flashcards. Follow the evidence, consider its limits, and make room for a little curiosity."
+      },
+      "events": {
+        "title": "Connect through experiences",
+        "summary": "Find your people. Try something new.",
+        "details": "Discover alcohol-free parties and raves, sport, outdoor activities and meetups. Different ways to spend your time, with connection at their heart."
+      }
+    },
+    "clarity": {
+      "title": "Discover a little more clarity.",
+      "copy": "Clarity creates space for new possibilities.",
+      "action": "Bring it together",
+      "reset": "Explore again",
+      "note": "An abstract moment of play — not a scientific model."
+    },
+    "principlesTitle": "Our approach",
+    "principles": {
+      "evidence": {
+        "title": "Evidence first",
+        "copy": "We prioritize credible research and communicate uncertainty openly."
+      },
+      "freedom": {
+        "title": "Freedom to choose",
+        "copy": "We encourage alcohol-free living with support and without judgment."
+      },
+      "together": {
+        "title": "Better together",
+        "copy": "Shared experiences and community can make a new way of living feel more accessible."
+      }
+    },
+    "closingTitle": "There’s more to life. Explore it.",
+    "closingCopy": "Knowledge, connection and new experiences — all in one place.",
+    "explore": {
+      "science": "Explore Science",
+      "events": "Discover Events"
+    },
+    "creditsTitle": "Data & acknowledgments"
   }
 }

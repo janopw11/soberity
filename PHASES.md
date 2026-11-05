@@ -2237,6 +2237,8 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+About us — redesign według załącznika: editorial hero, rozwijane filary Science/Experiences, abstrakcyjna interakcja clarity, trzy zasady i CTA do istniejących tras. Wspólne tokeny, EN/PL, reduced motion i GeoNames/CC BY zachowane. Bez nowych zależności/API. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
 Korekta właściciela: identyczne pills Articles i Sober Events — Articles korzysta z domyślnej prezentacji wspólnego CategoryChips bez dense. Wymiary, padding, typografia i stany wspólne. Bez testów i dodatkowych kontroli; NOT VERIFIED.
 
 Articles redesign według załącznika: kompaktowe wyszukiwanie z ikoną i clear, debounce500ms, poziome kompaktowe chips z All, heading/count z API, Load more zamiast paginacji, append/deduplikacja/anulowanie i retry bez utraty kart, skeleton/empty/clear filters/neutral error, liniowa ikona nagłówka. Karty i backend bez zmian. NOT VERIFIED, bez testów i dodatkowych kontroli.
@@ -2809,3 +2811,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | Articles — redesign otoczenia kart | Implementacja / NOT VERIFIED | DiscoverScreen: search, chips All, metadata count, skeleton/empty/error, Load more z ochroną przed duplikatami i retry. CategoryChips: opt-in dense; science layout: book icon wyłącznie Articles; EN/PL. Karty i kontrakt API zachowane. | Bez testów i dodatkowych kontroli na polecenie właściciela. CHANGELOG odroczony: brak odbioru runtime. Następny krok: odbiór Articles web/iOS/Android. |
 
 | 2026-11-05 | Articles/Events — identyczne pills | Implementacja / NOT VERIFIED | DiscoverScreen bez dense, ten sam wariant CategoryChips co Sober Events. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta bez weryfikacji. Następny krok: odbiór UI. |
+
+| 2026-11-05 | About us — pełny redesign | Implementacja / NOT VERIFIED | AboutScreen: hero, interaktywne rozwijane filary z opisami dostępnymi przed rozwinięciem, moment clarity z Animated, principles, CTA science/events, stopka LocationAttribution. EN/PL, focus i reduced motion. | Bez testów i dodatkowych kontroli na polecenie właściciela; runtime/a11y/platformy nieweryfikowane. CHANGELOG odroczony do odbioru. Następny krok: odbiór About us. |

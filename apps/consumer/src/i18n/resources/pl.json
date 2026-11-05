@@ -1192,6 +1192,53 @@
     "science": "Odkrywaj artykuły, quizy i fiszki oparte na weryfikowalnych źródłach.",
     "communityTitle": "Łącz się przez doświadczenia",
     "community": "Odkrywaj sober parties, rave’y i codzienne aktywności, które łączą ludzi.",
-    "approach": "Rzetelne źródła. Wsparcie bez oceniania."
+    "approach": "Rzetelne źródła. Wsparcie bez oceniania.",
+    "kicker": "POZNAJ SOBERITY",
+    "heroTitle": "Jaśniejszy umysł.\nPełniejsze życie.",
+    "heroCopy": "Odkrywaj naukę, próbuj nowych doświadczeń i poznawaj ludzi, którzy wierzą, że niezwykłe życie nie potrzebuje alkoholu.",
+    "scienceTag": "Ciekawość i odkrywanie",
+    "eventsTag": "Relacje i doświadczenia",
+    "pillars": {
+      "title": "Dwa światy. Jedna misja.",
+      "science": {
+        "title": "Odkrywaj naukę",
+        "summary": "Zrozum więcej. Wybieraj świadomie.",
+        "details": "Poznaj artykuły, quizy i fiszki oparte na źródłach. Przyglądaj się dowodom i ich ograniczeniom. Zostaw miejsce na ciekawość."
+      },
+      "events": {
+        "title": "Łącz się przez doświadczenia",
+        "summary": "Poznaj ludzi. Spróbuj czegoś nowego.",
+        "details": "Odkrywaj imprezy i rave’y bez alkoholu, sport, aktywności w plenerze i spotkania. Różne sposoby spędzania czasu, które zbliżają ludzi."
+      }
+    },
+    "clarity": {
+      "title": "Odkryj odrobinę więcej klarowności.",
+      "copy": "Przejrzystość tworzy przestrzeń na nowe możliwości.",
+      "action": "Połącz elementy",
+      "reset": "Odkryj ponownie",
+      "note": "Abstrakcyjna zabawa formą — nie model naukowy."
+    },
+    "principlesTitle": "Nasze podejście",
+    "principles": {
+      "evidence": {
+        "title": "Najpierw dowody",
+        "copy": "Stawiamy na wiarygodne badania i otwarcie mówimy o niepewności."
+      },
+      "freedom": {
+        "title": "Wolność wyboru",
+        "copy": "Zachęcamy do życia bez alkoholu. Wspieramy, nie oceniamy."
+      },
+      "together": {
+        "title": "Razem łatwiej",
+        "copy": "Wspólne doświadczenia i relacje mogą ułatwiać odkrywanie nowego sposobu życia."
+      }
+    },
+    "closingTitle": "Życie ma więcej do zaoferowania. Odkryj to.",
+    "closingCopy": "Wiedza, relacje i nowe doświadczenia — w jednym miejscu.",
+    "explore": {
+      "science": "Odkrywaj naukę",
+      "events": "Znajdź wydarzenia"
+    },
+    "creditsTitle": "Dane i podziękowania"
   }
 }
