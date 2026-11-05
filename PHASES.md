@@ -2237,6 +2237,10 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+Korekta Quizzes: bez Explore topics/count i strzałek na kartach; tytuły kategorii w semantic primary Ocean. Pozostały projekt i zachowanie zachowane. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
+Quizzes — redesign wyboru kategorii według załącznika: Explore topics/count z QUIZ_CATEGORIES, kompaktowa neutralna siatka2 kolumny, małe ikony, strzałki i opisy EN/PL, delikatne stany hover/press/focus bez animacji ruchu. Brak hero/bannerów, ID/routing/API i quizy bez zmian. NOT VERIFIED; bez testów i dodatkowych kontroli.
+
 About us — redesign według załącznika: editorial hero, rozwijane filary Science/Experiences, abstrakcyjna interakcja clarity, trzy zasady i CTA do istniejących tras. Wspólne tokeny, EN/PL, reduced motion i GeoNames/CC BY zachowane. Bez nowych zależności/API. NOT VERIFIED; bez testów i dodatkowych kontroli.
 
 Korekta właściciela: identyczne pills Articles i Sober Events — Articles korzysta z domyślnej prezentacji wspólnego CategoryChips bez dense. Wymiary, padding, typografia i stany wspólne. Bez testów i dodatkowych kontroli; NOT VERIFIED.
@@ -2813,3 +2817,7 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | Articles/Events — identyczne pills | Implementacja / NOT VERIFIED | DiscoverScreen bez dense, ten sam wariant CategoryChips co Sober Events. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta bez weryfikacji. Następny krok: odbiór UI. |
 
 | 2026-11-05 | About us — pełny redesign | Implementacja / NOT VERIFIED | AboutScreen: hero, interaktywne rozwijane filary z opisami dostępnymi przed rozwinięciem, moment clarity z Animated, principles, CTA science/events, stopka LocationAttribution. EN/PL, focus i reduced motion. | Bez testów i dodatkowych kontroli na polecenie właściciela; runtime/a11y/platformy nieweryfikowane. CHANGELOG odroczony do odbioru. Następny krok: odbiór About us. |
+
+| 2026-11-05 | Quizzes — kompaktowy wybór kategorii | Implementacja / NOT VERIFIED | QuizCategoryGrid: heading i dynamiczny count, neutralne karty2 kolumny, małe ikony primary, opis i arrow, usunięte pastelowe tła/dekoracyjne koła. EN/PL. Wysokość elastyczna dla długich etykiet. | Bez testów i dodatkowych kontroli na polecenie właściciela. Brak nowych zależności/backend changes. CHANGELOG odroczony: brak odbioru UI. Następny krok: odbiór Quizzes. |
+
+| 2026-11-05 | Quizzes — uproszczenie kart | Implementacja / NOT VERIFIED | QuizCategoryGrid: usunięte heading/count i arrowUpRight; tytuły primary Ocean. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta bez weryfikacji. Następny krok: odbiór Quizzes. |

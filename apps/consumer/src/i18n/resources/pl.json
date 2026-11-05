@@ -1090,7 +1090,18 @@
       "removeSource": "Usuń źródło",
       "requiredFields": "Aby opublikować quiz, uzupełnij tytuł oraz każde pytanie, odpowiedzi, poprawną odpowiedź, wyjaśnienie i przynajmniej jedno źródło z tytułem i linkiem HTTPS."
     },
-    "backToQuizzes": "Wróć do quizów"
+    "backToQuizzes": "Wróć do quizów",
+    "exploreTopics": "Odkrywaj tematy",
+    "topicCount_one": "{{count}} kategoria",
+    "topicCount_few": "{{count}} kategorie",
+    "topicCount_many": "{{count}} kategorii",
+    "topicCount_other": "{{count}} kategorii",
+    "topicDescriptions": {
+      "brain": "Umysł i poznanie",
+      "relationships": "Relacje i dobrostan",
+      "alco-facts": "Dowody i mity",
+      "sport": "Forma i regeneracja"
+    }
   },
   "eventEditor": {
     "title": "Panel wydarzeń",

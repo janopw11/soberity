@@ -1072,7 +1072,16 @@
       "removeSource": "Remove source",
       "requiredFields": "To publish, complete the quiz title and every question, answer options, correct answer, explanation, and at least one source with a title and HTTPS link."
     },
-    "backToQuizzes": "Back to quizzes"
+    "backToQuizzes": "Back to quizzes",
+    "exploreTopics": "Explore topics",
+    "topicCount_one": "{{count}} category",
+    "topicCount_other": "{{count}} categories",
+    "topicDescriptions": {
+      "brain": "Mind & cognition",
+      "relationships": "Social wellbeing",
+      "alco-facts": "Evidence & myths",
+      "sport": "Fitness & recovery"
+    }
   },
   "eventEditor": {
     "title": "Events panel",
