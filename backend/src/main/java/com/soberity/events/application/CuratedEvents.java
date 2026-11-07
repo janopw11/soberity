@@ -44,6 +44,15 @@ public class CuratedEvents {
             throw bad("Classification and supported language required.");
         curatedDates(input.startsAt(),input.endsAt(),input.timezone());coordinates(input.latitude(),input.longitude());
         String title=text(input.title(),300),description=text(input.description(),30000),organizerUrl=url(input.organizerUrl(),true);
+        String document=null;
+        if(input.descriptionDocument()!=null && !input.descriptionDocument().isNull()) {
+            try {
+                var checked=com.soberity.evidence.blog.BlogDocument.check(input.descriptionDocument());
+                if(!checked.images().isEmpty() || checked.text().isBlank() || checked.text().length()>30000)throw bad("Event description must contain text without embedded images.");
+                document=checked.document().toString();
+                if(document.length()>200000)throw bad("Event description is too large.");
+            }catch(IllegalArgumentException e){throw bad("Invalid rich event description.");}
+        }
         String rules=text(input.alcoholRules(),10000),beverages=text(input.beverageNotes(),5000),source=url(input.sourceUrl(),true),reference=text(input.sourceReference(),10000);
         if(!Boolean.TRUE.equals(input.contentRightsAttested()) || !Boolean.TRUE.equals(input.beverageRulesConfirmed()))throw bad("Confirm source/content rights and beverage rules.");
         var facts=new ContentFacts(input.track(),input.category(),AlcoholPolicy.ALCOHOL_FREE,rules,input.controls(),true,true,
@@ -68,10 +77,10 @@ public class CuratedEvents {
         jdbc.update("""
             INSERT INTO events_revision(event_id,revision,author_ref,title,description,locale,track,category_code,alcohol_policy,alcohol_rules,
             alcohol_sold,alcohol_served,alcohol_permitted,beverage_notes,venue_id,starts_at,ends_at,timezone,
-            price_kind,accessibility,entry_rules,source_url,source_reference,content_rights_attested,cover_id,organizer_url,source_checked_at,beverage_rules_confirmed)
-            VALUES (?,?,?,?,?,?,?,?,'ALCOHOL_FREE',?,false,false,false,?,?,?,?,?,'UNKNOWN','UNKNOWN','',?,?,true,?,?,clock_timestamp(),true)
+            price_kind,accessibility,entry_rules,source_url,source_reference,content_rights_attested,cover_id,organizer_url,source_checked_at,beverage_rules_confirmed,description_document)
+            VALUES (?,?,?,?,?,?,?,?,'ALCOHOL_FREE',?,false,false,false,?,?,?,?,?,'UNKNOWN','UNKNOWN','',?,?,true,?,?,clock_timestamp(),true,?::jsonb)
             """,id,revision,access.ref(actor),title,description,input.locale(),input.track().name(),input.category().name(),rules,beverages,venue,
-            Timestamp.from(input.startsAt().toInstant()),input.endsAt()==null?null:Timestamp.from(input.endsAt().toInstant()),input.timezone(),source,reference,input.coverId(),organizerUrl);
+            Timestamp.from(input.startsAt().toInstant()),input.endsAt()==null?null:Timestamp.from(input.endsAt().toInstant()),input.timezone(),source,reference,input.coverId(),organizerUrl,document);
         if(revision>1)jdbc.update("UPDATE sober_event SET current_revision=?,status='DRAFT',version=version+1,updated_at=clock_timestamp() WHERE id=?",revision,id);
         audit(actor,id,revision==1?"EVENT_CREATED":"EVENT_REVISED");return id;
     }
@@ -95,13 +104,39 @@ public class CuratedEvents {
     public Map<String,Object> detail(VerifiedToken actor,UUID id) {
         access.admin(actor);var event=lock(id);
         var result=new LinkedHashMap<>(event);
-        result.put("content",jdbc.queryForMap("SELECT r.*,v.country_id,v.city_id,v.name AS venue_name,v.address,v.coordinate_source,v.latitude,v.longitude FROM events_revision r JOIN events_venue v ON v.id=r.venue_id WHERE r.event_id=? AND revision=?",id,event.get("current_revision")));
+        var content=new LinkedHashMap<>(jdbc.queryForMap("""
+            SELECT r.*,v.country_id,v.city_id,v.name AS venue_name,v.address,v.coordinate_source,v.latitude,v.longitude,
+              c.geoname_id AS city_geoname_id,c.name AS city_name,c.label_en AS city_label_en,c.label_pl AS city_label_pl,c.region,c.district,
+              co.geoname_id AS country_geoname_id,co.name AS country_name,co.label_en AS country_label_en,co.label_pl AS country_label_pl
+            FROM events_revision r JOIN events_venue v ON v.id=r.venue_id
+            JOIN location_city c ON c.id=v.city_id JOIN location_country co ON co.id=v.country_id
+            WHERE r.event_id=? AND revision=?
+            """,id,event.get("current_revision")));
+        Object document=content.get("description_document");
+        if(document!=null)content.put("description_document",tools.jackson.databind.json.JsonMapper.builder().build().readTree(document.toString()));
+        result.put("content",content);
         result.put("audit",jdbc.queryForList("SELECT action,created_at FROM events_audit WHERE event_id=? ORDER BY created_at,id",id));return result;
     }
-    public Map<String,Object> list(VerifiedToken actor,int page,int size) {
+    public Map<String,Object> list(VerifiedToken actor,int page,int size,UUID countryId,UUID cityId) {
         access.admin(actor);pagination(page,size);
-        return Map.of("items",jdbc.queryForList("SELECT e.id,e.status,e.version,r.title,r.starts_at,r.timezone FROM sober_event e JOIN events_revision r ON r.event_id=e.id AND r.revision=e.current_revision WHERE e.curated AND e.status<>'DELETED' ORDER BY e.updated_at DESC,e.id LIMIT ? OFFSET ?",size,(long)page*size),
-            "page",page,"size",size,"total",jdbc.queryForObject("SELECT count(*) FROM sober_event WHERE curated AND status<>'DELETED'",Long.class));
+        if(countryId!=null && !locations.existsCountry(countryId))throw bad("Select an active country.");
+        if(cityId!=null)locations.selected(countryId,cityId);
+        String from="""
+            FROM sober_event e JOIN events_revision r ON r.event_id=e.id AND r.revision=e.current_revision
+            JOIN events_venue v ON v.id=r.venue_id JOIN location_city c ON c.id=v.city_id
+            JOIN location_country co ON co.id=v.country_id
+            WHERE e.curated AND e.status<>'DELETED'
+            """;
+        var args=new ArrayList<Object>();
+        if(countryId!=null){from+=" AND v.country_id=?";args.add(countryId);}
+        if(cityId!=null){from+=" AND v.city_id=?";args.add(cityId);}
+        long total=jdbc.queryForObject("SELECT count(*) "+from,Long.class,args.toArray());
+        args.add(size);args.add((long)page*size);
+        return Map.of("items",jdbc.queryForList("""
+            SELECT e.id,e.status,e.version,r.title,r.starts_at,r.timezone,v.country_id,v.city_id,
+              c.label_en AS city_en,c.label_pl AS city_pl,co.label_en AS country_en,co.label_pl AS country_pl
+            """+from+" ORDER BY e.updated_at DESC,e.id LIMIT ? OFFSET ?",args.toArray()),
+            "page",page,"size",size,"total",total);
     }
     public Map<String,Object> legacy(VerifiedToken actor,int page,int size) {
         access.admin(actor);pagination(page,size);

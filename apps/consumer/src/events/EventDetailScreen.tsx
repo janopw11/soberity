@@ -1,32 +1,46 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type PropsWithChildren,
-} from 'react';
-import { Link, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { Image, Linking, StyleSheet, Text, View } from 'react-native';
+  Link,
+  useRouter,
+  useFocusEffect,
+  useLocalSearchParams,
+} from 'expo-router';
+import {
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { radii, spacing, typography } from '@soberity/design-tokens';
-import {
-  Alert,
-  Button,
-  Dialog,
-  LoadingState,
-  Screen,
-  SettingsIcon,
-} from '../ui';
+import { Alert, Button, Dialog, LoadingState, Screen } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
-import { ReadingCard, ReadingText, RichDocument } from '../science/readingUi';
-import { downloadCalendar } from './calendarDownload';
+import { ReadingText, RichDocument } from '../science/readingUi';
+import {
+  EventActionBar,
+  EventBackButton,
+  EventHero,
+  EventInfoRow,
+  EventOrganizer,
+  EventSection,
+} from './EventDetailParts';
+import {
+  detailAction,
+  detailDates,
+  detailLocation,
+  detailPrice,
+  eventIsActive,
+  isPreviewListing,
+  type DetailAction,
+} from './eventDetailPresentation';
 import { EventMetadata } from './EventMetadata';
 import {
   EventRequestError,
-  eventImageUri,
   eventsGet,
   organizerGet,
-  safeEventLink,
   validEventId,
   type EventDetail,
   type PublicOrganizer,
@@ -44,16 +58,23 @@ export default function EventDetailScreen() {
 }
 function Detail({ id }: { id: string | null }) {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/events');
+  };
   const { colors } = useThemePreferences();
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [organizer, setOrganizer] = useState<PublicOrganizer | null>(null);
   const [organizerFailed, setOrganizerFailed] = useState(false);
   const [error, setError] = useState<'unavailable' | 'error' | null>(null);
   const [attempt, retry] = useState(0);
-  const [failedImage, setFailedImage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState(false);
-  const [target, setTarget] = useState<'tickets' | 'organizer' | null>(null);
+  const [confirmedAction, setConfirmedAction] = useState<DetailAction | null>(
+    null,
+  );
   const [now, setNow] = useState(Date.now());
   const action = useRef<AbortController | null>(null);
   useEffect(() => () => action.current?.abort(), []);
@@ -70,8 +91,7 @@ function Detail({ id }: { id: string | null }) {
     setEvent(null);
     setOrganizer(null);
     setError(null);
-    setTarget(null);
-    setFailedImage(false);
+    setConfirmedAction(null);
     setActionError(false);
     action.current?.abort();
     setBusy(false);
@@ -127,35 +147,15 @@ function Detail({ id }: { id: string | null }) {
       controller.abort();
     };
   }, [event]);
-  const locale = i18n.resolvedLanguage === 'pl' ? 'pl-PL' : 'en-GB';
-  const date = (instant: string, zone: string) => {
-    try {
-      return new Intl.DateTimeFormat(locale, {
-        dateStyle: 'full',
-        timeStyle: 'short',
-        timeZone: zone,
-      }).format(new Date(instant));
-    } catch {
-      return instant;
-    }
-  };
-  const active = Boolean(
-    event &&
-    event.status === 'PUBLISHED' &&
-    new Date(event.ends_at ?? event.starts_at).getTime() > now,
+  const language = i18n.resolvedLanguage === 'pl' ? 'pl' : 'en';
+  const locale = language === 'pl' ? 'pl-PL' : 'en-GB';
+  const nextAction = event ? detailAction(event, organizer, now) : null;
+  const organizerLoading = Boolean(
+    event?.organizer_id && !organizer && !organizerFailed,
   );
-  const ticketUrl = safeEventLink(event?.external_ticket_url);
-  const organizerUrl = safeEventLink(
-    event?.organizer_url ?? organizer?.website,
-  );
-  const destination =
-    target === 'tickets'
-      ? ticketUrl
-      : target === 'organizer'
-        ? organizerUrl
-        : null;
-  const perform = async (kind: 'calendar' | 'tickets' | 'organizer') => {
-    if (!id || busy) return;
+  const openExternal = async () => {
+    if (!id || busy || !confirmedAction) return;
+    const expected = confirmedAction;
     const controller = new AbortController();
     action.current?.abort();
     action.current = controller;
@@ -165,39 +165,24 @@ function Detail({ id }: { id: string | null }) {
     try {
       const current = await eventsGet<EventDetail>(`/${id}`, controller.signal);
       if (controller.signal.aborted) return;
-      const currentActive =
-        current.status === 'PUBLISHED' &&
-        new Date(current.ends_at ?? current.starts_at).getTime() > Date.now();
-      if (kind !== 'organizer' && !currentActive) {
+      const host =
+        current.organizer_id && current.organizer_url == null
+          ? await organizerGet(current.organizer_id, controller.signal)
+          : null;
+      const destination = detailAction(current, host, Date.now());
+      if (
+        !destination ||
+        destination.kind !== expected.kind ||
+        destination.url !== expected.url
+      ) {
         setEvent(current);
-        setTarget(null);
-        throw new Error('Event inactive');
+        if (host) setOrganizer(host);
+        setConfirmedAction(null);
+        throw new Error('Event action changed or unavailable');
       }
-      if (kind === 'calendar') await downloadCalendar(id);
-      else {
-        let url: string | null;
-        if (kind === 'tickets') {
-          url = safeEventLink(current.external_ticket_url);
-          if (current.availability === 'SOLD_OUT' || url !== ticketUrl) {
-            setEvent(current);
-            setTarget(null);
-            throw new Error('Ticket link changed');
-          }
-        } else {
-          const host = current.organizer_id
-            ? await organizerGet(current.organizer_id, controller.signal)
-            : null;
-          url = safeEventLink(current.organizer_url ?? host?.website);
-          if (url !== organizerUrl) {
-            setOrganizer(host);
-            setTarget(null);
-            throw new Error('Organizer link changed');
-          }
-        }
-        if (!url || controller.signal.aborted) throw new Error('Invalid link');
-        await Linking.openURL(url);
-        setTarget(null);
-      }
+      if (controller.signal.aborted) return;
+      await Linking.openURL(destination.url);
+      setConfirmedAction(null);
     } catch {
       if (action.current === controller) setActionError(true);
     } finally {
@@ -205,250 +190,232 @@ function Detail({ id }: { id: string | null }) {
       if (action.current === controller) setBusy(false);
     }
   };
-  if (error)
+  if (error || !event)
     return (
-      <Screen maxWidth={800}>
-        <EventMetadata
-          title={t('events.detailTitle')}
-          description={t('events.detail.unavailable')}
-        />
-        <Alert variant="danger" message={t(`events.detail.${error}`)} />
-        {error === 'error' ? (
-          <Button
-            label={t('events.retry')}
-            variant="secondary"
-            onPress={() => retry((value) => value + 1)}
-          />
-        ) : null}
-        <Link
-          href="/events"
-          style={{
-            ...typography.bodyStrong,
-            color: colors.primary,
-            padding: spacing.space12,
-          }}
-        >
-          {t('events.detail.browse')}
-        </Link>
-      </Screen>
-    );
-  if (!event)
-    return (
-      <Screen>
-        <EventMetadata title={t('events.detailTitle')} description="" />
-        <LoadingState label={t('events.detail.loading')} />
-      </Screen>
-    );
-  let price = t('events.priceUnknown');
-  if (event.price_kind === 'FREE') price = t('events.free');
-  else if (event.currency && event.price_minor !== null) {
-    const format = new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: event.currency,
-    });
-    price = format.format(
-      event.price_minor /
-        10 ** (format.resolvedOptions().maximumFractionDigits ?? 2),
-    );
-  }
-  return (
-    <Screen maxWidth={800}>
-      <Stack.Screen options={{ title: event.title }} />
-      <EventMetadata title={event.title} description={event.description} />
-      {event.status === 'CANCELLED' ? (
-        <Alert variant="warning" message={t('events.detail.cancelled')} />
-      ) : !active ? (
-        <Alert variant="info" message={t('events.detail.ended')} />
-      ) : null}
-      <View
-        style={[
-          styles.hero,
-          { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-        ]}
+      <SafeAreaView
+        edges={['top', 'left', 'right', 'bottom']}
+        style={[styles.root, { backgroundColor: colors.background }]}
       >
-        {event.cover_id && !failedImage ? (
-          <Image
-            source={{ uri: eventImageUri(event.cover_id) }}
-            style={StyleSheet.absoluteFill}
-            resizeMode="cover"
-            accessibilityLabel={event.cover_alt_text ?? event.title}
-            onError={() => setFailedImage(true)}
+        <View style={styles.stateHeader}>
+          <EventBackButton onPress={goBack} />
+        </View>
+        <Screen maxWidth={800}>
+          <EventMetadata
+            title={t('events.detailTitle')}
+            description={error ? t('events.detail.unavailable') : ''}
           />
-        ) : (
-          <View accessible={false}>
-            <SettingsIcon name="calendar" size={48} color={colors.primary} />
-          </View>
-        )}
-      </View>
-      <View style={styles.summary}>
-        <Text style={[styles.badge, { color: colors.primary }]}>
-          {t(`events.categories.${event.category_code}`)} ·{' '}
-          {t(
-            event.alcohol_policy === 'ALCOHOL_FREE'
-              ? 'events.alcoholFree'
-              : 'events.soberFriendly',
-          )}
-        </Text>
-        <Text
-          selectable
-          accessibilityRole="header"
-          style={[styles.title, { color: colors.textPrimary }]}
-        >
-          {event.title}
-        </Text>
-        {event.locale !== (i18n.resolvedLanguage === 'pl' ? 'pl' : 'en') ? (
-          <ReadingText muted>
-            {t(`events.contentLanguage.${event.locale}`)}
-          </ReadingText>
-        ) : null}
-        <ReadingText>
-          {date(event.starts_at, event.timezone)}
-          {event.ends_at ? ` — ${date(event.ends_at, event.timezone)}` : ''}
-        </ReadingText>
-        <ReadingText muted>
-          {t('events.detail.eventZone', { zone: event.timezone })}
-        </ReadingText>
-        <Text style={[styles.price, { color: colors.primary }]}>{price}</Text>
-        {event.availability !== 'UNKNOWN' ? (
-          <ReadingText muted>
-            {t(`events.availability.${event.availability}`)}
-          </ReadingText>
-        ) : null}
-      </View>
-      <Section title={t('events.detail.about')}>
-        <>
-          {event.description_document ? (
-            <RichDocument node={event.description_document} />
-          ) : (
-            <ReadingText>{event.description}</ReadingText>
-          )}
-        </>
-      </Section>
-      <Section title={t('events.detail.soberRules')}>
-        {event.alcohol_policy === 'SOBER_FRIENDLY' ? (
-          <ReadingText muted>{t('events.friendlyHint')}</ReadingText>
-        ) : null}
-        <ReadingText>{event.alcohol_rules}</ReadingText>
-        <ReadingText muted>{event.beverage_notes}</ReadingText>
-      </Section>
-      <Section title={t('events.detail.place')}>
-        <ReadingText>{event.venue_name}</ReadingText>
-        <ReadingText muted>
-          {[event.address, event.city, event.region, event.country_code]
-            .filter(Boolean)
-            .join(', ')}
-        </ReadingText>
-        <ReadingText>
-          {t(`events.accessibilityValues.${event.accessibility}`)}
-        </ReadingText>
-        {event.accessibility_notes ? (
-          <ReadingText muted>{event.accessibility_notes}</ReadingText>
-        ) : null}
-        <ReadingText heading>{t('events.detail.entry')}</ReadingText>
-        <ReadingText>{event.entry_rules}</ReadingText>
-      </Section>
-      <Section title={t('events.detail.organizer')}>
-        <ReadingText>{organizer?.name ?? event.organizer_name}</ReadingText>
-        {organizer ? (
-          <>
-            <ReadingText muted>
-              {t('events.detail.verifiedOrganizer')}
-            </ReadingText>
-            <ReadingText>{organizer.description}</ReadingText>
-            {organizerUrl ? (
-              <Button
-                variant="secondary"
-                label={t('events.detail.organizerWebsite')}
-                onPress={() => {
-                  setActionError(false);
-                  setTarget('organizer');
-                }}
-              />
-            ) : (
-              <ReadingText muted>{t('events.detail.invalidLink')}</ReadingText>
-            )}
-          </>
-        ) : !event.organizer_id ? (
-          organizerUrl ? (
-            <Button
-              variant="secondary"
-              label={t('events.detail.organizerWebsite')}
-              onPress={() => {
-                setActionError(false);
-                setTarget('organizer');
-              }}
-            />
-          ) : null
-        ) : organizerFailed ? (
-          <>
-            <ReadingText muted>{t('events.detail.organizerError')}</ReadingText>
-            <Button
-              variant="tertiary"
-              label={t('events.retry')}
-              onPress={() => retry((value) => value + 1)}
-            />
-          </>
-        ) : (
-          <LoadingState label={t('events.detail.organizerLoading')} />
-        )}
-      </Section>
-      {active && event.organizer_id ? (
-        <ReadingCard>
-          {ticketUrl && event.availability !== 'SOLD_OUT' ? (
+          {error ? (
             <>
-              <Button
-                label={t('events.detail.tickets')}
-                disabled={busy}
-                onPress={() => {
-                  setActionError(false);
-                  setTarget('tickets');
+              <Alert variant="danger" message={t(`events.detail.${error}`)} />
+              {error === 'error' ? (
+                <Button
+                  label={t('events.retry')}
+                  variant="secondary"
+                  onPress={() => retry((value) => value + 1)}
+                />
+              ) : null}
+              <Link
+                href="/events"
+                style={{
+                  ...typography.bodyStrong,
+                  color: colors.primary,
+                  padding: spacing.space12,
                 }}
-              />
-              <ReadingText muted>
-                {t('events.detail.externalCheckout')}
-              </ReadingText>
+              >
+                {t('events.detail.browse')}
+              </Link>
             </>
           ) : (
-            <ReadingText muted>
-              {t(
-                event.availability === 'SOLD_OUT'
-                  ? 'events.availability.SOLD_OUT'
-                  : event.external_ticket_url
-                    ? 'events.detail.invalidLink'
-                    : 'events.detail.noTickets',
-              )}
-            </ReadingText>
+            <LoadingState label={t('events.detail.loading')} />
           )}
-          <Button
-            variant="secondary"
-            label={t('events.detail.calendar')}
-            loading={busy && !target}
-            disabled={busy}
-            onPress={() => {
-              void perform('calendar');
-            }}
-          />
-          <ReadingText muted>{t('events.detail.calendarHint')}</ReadingText>
-        </ReadingCard>
-      ) : null}
-      {actionError ? (
-        <Alert variant="danger" message={t('events.detail.actionError')} />
-      ) : null}
+        </Screen>
+      </SafeAreaView>
+    );
+  const dates = detailDates(event, locale);
+  const place = detailLocation(event, language);
+  const price = detailPrice(event, locale);
+  const preview = isPreviewListing(event);
+  const hostName = organizer?.name?.trim() || event.organizer_name?.trim();
+  const availability =
+    event.availability === 'AVAILABLE' || event.availability === 'SOLD_OUT'
+      ? t(`events.availability.${event.availability}`)
+      : undefined;
+  return (
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      style={[styles.root, { backgroundColor: colors.background }]}
+    >
+      <EventMetadata title={event.title} description={event.description} />
+      <ScrollView
+        testID="event-detail-scroll"
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <EventHero
+          coverId={event.cover_id}
+          alt={event.cover_alt_text?.trim() || event.title}
+          onBack={goBack}
+        />
+        <View
+          style={[
+            styles.body,
+            {
+              backgroundColor: colors.background,
+              paddingHorizontal:
+                width >= 768 ? spacing.space40 : spacing.space24,
+            },
+          ]}
+        >
+          <View style={styles.identity}>
+            <Text
+              selectable
+              accessibilityRole="header"
+              style={[
+                width >= 768 ? typography.display : typography.h1,
+                { color: colors.textPrimary },
+              ]}
+            >
+              {event.title?.trim() || t('events.detailTitle')}
+            </Text>
+            <View style={styles.badges}>
+              <Text
+                style={[
+                  styles.category,
+                  { color: colors.primary, backgroundColor: colors.surfaceAlt },
+                ]}
+              >
+                {t(`events.categories.${event.category_code}`, {
+                  defaultValue: event.category_code,
+                })}
+              </Text>
+            </View>
+            {event.status === 'CANCELLED' ? (
+              <Alert variant="warning" message={t('events.detail.cancelled')} />
+            ) : !eventIsActive(event, now) && !preview ? (
+              <Alert variant="info" message={t('events.detail.ended')} />
+            ) : null}
+          </View>
+          {dates || place || price || availability ? (
+            <View style={[styles.facts, { borderColor: colors.surfaceAlt }]}>
+              {dates ? (
+                <View
+                  style={[
+                    styles.fact,
+                    { flexBasis: width >= 768 ? '40%' : '100%' },
+                  ]}
+                >
+                  <EventInfoRow
+                    icon="calendar"
+                    value={dates.day}
+                    detail={dates.time}
+                  />
+                </View>
+              ) : null}
+              {place ? (
+                <View
+                  style={[
+                    styles.fact,
+                    { flexBasis: width >= 768 ? '40%' : '100%' },
+                  ]}
+                >
+                  <EventInfoRow
+                    icon="location"
+                    value={place.name}
+                    detail={place.detail}
+                  />
+                </View>
+              ) : null}
+              {price || availability ? (
+                <View
+                  style={[
+                    styles.fact,
+                    { flexBasis: width >= 768 ? '40%' : '100%' },
+                  ]}
+                >
+                  <EventInfoRow
+                    icon="arrowUpRight"
+                    label={t('events.detail.admission')}
+                    value={
+                      price === 'FREE'
+                        ? t('events.free')
+                        : (price ?? availability!)
+                    }
+                    detail={price ? availability : undefined}
+                  />
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+          <EventSection title={t('events.detail.about')}>
+            {event.locale !== language ? (
+              <ReadingText muted>
+                {t(`events.contentLanguage.${event.locale}`)}
+              </ReadingText>
+            ) : null}
+            {event.description_document ? (
+              <RichDocument node={event.description_document} />
+            ) : (
+              <ReadingText>
+                {event.description?.trim() ||
+                  t('events.detail.descriptionEmpty')}
+              </ReadingText>
+            )}
+          </EventSection>
+          {hostName ? (
+            <EventOrganizer
+              name={hostName}
+              description={organizer?.description?.trim()}
+              verified={organizer?.verification === 'VERIFIED'}
+            />
+          ) : null}
+          {actionError ? (
+            <Alert variant="danger" message={t('events.detail.actionError')} />
+          ) : null}
+        </View>
+      </ScrollView>
+      <SafeAreaView
+        edges={['bottom']}
+        style={{ backgroundColor: colors.surface }}
+      >
+        <EventActionBar
+          label={
+            nextAction
+              ? t(
+                  nextAction.kind === 'tickets'
+                    ? 'events.detail.getTickets'
+                    : 'events.detail.viewOrganizer',
+                )
+              : undefined
+          }
+          busy={busy}
+          notice={
+            organizerLoading ? t('events.detail.organizerLoading') : undefined
+          }
+          onPress={() => {
+            setActionError(false);
+            setConfirmedAction(nextAction);
+          }}
+        />
+      </SafeAreaView>
       <Dialog
-        visible={Boolean(target && destination)}
+        visible={Boolean(confirmedAction)}
         title={t('events.detail.externalTitle')}
         closeLabel={t('events.close')}
         onClose={() => {
-          action.current?.abort();
+          const pending = action.current;
+          action.current = null;
+          pending?.abort();
           setBusy(false);
-          setTarget(null);
+          setConfirmedAction(null);
         }}
       >
         <ReadingText>
           {t('events.detail.externalHost', {
-            host: destination ? new URL(destination).hostname : '',
+            host: confirmedAction ? new URL(confirmedAction.url).hostname : '',
           })}
         </ReadingText>
+        <ReadingText muted>{t('events.detail.externalNotice')}</ReadingText>
         {actionError ? (
           <Alert variant="danger" message={t('events.detail.actionError')} />
         ) : null}
@@ -456,33 +423,55 @@ function Detail({ id }: { id: string | null }) {
           label={t('events.detail.continue')}
           loading={busy}
           onPress={() => {
-            if (target) void perform(target);
+            void openExternal();
           }}
         />
       </Dialog>
-    </Screen>
-  );
-}
-function Section({ title, children }: PropsWithChildren<{ title: string }>) {
-  return (
-    <ReadingCard>
-      <ReadingText heading>{title}</ReadingText>
-      {children}
-    </ReadingCard>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
-  hero: {
+  root: { flex: 1 },
+  scroll: { flex: 1 },
+  scrollContent: {
     width: '100%',
-    aspectRatio: 16 / 8,
-    borderWidth: 1,
-    borderRadius: radii.lg,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    maxWidth: 1120,
+    alignSelf: 'center',
+    flexGrow: 1,
   },
-  summary: { gap: spacing.space8 },
-  title: { ...typography.h2 },
-  price: { ...typography.h3 },
-  badge: { ...typography.label },
+  stateHeader: { padding: spacing.space16 },
+  body: {
+    width: '100%',
+    maxWidth: 992,
+    alignSelf: 'center',
+    paddingTop: spacing.space24,
+    paddingBottom: spacing.space40,
+    gap: spacing.space32,
+    marginTop: -spacing.space24,
+    borderTopLeftRadius: radii.xl,
+    borderTopRightRadius: radii.xl,
+  },
+  identity: { gap: spacing.space16 },
+  badges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.space12,
+    alignItems: 'center',
+  },
+  category: {
+    ...typography.label,
+    paddingVertical: spacing.space4,
+    paddingHorizontal: spacing.space12,
+    borderRadius: radii.pill,
+    overflow: 'hidden',
+  },
+  facts: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: spacing.space24,
+    paddingVertical: spacing.space8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  fact: { flexGrow: 1, minWidth: 0 },
 });

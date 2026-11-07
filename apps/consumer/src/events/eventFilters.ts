@@ -55,7 +55,7 @@ export function eventFilterQuery(input: EventFilters): string {
     throw new Error('A past range needs a start');
   if (input.cityId && !input.countryId) throw new Error('Country required');
   const params = new URLSearchParams();
-  if (!from && !to) params.set('dateScope', 'ANY');
+  params.set('dateScope', 'UPCOMING');
   if (input.name.trim()) params.set('q', input.name.trim());
   if (input.countryId) params.set('countryId', input.countryId);
   if (input.cityId) params.set('cityId', input.cityId);

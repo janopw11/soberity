@@ -17,7 +17,7 @@ export default function EventsLayout() {
           headerTitle: () => <EventsTitle />,
         }}
       />
-      <Stack.Screen name="[id]" options={{ title: t('events.detailTitle') }} />
+      <Stack.Screen name="[id]" options={{ headerShown: false }} />
     </Stack>
   );
 }

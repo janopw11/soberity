@@ -22,6 +22,7 @@ describe('event filter contract', () => {
       'category',
       'cityId',
       'countryId',
+      'dateScope',
       'from',
       'q',
       'to',
@@ -114,10 +115,10 @@ describe('date presets and applying filter drafts', () => {
       new URLSearchParams(eventFilterQuery(initialEventFilters)).get(
         'dateScope',
       ),
-    ).toBe('ANY');
+    ).toBe('UPCOMING');
     expect(
-      new URLSearchParams(eventFilterQuery(applied)).has('dateScope'),
-    ).toBe(false);
+      new URLSearchParams(eventFilterQuery(applied)).get('dateScope'),
+    ).toBe('UPCOMING');
   });
   it('requires complete valid custom bounds', () => {
     for (const dates of [

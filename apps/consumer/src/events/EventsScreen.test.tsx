@@ -3,12 +3,28 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { render } from '../test-utils';
 import EventsScreen from './EventsScreen';
 
+jest.mock('react-native-safe-area-context', () =>
+  jest.requireActual('react-native-safe-area-context/jest/mock'),
+);
+
 const mockGet =
   jest.fn<(path: string, signal?: AbortSignal) => Promise<unknown>>();
 jest.mock('./eventsApi', () => ({
   ...jest.requireActual<typeof import('./eventsApi')>('./eventsApi'),
   eventsGet: (path: string, signal: AbortSignal) => mockGet(path, signal),
 }));
+jest.mock('./EventLocationContext', () => {
+  const enterEvents = () => {};
+  const leaveEvents = () => {};
+  return {
+    useEventLocation: () => ({
+      enabled: false,
+      currentLocation: null,
+      enterEvents,
+      leaveEvents,
+    }),
+  };
+});
 jest.mock('expo-router', () => {
   const React = jest.requireActual<typeof import('react')>('react');
   return {
@@ -54,7 +70,7 @@ describe('Sober Events draft/applied filters', () => {
       expect(screen.getByText('No events found')).toBeTruthy(),
     );
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(query().get('dateScope')).toBe('ANY');
+    expect(query().get('dateScope')).toBe('UPCOMING');
     await open();
     await fireEvent.changeText(screen.getByLabelText('Event name'), '  RaVe  ');
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -80,6 +96,7 @@ describe('Sober Events draft/applied filters', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Next' }));
     await waitFor(() => expect(query().get('page')).toBe('1'));
     expect(query().get('q')).toBe('rave');
+    expect(query().get('dateScope')).toBe('UPCOMING');
     await open();
     await fireEvent.changeText(
       screen.getByLabelText('Event name'),
@@ -100,6 +117,7 @@ describe('Sober Events draft/applied filters', () => {
     );
     expect(query().get('page')).toBe('0');
     expect(query().has('q')).toBe(false);
+    expect(query().get('dateScope')).toBe('UPCOMING');
   });
   it('applies chips immediately and synchronizes the advanced multi-select without losing name filters', async () => {
     await render(<EventsScreen />);

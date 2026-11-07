@@ -1,70 +1,67 @@
-# Manual event editor — scoped P2-I04 work
+# Admin event editor — P2-I04
 
-Prepared2026-11-04. **NOT VERIFIED** at the owner's request: no tests/builds,
-typecheck, API/browser/simulator checks, migrations or backend restart.
+Updated 2026-11-06. Web entry: **Profile → Events panel** (`/editorial-events`).
+The panel uses `/api/v1/admin/events` for listing, media, creation, editing,
+publication and deletion. An Events administrator needs no organizer account,
+organizer verification or independent event review in the curated stage.
 
-## Entry and fields
+## Access
 
-Web: **Profile → Events panel** (`/editorial-events`), alongside existing article,
-weekly-feature and quiz editorial entries. Entry follows existing editorial
-membership visibility; the authenticated route and every API operation enforce
-identity and organizer membership separately. Use an existing own organizer or
-create one with name/about/HTTPS website/private contact email. An unverified
-host can save drafts; host verification is required before submission.
+Every operation checks the verified Firebase identity and an active `events_admin`
+grant. Article AUTHOR/REVIEWER and event organizer/moderator roles do not imply
+this grant. Profile checks Events access independently from editorial roles;
+direct navigation as a non-admin displays an access error without edit actions.
+Grant the intended verified UID through the operator workflow documented in
+`LOCATIONS_IMPORT.md`. Never promote all authors or expose self-assigned roles.
+The old organizer/moderation endpoints remain blocked.
 
-Main event fields: name, Tiptap description (bold/italic/underline, headings,
-bullets/numbers and text alignment), photo with alt text, HTTPS organizer URL.
-Existing Tiptap dependencies and Ocean semantic tokens are reused. Photos use
-existing member-only upload/preview, normalized JPEG1600×900,5MB limit; object URLs
-are revoked on replacement/unmount. No remote-image fetching or inline images.
+## Creation and publication
 
-Catalog requires real dates, IANA timezone, category, venue/address/city/country,
-price kind, alcohol/beverage/entry rules and private source confirmation. These
-are grouped below the main fields. Unknown price stays UNKNOWN; alcohol controls
-are never assumed false without confirmation. Permissions attestation and human
-review still gate publication. No fake dates, venues, policy assertions or prices
-are invented to bypass the data model. Save draft validates the existing required
-event fields; it is not a four-field incomplete-draft persistence API.
+Select country, then city from the global location catalog. Text search never
+becomes a location ID; changing country clears city. Reopening restores record
+labels, region and district. Optional venue name/address refine the city; existing
+exact venue coordinates are preserved when editing within the same city.
 
-Library lists own events, paginated50/page, with status and reopening for edit.
-Organization pages are likewise bounded50/page. Saving appends an immutable
-revision and uses expectedVersion. Existing accessibility/availability/locale
-values are preserved on edits. Venue changes create new immutable venue snapshots;
-unchanged venues are reused. Exact owned-venue lookup avoids assuming a venue is
-on the first page. Unsaved descriptions have a before-unload warning. Events can
-be sent for review after saving; no self-verification/approval/publish bypass was
-introduced. Existing independent moderator API remains responsible for approval
-and publication; no moderation UI or public organizer-profile page is claimed.
-The rest of P2-I04 remains open.
+Complete title, rich description, HTTPS organizer and source URLs, start, IANA
+timezone, category, source confirmation, alcohol/beverage rules and a cover photo.
+End is optional; entered times follow the device timezone as explained in the
+form, while the event's IANA timezone controls public display. JPEG/PNG uploads
+require alt text, max 5 MB; the server normalizes images. Source/content-rights,
+strict no-sale/service/BYOB and checked beverage/ABV statements are explicit.
+No organization, pricing or organizer-verification form is required by this API.
 
-## V18 contract
+Save draft, then **Publish event**. Changes to a published event withdraw it to
+DRAFT until republished. Version guards reject stale writes. The library is
+paginated at 20 per page. Country/city library filters are independent from the
+event form and are applied on the server before count and pagination. Changing
+country clears city; changes reset the page. Clear location restores the entire
+library. Rows show localized city/country names.
 
-`events_revision.description_document` nullable JSONB and `organizer_url` optional
-HTTPS field. Organizer EventInput additionally accepts `descriptionDocument`
-(Tiptap JSON) and `organizerUrl`. Existing clients can omit both. Documents pass
-existing server BlogDocument allowlist/depth/complexity checks, exclude embedded
-images and require nonempty text, max30000 plain characters/200000 serialized
-characters. No arbitrary HTML is persisted. Private revision/public detail decode
-JSON to structured content; public list avoids sending the full rich document.
-Public detail renders RichDocument with plain-text fallback for older records.
-Calendar/metadata retain plain text. The event-specific organizer URL is rechecked
-on external navigation; organization website remains fallback for older records.
+The web panel has its own bounded, keyboard-focusable vertical scroll container
+inside the app layout. Switching between library and form scrolls to the top.
 
-`GET /api/v1/organizer/organizations/{org}/venues/{venue}` is member-only and
-returns only a venue owned by that organization, otherwise404. Private contact
-and evidence data remain excluded from public projections.
+Delete requires confirmation, uses expectedVersion,
+refreshes the library and removes the event from public projections. Catalog,
+Home and details already reload on route focus; requests do not cache private
+responses. Joined remains deferred to P2-I05.
 
-Activation requires pending V17 plus V18 and a backend rebuild/restart by the
-owner; none performed here. Native editing shows the same web-only message as
-the existing article editor; native public event reading retains formatting.
+Descriptions keep the existing Tiptap editor. The curated API validates structured
+JSON with BlogDocument, rejects embedded images/unsupported nodes and stores it
+with the immutable revision. Private/public detail decode JSONB into structured
+JSON for reopening and reading. No migration was required.
 
-## Acceptance handoff — NOT EXECUTED
+Native editing remains web-only, as before. This repair does not claim native
+editor support or a complete P2-I04 acceptance.
 
-Owner: open Profile → Events panel, create/select own organizer, add real fields
-and photo, save/reopen/edit rich content, submit after host verification. Check
-formatting in public details only after independent publication; cross-organizer
-venue/media ACL, stale-version conflict, changed published content hiding until
-review, image failures/size/alt, UTF-8, EN/PL/Ocean themes/mobile web, DST and price
-validation, unsaved content and object-URL lifecycle. Verify V18 on existing/plain
-records and direct API invalid document/link inputs. No results claimed.
-CHANGELOG deferred until verification; P2-I04 checkboxes remain open.
+## Verification
+
+See PHASES.md for the actual test results and remaining acceptance work. Backend
+lifecycle/ACL tests use isolated PostgreSQL and mocked verified identities; browser
+editor tests use controlled API fixtures and do not log in as the owner's account.
+The owner's email was matched against development Firebase before provisioning
+its local PostgreSQL grant. No production role or Firebase account was modified.
+
+The scrolling/location-filter correction on 2026-11-06 is NOT VERIFIED: the owner
+requested no tests. Only formatting and a backend package/restart with test
+execution and test compilation disabled were performed. Previous test results
+cover the earlier admin-access repair, not this follow-up.

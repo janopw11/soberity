@@ -12,4 +12,4 @@ public record CuratedEventInput(Integer expectedVersion,UUID countryId,UUID city
         @JsonFormat(without=JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE) OffsetDateTime startsAt,
         @JsonFormat(without=JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE) OffsetDateTime endsAt,String timezone,
         String alcoholRules,AlcoholControls controls,String beverageNotes,Boolean beverageRulesConfirmed,
-        String sourceUrl,String sourceReference,Boolean contentRightsAttested) { }
+        String sourceUrl,String sourceReference,Boolean contentRightsAttested,tools.jackson.databind.JsonNode descriptionDocument) { }

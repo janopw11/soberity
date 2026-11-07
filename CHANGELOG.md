@@ -1,3 +1,7 @@
+## 2026-11-06
+
+- Naprawiono panel wydarzeń administratora (P2-I04): używa API admina zamiast zablokowanego API organizatora. Dodawanie, edycja, bezpośrednia publikacja i usuwanie z potwierdzeniem nie wymagają konta ani weryfikacji organizatora. Globalny wybór kraj → miasto, opcjonalny koniec, rich opis, EN/PL i niezależny dostęp w Profilu. Zweryfikowano konto właściciela w development Firebase i nadano lokalny grant Events admin; backend zrestartowany bez nowych migracji. Backend: 34 unit/architecture i 13 IT PASS; web z kontrolowanym API: 10/10 desktop/mobile, EN/PL, light/dark PASS; lint/format PASS. Pełny typecheck blokuje wcześniejszy błąd SideMenu.tsx:163. Natywne runtime i pełny odbiór P2-I04 pozostają otwarte.
+
 ## 2026-11-05
 
 - Lokalny backend: przywrócono API na `localhost:8090`, zgodnie z konfiguracją klienta, po błędzie „We can't confirm your session” spowodowanym brakiem procesu na tym porcie. Build aplikacji PASS; Flyway zastosował zaległe lokalne V17–V20. Readiness 200/UP, publiczny katalog 200, CORS dla web 8081 PASS, brak/niepoprawny token 401. Bez zmian kodu uwierzytelniania, kont użytkowników ani produkcji; sesja właściciela wymaga ponowienia w jego przeglądarce.

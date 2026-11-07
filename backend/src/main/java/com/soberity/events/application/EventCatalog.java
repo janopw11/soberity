@@ -57,8 +57,9 @@ public class EventCatalog {
     }
     public Map<String,Object> search(Search input,List<Category> categories,DateScope dateScope) {
         pagination(input.page(),input.size());locale(input.locale());
-        Instant from=input.from()==null && dateScope!=DateScope.ANY?Instant.now():input.from();
-        if(from!=null && input.to()!=null&&!input.to().isAfter(from))throw bad("Search end must follow start.");
+        if(input.from()!=null && input.to()!=null&&!input.to().isAfter(input.from()))throw bad("Search end must follow start.");
+        Instant from=input.from(),now=Instant.now();
+        if(dateScope!=DateScope.ANY && (from==null || from.isBefore(now)))from=now;
         var args=new ArrayList<Object>();var where=new StringBuilder(ELIGIBLE);
         add(where,args,"r.starts_at>=?",from==null?null:Timestamp.from(from));
         add(where,args,"r.starts_at<?",input.to()==null?null:Timestamp.from(input.to()));
@@ -94,7 +95,10 @@ public class EventCatalog {
     public Map<String,Object> detail(UUID id) {
         var rows=jdbc.queryForList("SELECT "+FIELDS+JOIN+" WHERE e.id=? AND "+ELIGIBLE,id);
         if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event unavailable.");
-        return rows.getFirst();
+        var result=new LinkedHashMap<>(rows.getFirst());
+        if(result.get("description_document")!=null)
+            result.put("description_document",tools.jackson.databind.json.JsonMapper.builder().build().readTree(result.get("description_document").toString()));
+        return result;
     }
     public List<Map<String,Object>> categories(){return jdbc.queryForList("SELECT code,track,label_en,label_pl FROM events_category ORDER BY track,code");}
     public boolean publicMedia(UUID id){return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 "+JOIN+" WHERE r.cover_id=? AND "+ELIGIBLE+")",Boolean.class,id));}

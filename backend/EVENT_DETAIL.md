@@ -1,5 +1,25 @@
 # P2-I03 — Event detail, external checkout & links
 
+## Current presentation — 2026-11-06
+
+The redesign uses an immersive cover with floating back control, title/category,
+icon-led metadata, an unboxed editorial description, optional real organizer
+details, and one bottom action outside the scroll area. Reusable presentation
+components live in EventDetailParts.tsx; data formatting/action selection lives
+in eventDetailPresentation.ts. Ocean themes, EN/PL, route IDs, API reads and
+external-link revalidation are retained.
+
+Owner follow-up: category pill sits below the title; the primary action reads
+Tickets / Bilety for either existing external destination. Link selection and
+confirmation are unchanged. No tests or scripts were run for this copy/order edit.
+
+Latest owner correction removes the separate Preview/test banner, alcohol-free
+indicator, When/Where labels and the destination hostname in the bottom bar.
+Original descriptions remain intact. The external confirmation dialog still
+shows its destination. Test/preview classification still prevents misleading
+ticket actions. No tests or scripts were run after that correction. Current
+layout/native behavior remains NOT VERIFIED; CHANGELOG is deferred.
+
 Prepared 2026-11-04, **NOT VERIFIED**. No tests, typecheck, compilation, API
 requests, browser/simulator checks, migration execution or restart were performed.
 P2-I01/V17 and P2-I02 remain unverified dependencies; this iteration does not
@@ -17,16 +37,19 @@ Guests retain public access through the existing auth shell; authenticated users
 retain menu/profile/back controls. No new universal/app links or domain ownership
 claims have been configured.
 
-Detail shows the real cover/fallback, title/category/policy, start/end in the
-IANA event timezone (including dates on both sides of midnight), price in currency
-minor units, description, alcohol/beverage rules, venue/address/accessibility,
-entry rules and verified organizer data. No contact email or moderation evidence
-is exposed. Organizer data failure does not hide the event. No organizer portal
-or separate organizer-profile route from P2-I04 was introduced.
+Current layout (owner request 2026-11-06): cover/fallback first, event title
+without a Name label, event dates without an explicit timezone label, **About
+event** and its rich/plain description, then **Check organizer page**. EN/PL use
+shared Ocean components. Dates still format in the event's IANA timezone.
+Price/availability, category/policy badge, alcohol/drinks, venue/accessibility/entry
+sections and the organizer profile are omitted. The simplified page has one
+external organizer action; legacy checkout/calendar controls are not shown.
+The underlying event data, validation and calendar API remain unchanged.
+The organizer button is disabled for missing/invalid URLs; legacy organizer
+lookup is used only when the event has no organizer URL.
 
 Cancelled events show their last published snapshot with a cancellation notice;
-ended events show an ended notice. Calendar and checkout actions are omitted for
-both, and checkout is omitted for SOLD_OUT/missing/invalid links. Unpublished,
+ended events show an ended notice. Organizer links can still be checked. Unpublished,
 suspended and expired public records retain the API's404 boundary. Fetches use
 timeouts, cleanup/abort and refetch on focus, with unavailable/error/retry states.
 
@@ -38,10 +61,10 @@ arbitrary client redirect parameters are rejected. A dialog shows the normalized
 destination hostname before opening the OS browser. The application does not
 implement an open redirect endpoint or relay authentication tokens to sellers.
 
-Before an action, details are fetched again through the public API. Ticket links
-must still match the displayed destination, the event must still be published,
-not ended or sold out; organizer URLs are likewise fetched again. A changed
-link requires a fresh user action. Browser/OS failures produce a localized error.
+Before opening the organizer page, details are fetched again through the public
+API, with an organizer lookup only for the legacy website fallback. The URL must
+still match the displayed destination. A changed link refreshes the event and
+requires a fresh user action. Browser/OS failures produce a localized error.
 This does not guarantee the availability, expiry or redirect behavior of an
 external website, or guarantee seats after click-through; the provider controls
 checkout. No payment integration or transaction is performed by this iteration.
@@ -56,7 +79,8 @@ line injection, folded to75 UTF-8 octets without splitting Unicode code points,
 and separated with CRLF. Description and location use public content only;
 private contact/source data, alarms and external executable fields are omitted.
 
-Web fetches the attachment and starts an ICS download. Native opens the configured
+Existing calendar helpers (not exposed by the simplified detail page): web
+fetches the attachment and starts an ICS download. Native opens the configured
 API attachment URL in the OS/browser import flow. This is calendar-file export,
 not direct insertion into Apple/Google calendars; app/browser import support
 requires owner acceptance. No calendar permission, background synchronization,
@@ -103,3 +127,11 @@ and Ocean light/dark. All remain NOT VERIFIED, as do tests/builds/typecheck.
 Separate owner tweak: Articles week-star badge visual reduced to36×28 minimum
 with a16px icon, retaining a48×44 target and the existing popover. Not verified.
 CHANGELOG is deferred until actual verification.
+
+## Layout follow-up — 2026-11-06
+
+The simplified layout is NOT VERIFIED. No tests, lint, typecheck, builds, API
+requests, browser/native checks, migrations or restarts were run for this
+follow-up, following the owner’s continuing no-tests instruction. Only source
+edits and formatting were performed. Earlier acceptance notes describe the
+historical scope and do not verify this layout. CHANGELOG is deferred.

@@ -870,6 +870,8 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Dowód:** `apps/consumer/app/events/{_layout,index,[id]}.tsx`, `apps/consumer/src/events/EventDetailScreen.tsx`, `EventCard.tsx`, `eventsApi.ts`, `calendarDownload.ts`/`.web.ts`, `EventMetadata.tsx`/`.web.ts`, EN/PL, `EventCalendar.java`, publiczny kontroler/SecurityConfig, `backend/EVENT_DETAIL.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** aktywacja backendu i V17 oraz rzeczywisty odbiór pozostają do wykonania. Na polecenie właściciela bez testów/buildów/typecheck, API/przeglądarki/symulatorów, migracji i restartów. T01–T04/V01/V02 otwarte. SEO produkcyjne wymaga finalnego origin i hostingu; T04 określa minimum, nie deklaruje indeksowania.
 
+**Uproszczenie szczegółów 2026-11-06 — NOT VERIFIED:** na polecenie właściciela zdjęcie/fallback jest pierwszym elementem treści, następnie tytuł bez etykiety Name, daty bez jawnej etykiety strefy, sekcja About event / O wydarzeniu z opisem rich/plain oraz Check organizer page / Sprawdź stronę organizatora. Usunięto cenę/availability, badge kategorii/polityki, sekcje alkoholu/napojów, miejsca/accessibility/wstępu i profil organizatora; uproszczony bieżący widok nie pokazuje dawnych akcji checkout/kalendarz. Dane i API tych funkcji pozostają bez zmian. CTA używa istniejącego URL, HTTPS, potwierdzenia domeny i ponownego odczytu eventu; legacy fallback organizatora tylko przy braku event-specific URL. EN/PL i wspólne tokeny; brak nowych zależności. Bez testów, lint/typecheck/build i kontroli runtime zgodnie z utrzymanym poleceniem właściciela; wykonano wyłącznie formatowanie. Checkboxy/Finished bez zmian, CHANGELOG bez nowego wpisu do odbioru.
+
 **Implementacja 2026-11-04:** szczegóły rzeczywistego publicznego wydarzenia, zdjęcie/fallback, opis, daty/strefa, cena, zasady sober/napojów, miejsce i dostępność, zasady wstępu i zweryfikowany organizator. Całe karty prowadzą do /events/{UUID}, web href i native route w istniejącym scheme. Invalid ID/404, ładowanie, błędy i ponowienie; cancelled/ended oznaczone bez zakupu/kalendarza. Linki HTTPS bez credentials/control characters, dialog z domeną, ponowny odczyt aktualnego eventu/organizatora i porównanie celu; brak dowolnego redirect parametru. Eksport .ics przez publiczny endpoint: aktualna kwalifikacja, 410 dla cancelled/ended, UTC, UTF-8 fold/escape/CRLF, no-store, import bez uprawnień do kalendarza; native otwiera attachment w OS/browser, bez deklaracji bezpośredniego zapisu. Minimalny kontrakt SEO w EVENT_DETAIL.md, runtime title/description i noindex do przygotowania serwerowego renderowania/hostingu. EN/PL, oba motywy. Bez następnej P2-I04 i płatności. Dodatkowa korekta właściciela: wizualny pill gwiazdki Articles mniejszy (36×28, ikona16), target48×44 i popover zachowane. CHANGELOG odroczony do odbioru.
 
 **Zakres zadań:**
@@ -889,10 +891,14 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I04 — Admin event creation & deletion
 
-**Status:** IN_PROGRESS — częściowy zakres panelu na polecenie właściciela; NOT VERIFIED  
+**Status:** IN_PROGRESS — panel dostosowany do API admina 2026-11-06; pełny odbiór P2-I04 pozostaje otwarty
 **Started:** 2026-11-04  
 **Finished:** —  
-**Zależności iteracji:** P2-I00/P2-I01 DONE dla etapu 1 (2026-11-05). Historyczny panel z 2026-11-04 wymaga dostosowania do nowych endpointów admin-only i globalnego wyboru kraj/miasto po osobnym poleceniu P2-I04.
+**Zależności iteracji:** P2-I00/P2-I01 DONE dla etapu 1 (2026-11-05). Panel z 2026-11-04 dostosowano na polecenie właściciela 2026-11-06 do endpointów admin-only i globalnego wyboru kraj/miasto; pełny odbiór poniżej pozostaje otwarty.
+
+**Korekta formularza i biblioteki 2026-11-06 — NOT VERIFIED:** na polecenie właściciela dodano własny obszar przewijania panelu z ograniczoną wysokością/min-height0, dostępem klawiaturą i powrotem na górę przy zmianie formularz ↔ lista. Biblioteka ma niezależne filtry kraj → miasto z resetem strony i filtra; lista pokazuje miasto/kraj EN/PL, także osobny pusty stan. API admina przyjmuje countryId/cityId, sprawdza aktywne rekordy/parę i filtruje parametryzowanym SQL przed count/paginacją. Filtry pozostają dostępne przy błędzie odczytu. Bez nowych testów, lint/typecheck i kontroli runtime na polecenie właściciela; wykonano formatowanie i build backendu z pominięciem testów oraz ich kompilacji, lokalny restart na8090. Brak nowych migracji/zmian produkcyjnych. Wcześniejsze wyniki poniżej nie weryfikują tej korekty; bez nowych zaliczonych checkboxów i bez zamknięcia iteracji. CHANGELOG bez nowego wpisu do rzeczywistego odbioru.
+
+**Naprawa dostępu administratora 2026-11-06:** na polecenie właściciela panel przełączono z zablokowanego `/organizer` na `/admin/events`: biblioteka, zdjęcia, szkic/edycja, bezpośrednia publikacja i usunięcie z potwierdzeniem/expectedVersion. Bez konta ani weryfikacji organizatora; kraj → miasto przez wspólny LocationSelect, koniec/miejsce/adres opcjonalne, EN/PL i tokeny Ocean. Dostęp do pozycji Profil sprawdzany niezależnie od roli autora artykułów; odmowa dostępu ukrywa akcje. Rich JSON w curated API walidowany i dekodowany również w publicznym szczególe. Email wskazany przez właściciela dopasowano przez development Firebase; nadano wyłącznie jego lokalny grant events_admin. Backend lokalny przebudowany i zrestartowany na8090, bez nowych migracji (V23); readiness200/UP, anonimowy admin API401. Testy: 34 unit/architecture PASS oraz końcowy CuratedEventsApiIT13/13 PASS na izolowanym PostgreSQL. Lint zmienionego klienta PASS; typecheck blokuje istniejący `SideMenu.tsx:163` (TS2339, plik bez zmian). Playwright z kontrolowanym API:10/10 PASS (EN/PL × light/dark × desktop/mobile-web, tworzenie/publikacja/usunięcie oraz odmowa zwykłemu autorowi); wizualnie sprawdzono zrzuty desktop/mobile. Formatowanie i git diff --check PASS. Natywne runtime tej korekty NOT VERIFIED, edycja nadal web-only. Zaliczone T02 i V01; Finished bez zmian, pełny DoD niezaliczony.
 **Dowód:** `apps/consumer/src/events/EventEditorScreen.web.tsx`, `eventEditorApi.ts`, route `editorial-events`, wejście Profil, EN/PL; V18, EventInputs/Service/Catalog, member-only venue GET, formatowanie w EventDetailScreen; `backend/EVENT_EDITOR.md`.  
 **Blokery historycznej implementacji (stan 2026-11-04; aktualny zakres powyżej):** V17/V18 i backend wymagają aktywacji. Bez testów/buildów/typecheck, API/UI/migracji/restartów na polecenie właściciela. Publiczny profil organizatora i UI moderacji nie są wykonane w tym zawężonym zadaniu; istniejące API moderacji pozostaje. Checkboxy otwarte.
 
@@ -901,7 +907,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Zakres zadań:**
 
 - [ ] `P2-I04-T01` **ODŁOŻONE:** publiczny profil organizatora.
-- [ ] `P2-I04-T02` Dostosuj istniejący panel do dodawania i publikowania eventów przez admina: nazwa, lokalizacja, opis, link do strony organizatora, zdjęcie, data/godzina/strefa i typ. Bez wymogu osobnego konta/organizacji i wieloetapowego zgłaszania do moderacji.
+- [x] `P2-I04-T02` Dostosuj istniejący panel do dodawania i publikowania eventów przez admina: nazwa, lokalizacja, opis, link do strony organizatora, zdjęcie, data/godzina/strefa i typ. Bez wymogu osobnego konta/organizacji i wieloetapowego zgłaszania do moderacji.
 - [ ] `P2-I04-T03` **ODŁOŻONE:** osobny portal moderacji zatwierdź/odrzuć/ukryj zgłoszeń organizatorów. Audyt adminowego dodania/usunięcia pozostaje obowiązkowy w T05.
 - [ ] `P2-I04-T04` **ODŁOŻONE:** samoobsługa roli ORGANIZER. Uprawnienia nowego panelu i API admina egzekwuj przez T07, niezależnie od dotychczasowego organizer ACL.
 - [ ] `P2-I04-T05` Dodaj listę eventów i usunięcie konkretnego wpisu przez admina z potwierdzeniem i audytem. Po usunięciu odśwież listę i unieważnij dane katalogu, Home, szczegółów oraz Joined.
@@ -910,7 +916,7 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Weryfikacja:**
 
-- [ ] `P2-I04-V01` Testy nieautoryzowanego dodawania/publikacji/usuwania, ukrytych eventów i eskalacji roli; także przez dotychczasowe API organizatorów.
+- [x] `P2-I04-V01` Testy nieautoryzowanego dodawania/publikacji/usuwania, ukrytych eventów i eskalacji roli; także przez dotychczasowe API organizatorów.
 - [ ] `P2-I04-V02` E2E admin → wybór kraju/miasta → uzupełnienie wymaganych pól → publikacja → widoczność w katalogu/szczegółach → usunięcie → brak wpisu w katalogu/Home i obsługa starego linku (Joined sprawdzane w P2-I05/P2-I06). Sprawdź walidację, EN/PL, a11y i responsywność panelu web; publiczny odczyt także na dostępnych platformach natywnych.
 
 **Definition of Done:** Administrator dodaje i publikuje podstawowy sober event oraz usuwa wybrany wpis; zwykły użytkownik nie ma tych uprawnień. Globalna lokalizacja i wymagane pola działają bez procesu samoobsługi organizatorów. Każdy obowiązkowy punkt ma dowód.
@@ -2237,6 +2243,20 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+**2026-11-07 — dokumentacja uruchomienia:** dodano `RUN.md` z komendami web/iOS/Android, lokalnego helpera backendu z PostgreSQL i alternatywnego pełnego Compose z Auth emulator. Zadanie dokumentacyjne poza iteracją; statusy i checkboxy P2-I03/P2-I04 bez zmian. Komendy porównano ze skryptami i konfiguracją repozytorium; bez uruchamiania usług i testów runtime. CHANGELOG bez wpisu: drobna dokumentacja. Następny krok: odbiór P2-I03/P2-I04 zgodnie z poleceniem właściciela.
+
+**P2-I03 — wyśrodkowany CTA (2026-11-06):** EventDetailParts bez Continue the experience, przycisk Tickets/Bilety wyśrodkowany i poszerzony do360px (maksymalnie dostępna szerokość). Bez testów/skryptów na polecenie właściciela; NOT VERIFIED. CHANGELOG odroczony do odbioru. Następny krok: ręczny odbiór P2-I03.
+
+**P2-I03 — kolejność i CTA (2026-11-06):** pill kategorii przeniesiony poniżej tytułu; główny przycisk Tickets / Bilety z zachowaniem dotychczasowego URL i potwierdzenia. Bez testów i skryptów na polecenie właściciela; NOT VERIFIED, checkboxy bez zmian. CHANGELOG bez wpisu: drobna nieweryfikowana korekta. Następny krok: ręczny odbiór P2-I03.
+
+**Korekta redesignu P2-I03 (2026-11-06):** hero z przyciskiem Back, kategoria/tytuł, lekkie metadane, opis bez ramki, opcjonalny organizator i dolna akcja. Na najnowsze polecenie usunięto banner Preview/test, informację alcohol-free, etykiety When/Where i domenę z dolnego paska. Zachowany tekst opisu oraz potwierdzenie domeny w dialogu linku. Bez uruchamiania testów i skryptów po tym poleceniu; bieżący UI/native NOT VERIFIED. Następny krok: ręczny odbiór P2-I03, bez zamknięcia iteracji.
+
+**Najnowsza korekta P2-I03 (2026-11-06):** uproszczono szczegóły wydarzenia do zdjęcia, tytułu/dat, About event i przycisku strony organizatora. EN/PL i wspólne komponenty; NOT VERIFIED, bez testów na polecenie właściciela. Następny krok: ręczny odbiór P2-I03; nie zamknięto P2-I04 ani nie rozpoczęto P2-I05.
+
+**Najnowsza korekta P2-I04 (2026-11-06):** przewijanie panelu i filtrowanie biblioteki wydarzeń po kraju/mieście wdrożone; build backendu bez testów PASS, reszta NOT VERIFIED na polecenie właściciela. Następny krok: ręczny odbiór przewijania i filtrów P2-I04; bez startu P2-I05.
+
+**2026-11-06 — P2-I04:** naprawiono lokalny dostęp admina i panel tworzenia/publikacji/usuwania bez organizacji. Zweryfikowane T02/V01; API13/13, web10/10, lint i format PASS. Pozostaje pełny odbiór P2-I04 (realny przebieg UI → backend, pozostałe checkboxy, natywne publiczne odczyty); typecheck blokuje istniejący SideMenu.tsx:163. Nie rozpoczęto P2-I05.
+
 Decyzja właściciela: tymczasowo ukryte Flashcards w menu Science i link na LearningScreen; widoczne opisy bez promowania fiszek. Implementacja, trasa, treść i postęp pozostają zachowane. NOT VERIFIED; bez testów i dodatkowych kontroli.
 
 About us — usunięta końcowa sekcja Understand more / Experience more na polecenie właściciela. Pozostały Kim jesteśmy? i rozwijane założenia. NOT VERIFIED; bez testów i dodatkowych kontroli.
@@ -2316,6 +2336,12 @@ Bieżąca korekta P2-I02 (2026-11-05): profil — ikona i etykieta, Switch, „?
 - **CHANGELOG.md:** wpis P2-I02 pod 2026-11-05, z wynikami oraz ograniczeniem Androida.
 
 # 6. Dziennik sesji agenta (dopisuj po każdej sesji)
+
+**2026-11-06 — P2-I03, dolny CTA:** usunięto tekst Continue the experience, wyśrodkowano i poszerzono przycisk Tickets/Bilety. Zmieniono EventDetailParts, BRANDING i PHASES. Bez testów/skryptów ani nowych zaliczonych checkboxów; CHANGELOG bez wpisu do weryfikacji. Następny krok: ręczny odbiór P2-I03.
+
+**2026-11-06 — P2-I03, pill i CTA:** EventDetailScreen: tytuł przed pillem kategorii; EN/PL: Tickets/Bilety dla głównej akcji. BRANDING/EVENT_DETAIL/PHASES uzupełnione. Bez testów/skryptów i kontroli runtime na polecenie właściciela; NOT VERIFIED, bez nowych checkboxów i wpisu CHANGELOG. Następny krok: ręczny odbiór P2-I03.
+
+**2026-11-06 — P2-I03, redesign i korekta właściciela:** EventDetailScreen, nowe EventDetailParts/eventDetailPresentation, nawigacja szczegółu i EN/PL. Przed najnowszym zakazem wykonano 7/7 unit PASS; browser desktop EN/PL/light/dark: cztery scenariusze layoutu przeszły, kolejny zakończył się błędem selektora dwóch alertów, dalsze scenariusze niewykonane. Pełny typecheck wskazał istniejący SideMenu.tsx:163; początkowe błędy nowych propsów/importów poprawiono bez deklarowania pełnego PASS. Simulator wykryty, bez inspekcji ekranu. Następnie właściciel zabronił dalszych testów/skryptów i zlecił usunięcie bannera Preview/test, informacji alcohol-free, etykiet When/Where oraz domeny z footera. Zmiany zapisane ręcznie, bieżący stan NOT VERIFIED; bez nowych ukończonych checkboxów, migracji/restartu i wpisu CHANGELOG. Następny krok: ręczny odbiór P2-I03.
 
 | Data (YYYY-MM-DD) | Iteracja | Wynik | Zmienione pliki / testy / dowody | Blokery i następne kroki |
 |---|---|---|---|---|
@@ -2849,3 +2875,16 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-05 | About us — ikona zgodna z menu | Implementacja / NOT VERIFIED | Nagłówek pobiera ilustrację About z navigationItems, wraz z wariantem light/dark, zamiast ikony liniowej. | Bez testów i dodatkowych kontroli. CHANGELOG bez wpisu: drobna korekta. Następny krok: odbiór About us. |
 
 | 2026-11-05 | Flashcards — tymczasowe ukrycie | Implementacja / NOT VERIFIED | navigation: usunięta pozycja menu; LearningScreen: usunięty kafel/link fiszek; EN/PL bez promocji fiszek i sugestii w empty quizów. Kod, API i dane zachowane. | Bez testów i dodatkowych kontroli. CHANGELOG odroczony: brak weryfikacji UI. Następny krok: odbiór nawigacji. |
+
+
+| 2026-11-06 | P2-I04 — naprawa dostępu i katalog admina | IN_PROGRESS; T02/V01 zweryfikowane | Panel/klient API/Profil/EN/PL, curated rich JSON i etykiety lokalizacji, testy API i web, EVENT_EDITOR/BRANDING/PHASES/CHANGELOG. Email właściciela dopasowano w dev Firebase przed lokalnym grantem events_admin. Backend zrestartowany na8090, DB V23 bez nowych migracji. | 34 unit/architecture +13 IT na izolowanym PostgreSQL PASS; web fixture10/10 EN/PL/light/dark/desktop/mobile-web PASS; lint/format/diff PASS; readiness200/UP i anonimowy admin401. Typecheck: istniejący SideMenu.tsx:163 TS2339. Realny pełny przebieg właściciela i native NOT VERIFIED. Następny krok: odbiór pozostałych punktów P2-I04; bez startu P2-I05. |
+
+
+| 2026-11-06 | P2-I04 — przewijanie i lokalizacja biblioteki | Implementacja / NOT VERIFIED | EventEditorScreen.web: własny scroll viewport, reset scrolla przy zmianie widoku, filtry kraj–miasto/clear/empty/etykiety lokalizacji. Admin controller/CuratedEvents: countryId/cityId i SQL count/list przed paginacją z walidacją ID. EN/PL, EVENT_EDITOR/BRANDING/PHASES uzupełnione. | Bez testów, lint/typecheck i kontroli runtime na polecenie właściciela; formatowanie i package z maven.test.skip=true BUILD SUCCESS, bez kompilacji testów. Backend lokalny zrestartowany na8090, bez nowych migracji. Checkboxy bez zmian; CHANGELOG bez wpisu do odbioru. Następny krok: ręczny odbiór tej korekty P2-I04. |
+
+
+| 2026-11-06 | P2-I03 — uproszczony szczegół wydarzenia | Implementacja / NOT VERIFIED | EventDetailScreen: zdjęcie pierwsze, tytuł/datowanie bez strefy, About event z rich/plain opisem, Check organizer page. Bez ceny, policy/drinks, venue/accessibility i profilu organizatora. Zachowane błędy/statusy, HTTPS/domain dialog i rewalidacja URL. EN/PL, BRANDING/EVENT_DETAIL/PHASES uzupełnione. | Wyłącznie formatowanie; bez testów, lint/typecheck/build, API/browser/native, migracji i restartów zgodnie z utrzymanym poleceniem właściciela. Checkboxy bez zmian; CHANGELOG bez wpisu do weryfikacji. Następny krok: ręczny odbiór P2-I03. |
+
+| 2026-11-06 | Uruchomienie lokalnego backendu na polecenie właściciela | Runtime UP; statusy iteracji bez zmian | Uruchomiono Docker Desktop, istniejący kontener soberity-postgres-1 i helper scripts/start-local-backend.mjs jako odłączony proces w tle. API localhost:8090; log /private/tmp/soberity-local-backend-2026-11-06.log. | Package z -DskipTests zakończony uruchomieniem API; readiness HTTP 200 / UP. Flyway: V23, bez nowych migracji. Testów nie uruchamiano; odbiór P2-I03/P2-I04 pozostaje otwarty. CHANGELOG bez nowego wpisu: rutynowe uruchomienie istniejącej aplikacji, bez nowej funkcji lub naprawy. Następny krok: odbiór P2-I03/P2-I04 po poleceniu właściciela. |
+
+| 2026-11-07 | RUN.md — komendy uruchomienia | Dokumentacja ukończona; iteracje bez zmian | Dodano RUN.md: wymagania, web/iOS/Android, backend helper + PostgreSQL, pełny Compose demo Auth, porty/CORS i zatrzymanie usług. | Porównanie z package.json, helperem i Compose; Prettier RUN.md PASS, git diff --check zmian PASS. Usług i testów runtime nie uruchamiano. CHANGELOG bez wpisu: drobna dokumentacja. Następny krok: odbiór P2-I03/P2-I04 na polecenie właściciela. |

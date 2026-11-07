@@ -184,7 +184,7 @@ for (const language of ['en', 'pl'] as const)
         await expect.poll(() => state.queries.length).toBe(count + 1);
         expect(query(state.queries).get('from')).toBe(from);
         expect(query(state.queries).get('to')).toBe(to);
-        expect(query(state.queries).get('dateScope')).toBe(from ? null : 'ANY');
+        expect(query(state.queries).get('dateScope')).toBe('UPCOMING');
       }
       await open(page);
       await page.getByRole('button', { name: labels.dates }).click();

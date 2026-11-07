@@ -93,6 +93,24 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         mvc.perform(get("/api/v1/admin/events").header("Authorization","Bearer "+erased)).andExpect(status().isForbidden());
         assertThat(jdbc.queryForObject("SELECT count(*) FROM events_admin WHERE firebase_uid=?",Long.class,erased)).isZero();
     }
+    @Test void adminRichDescriptionAndSelectedLocationSurviveReopeningWithoutOrganizer()throws Exception {
+        var body=input("Rich admin event");
+        body.put("descriptionDocument",json.readTree("""
+            {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Synthetic event description","marks":[{"type":"bold"}]}]}]}
+            """));
+        var created=create(body);String id=created.path("id").asText();
+        mvc.perform(get("/api/v1/admin/events/"+id).header("Authorization","Bearer "+admin))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.content.description_document.type").value("doc"))
+            .andExpect(jsonPath("$.content.description_document.content[0].content[0].marks[0].type").value("bold"))
+            .andExpect(jsonPath("$.content.country_name").value("Austria"))
+            .andExpect(jsonPath("$.content.city_label_en").value("Vienna"));
+        publish(id,1);
+        mvc.perform(get("/api/v1/events/"+id)).andExpect(status().isOk())
+            .andExpect(jsonPath("$.description_document.type").value("doc"));
+        body.put("descriptionDocument",json.readTree("{\"type\":\"script\"}"));
+        mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin)
+            .contentType("application/json").content(json.writeValueAsString(body))).andExpect(status().isBadRequest());
+    }
     @Test void combinedFiltersAndLiteralNameApplyBeforeStablePagination()throws Exception {
         String prefix="Combined-"+UUID.randomUUID();
         for(int i=0;i<3;i++){var body=input(prefix+" 100%_literal "+i);body.put("startsAt","2029-11-0"+(6+i)+"T20:00:00+01:00");published(body);}
@@ -197,15 +215,37 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM events_audit WHERE event_id=? AND action='EVENT_DELETED'",Long.class,UUID.fromString(id))).isEqualTo(1);
     }
     @Test void startedEventsLeaveUpcomingAndNearbyButExplicitPastSearchStillWorks()throws Exception {
-        var body=input("Just started "+UUID.randomUUID());body.put("startsAt",java.time.Instant.now().plusSeconds(5).toString());
+        var body=input("Just started "+UUID.randomUUID());
         String id=published(body);
-        Thread.sleep(5200);
+        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()-interval '1 hour' WHERE event_id=?",UUID.fromString(id));
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString())).andExpect(jsonPath("$.total").value(0));
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("dateScope","ANY"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
-        mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("from",java.time.Instant.now().minusSeconds(86400).toString())).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("from",java.time.Instant.now().minusSeconds(86400).toString())).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("dateScope","ANY")
+            .param("from",java.time.Instant.now().minusSeconds(86400).toString())).andExpect(jsonPath("$.total").value(1));
         mvc.perform(post("/api/v1/events/nearby").contentType("application/json").content("{\"latitude\":48.2082,\"longitude\":16.3738}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.items[*].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem(id))));
+    }
+    @Test void upcomingExcludesPastEventsBeforeCountingAndPaginationEvenWithPastDateBounds()throws Exception {
+        String prefix="UpcomingOnly-"+UUID.randomUUID();
+        String started=published(input(prefix+" started without end")),ended=published(input(prefix+" ended"));
+        String first=published(input(prefix+" tomorrow")),second=published(input(prefix+" day after"));
+        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()-interval '2 days' WHERE event_id IN (?,?)",UUID.fromString(started),UUID.fromString(ended));
+        jdbc.update("UPDATE events_revision SET ends_at=clock_timestamp()-interval '1 day' WHERE event_id=?",UUID.fromString(ended));
+        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()+interval '1 day' WHERE event_id=?",UUID.fromString(first));
+        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()+interval '2 days' WHERE event_id=?",UUID.fromString(second));
+        for(String from:List.of("",java.time.Instant.now().minusSeconds(7*86400).toString())) {
+            for(int page=0;page<2;page++)mvc.perform(get("/api/v1/events").param("q",prefix).param("dateScope","UPCOMING")
+                .param("from",from).param("to",java.time.Instant.now().plusSeconds(3*86400).toString()).param("size","1").param("page",""+page))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(2)).andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(page==0?first:second));
+        }
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("from",java.time.Instant.now().minusSeconds(7*86400).toString())
+            .param("to",java.time.Instant.now().minusSeconds(86400).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0)).andExpect(jsonPath("$.items.length()").value(0));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("to",java.time.Instant.now().minusSeconds(86400).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
     }
     @Test void badImagesAndUnpublishedMediaCannotEscapeAdminPermissions()throws Exception {
         mvc.perform(multipart("/api/v1/admin/events/media").file(new MockMultipartFile("file","bad.svg","image/svg+xml","<svg/>".getBytes())).param("altText","Bad")

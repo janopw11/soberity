@@ -22,7 +22,8 @@ public class EventAdminController {
     @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id,@RequestParam int expectedVersion){events.delete(actor,id,expectedVersion);}
     @GetMapping("/{id}") public Map<String,Object> detail(@AuthenticationPrincipal VerifiedToken actor,@PathVariable UUID id){return events.detail(actor,id);}
-    @GetMapping public Map<String,Object> list(@AuthenticationPrincipal VerifiedToken actor,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return events.list(actor,page,size);}
+    @GetMapping public Map<String,Object> list(@AuthenticationPrincipal VerifiedToken actor,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size,
+            @RequestParam(required=false) UUID countryId,@RequestParam(required=false) UUID cityId){return events.list(actor,page,size,countryId,cityId);}
     @GetMapping("/legacy") public Map<String,Object> legacy(@AuthenticationPrincipal VerifiedToken actor,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return events.legacy(actor,page,size);}
     @PostMapping(value="/media",consumes=MediaType.MULTIPART_FORM_DATA_VALUE) @ResponseStatus(HttpStatus.CREATED)
     public Map<String,Object> media(@AuthenticationPrincipal VerifiedToken actor,@RequestParam MultipartFile file,@RequestParam String altText)throws java.io.IOException {

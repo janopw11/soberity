@@ -50,7 +50,7 @@ Importer and refresh commands: [LOCATIONS_IMPORT.md](LOCATIONS_IMPORT.md).
 ## Public event catalog
 
 - `GET /api/v1/events`: `q` (literal case-insensitive title substring, max 200),
-  `countryId`, `cityId`, `track`, `category`, `from`, `to`, `locale`, `page`, `size`.
+  `countryId`, `cityId`, `track`, `category`, `from`, `to`, `dateScope`, `locale`, `page`, `size`.
 
 `category` accepts one or more enum codes, comma-separated or repeated, for
 example `category=SOBER_RAVE,SOBER_PARTY`. Categories combine with OR, and the
@@ -68,9 +68,12 @@ version. Organizer verification/review is not required. Source evidence, author
 references, admin identity, moderation/internal fields and Joined never appear
 in public event DTOs. Friendly supply cannot fill a strict result.
 
-Search defaults to `starts_at >= now`. `from` is inclusive and `to` exclusive,
-ISO-8601 instants; `to` must be later than `from`. A past search must supply its
-own `from`, and only retained nondeleted listings can appear. Client calendar-day
+Search defaults to `dateScope=UPCOMING`, enforcing `starts_at >= now` even when
+`from` is in the past. `from` is inclusive and `to` exclusive, ISO-8601 instants;
+`to` must be later than a supplied `from`. Entirely past windows return an empty
+page. Retained historical entries require an explicit `dateScope=ANY`; the
+Sober Events page always requests `UPCOMING`, including with calendar filters.
+Client calendar-day
 filters should convert local midnight boundaries (including next-day exclusive
 end) with DST awareness in P2-I02. All filters combine before count/pagination;
 cityId requires its countryId. Sort is start instant ascending then event ID.
