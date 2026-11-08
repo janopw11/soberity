@@ -27,6 +27,8 @@ export type DiscoveryEvent = {
   city_en?: string;
   city_pl?: string;
   coordinate_source: 'CITY' | 'VENUE';
+  latitude?: number | null;
+  longitude?: number | null;
   distance_km?: number;
   organizer_name?: string;
   price_kind: 'FREE' | 'PAID' | 'UNKNOWN';

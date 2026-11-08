@@ -164,7 +164,12 @@ Required write fields:
 ```
 
 Optional: `venueName`, `address`, paired `latitude/longitude`, `endsAt`; edits also
-require `expectedVersion`. There is no separate venue/organizer-creation step.
+require `expectedVersion`. Precise fields: `street`, `buildingNumber`, `postalCode`,
+`formattedAddress`, `providerPlaceId`, `locationPrecision` (`ADDRESS`/`VENUE`/`CITY`).
+Coordinates are used only with `ADDRESS`/`VENUE` and a non-`CITY` precision; `CITY` falls
+back to the city point and never publishes a marker. Without `countryId`/`cityId` the
+admin form sends only the address: the backend derives country and city from the confirmed
+point (nearest active catalog city within 20 km). No point or no city in range returns 400. There is no separate venue/organizer-creation step.
 No exact venue coordinates means the selected city's point, marked CITY. A partial
 or invalid exact point is rejected, not silently replaced. New entries must be
 future, classified sober and have complete rights/source/beverage confirmation;
@@ -228,3 +233,20 @@ verified Firebase token. Only the preference is persisted in `user_profile`;
 coordinates and location history remain unsaved. Account deletion removes the
 preference with its profile. OS permission remains a separate requirement for
 real device location; temporary Vienna mock mode is unchanged.
+
+## Precise venue locations (P2-I07)
+
+`POST /api/v1/organizer/organizations/{id}/venues` accepts optional precise-location fields:
+`street`, `buildingNumber`, `postalCode`, `formattedAddress`, `providerPlaceId` and
+`locationPrecision` (`ADDRESS`, `VENUE` or `CITY`). Admins never send raw map numbers
+from a form; the client derives coordinates from the selected address.
+Admin forms must not expose numeric latitude/longitude inputs.
+
+Rules enforced server-side:
+- `ADDRESS` and `VENUE` require a valid `latitude`/`longitude` pair; `CITY` may omit it.
+- Coordinates without a precision are stored for compatibility but never publish a marker.
+- Venues are append-only. Changing an address creates a new venue row; old coordinates are never reused.
+- Legacy venues keep `location_precision` as `NULL` and never publish map markers.
+- Only `ADDRESS`/`VENUE` rows with coordinates are marker-eligible (partial index `events_venue_map_points`).
+
+The provider's address-to-coordinate resolution is not verified by the backend.

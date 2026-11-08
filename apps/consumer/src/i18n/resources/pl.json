@@ -135,6 +135,7 @@
     "title": "Sober Events",
     "currentLocation": {
       "label": "Bieżąca lokalizacja",
+      "unknown": "Lokalizacja niedostępna",
       "nearPlace": "Okolice: {{place}}",
       "locating": "Ustalanie lokalizacji…",
       "unavailable": "Lokalizacja niedostępna"
@@ -244,6 +245,26 @@
     "error": "Nie udało się wczytać wydarzeń. Spróbuj ponownie.",
     "retry": "Spróbuj ponownie",
     "loading": "Szukamy wydarzeń…",
+    "view": { "list": "Lista", "map": "Mapa" },
+    "map": {
+      "label": "Mapa wydarzeń bez alkoholu",
+      "unavailable": "Mapa wymaga klucza Geoapify. Poproś administratora o jego konfigurację.",
+      "error": "Nie udało się wczytać mapy. Spróbuj ponownie.",
+      "empty": "Żadne wydarzenia nie pasują do tych filtrów.",
+      "cityOnly": "{{count}} wydarzeń pasuje do filtrów, ale ma tylko lokalizację miasta, więc nie można ich pokazać na mapie. Potwierdź dokładny adres w panelu admina, aby pojawiły się tutaj. Nadal są widoczne w widoku listy.",
+      "truncated": "Pokazano {{shown}} z {{total}} wydarzeń. Zawęź filtry, aby zobaczyć resztę na mapie.",
+      "viewDetails": "Zobacz szczegóły wydarzenia",
+      "googleMaps": "Mapy Google",
+      "appleMaps": "Mapy Apple",
+      "close": "Zamknij",
+      "showOnMap": "Pokaż na mapie",
+      "modalTitle": "Lokalizacja wydarzenia",
+      "modalLabel": "Mapa lokalizacji wydarzenia",
+      "addressUnknown": "Dokładny adres nie został podany",
+      "openDirections": "Otwórz lokalizację w aplikacji map",
+      "chooserTitle": "Otwórz tę lokalizację w",
+      "cancel": "Anuluj"
+    },
     "emptyTitle": "Brak wydarzeń",
     "emptyDescription": "Wybierz inne miasto, szerszy zakres dat lub mniej filtrów. Nowe wydarzenia pojawią się po weryfikacji i publikacji.",
     "firstPage": "Przejdź do pierwszej strony",
@@ -324,7 +345,7 @@
     "locationSettings": {
       "switchLabel": "Zgoda na użycie lokalizacji",
       "whyTitle": "Dlaczego potrzebujemy lokalizacji?",
-      "explanation": "Używamy Twojej lokalizacji wyłącznie do wyszukiwania pobliskich wydarzeń na stronie głównej. Lokalizacja jest odczytywana podczas korzystania z aplikacji; nie prowadzimy historii ani nie zapisujemy współrzędnych. Zgoda jest zapisywana na Twoim koncie i możesz ją w każdej chwili wyłączyć. Bez udostępniania lokalizacji nadal możesz wyszukiwać wydarzenia po mieście lub kraju.",
+      "explanation": "Używamy Twojej lokalizacji wyłącznie do wyszukiwania pobliskich wydarzeń na stronie głównej. Aby pokazać najbliższy adres, Twoja przybliżona pozycja (zaokrąglona do ok. 100 m) jest wysyłana do Geoapify, naszego dostawcy adresów. Dokładne współrzędne nie są zapisywane i nie prowadzimy historii lokalizacji. Zgoda jest zapisywana na Twoim koncie i możesz ją w każdej chwili wyłączyć. Bez udostępniania lokalizacji nadal możesz wyszukiwać wydarzenia po mieście lub kraju.",
       "consentLabel": "Pozwól aplikacji używać lokalizacji, wyłącznie w celach wyszukiwania pobliskich wydarzeń",
       "saveError": "Nie udało się zapisać preferencji lokalizacji. Spróbuj ponownie.",
       "sessionHint": "Wybór zapisujemy na Twoim koncie. Nie zapisujemy współrzędnych ani historii lokalizacji.",
@@ -1118,6 +1139,14 @@
   },
   "eventEditor": {
     "title": "Panel wydarzeń",
+    "location": {
+      "search": "Wyszukaj adres, miejsce lub punkt orientacyjny",
+      "cityOnly": "Ten wynik wskazuje tylko miasto. Wybierz dokładniejszy adres lub potwierdź pozycję, zanim pojawi się marker na mapie.",
+      "notSelected": "Wybierz adres z podpowiedzi, aby zapisać dokładną lokalizację.",
+      "confirmRequired": "Przed zapisaniem wybierz adres i potwierdź jego pozycję na mapie.",
+      "mapLabel": "Podgląd lokalizacji na mapie",
+      "mapHint": "Przeciągnij marker lub kliknij mapę, aby potwierdzić dokładną pozycję. Współrzędne zapisują się automatycznie."
+    },
     "webOnly": "Dodawaj i edytuj wydarzenia w aplikacji webowej.",
     "description": "Opis wydarzenia",
     "organizations": "Twoi organizatorzy",
@@ -1211,6 +1240,8 @@
     },
     "publish": "Opublikuj wydarzenie",
     "published": "Wydarzenie opublikowane.",
+    "saveAndPublish": "Zapisz i opublikuj",
+    "publishedDirectly": "Wydarzenie zapisane i opublikowane.",
     "delete": "Usuń wydarzenie",
     "deleteNamed": "Usuń {{title}}",
     "deleteConfirm": "Usunąć to wydarzenie? Zniknie z publicznego katalogu i szczegółów wydarzenia.",

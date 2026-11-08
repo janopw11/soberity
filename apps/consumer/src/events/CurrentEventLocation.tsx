@@ -12,16 +12,28 @@ export function CurrentEventLocation() {
   const { enabled, currentLocation } = useEventLocation();
   if (!enabled) return null;
   const polish = i18n.resolvedLanguage === 'pl';
-  // Temporary owner-requested display fallback; never used for event queries or GPS state.
   const place = currentLocation?.place;
-  const label = place
+  const placeLabel = place
     ? [
-        polish ? place.label_pl || place.label_en : place.label_en || place.label_pl,
+        polish
+          ? place.label_pl || place.label_en
+          : place.label_en || place.label_pl,
         polish
           ? place.country_label_pl || place.country_label_en
           : place.country_label_en || place.country_label_pl,
-      ].filter(Boolean).join(', ') || 'Vienna, Austria'
-    : 'Vienna, Austria';
+      ]
+        .filter(Boolean)
+        .join(', ')
+    : '';
+  const resolved = currentLocation?.location;
+  const geoCity = resolved?.city
+    ? [resolved.city, resolved.country].filter(Boolean).join(', ')
+    : '';
+  const label =
+    geoCity ||
+    resolved?.address ||
+    placeLabel ||
+    t('events.currentLocation.unknown');
   return (
     <View
       style={styles.row}

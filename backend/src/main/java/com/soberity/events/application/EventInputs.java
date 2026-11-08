@@ -12,7 +12,8 @@ public final class EventInputs {
     public record OrganizerInput(String name,String description,String website,String contactEmail) { }
     public record VerificationRequest(Integer expectedVersion,String evidenceReference) { }
     public record VerificationDecision(Integer expectedVersion,Verification decision,String notes,Boolean authorityConfirmed) { }
-    public record VenueInput(String name,String address,String city,String region,String countryCode,Double latitude,Double longitude) { }
+    public record VenueInput(String name,String address,String city,String region,String countryCode,Double latitude,Double longitude,
+        String street,String buildingNumber,String postalCode,String formattedAddress,String providerPlaceId,String locationPrecision) { }
     public record EventInput(Integer expectedVersion,UUID venueId,String title,String description,String locale,
         Track track,Category category,AlcoholPolicy alcoholPolicy,String alcoholRules,AlcoholControls controls,
         String beverageNotes,OffsetDateTime startsAt,OffsetDateTime endsAt,String timezone,

@@ -48,6 +48,37 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         body.put("controls",Map.of("alcoholSold",false,"alcoholServed",false,"alcoholPermitted",false));body.put("beverageNotes","Confirmed 0.0% only");body.put("beverageRulesConfirmed",true);
         body.put("sourceUrl","https://example.test/event");body.put("sourceReference","Private synthetic confirmation");body.put("contentRightsAttested",true);return body;
     }
+    @Test void storesPreciseLocationFieldsOnPublishedCuratedVenue() throws Exception {
+        var body=input("Precise venue");body.put("latitude",52.2297);body.put("longitude",21.0122);
+        body.put("street","Marszałkowska");body.put("buildingNumber","1");body.put("postalCode","00-001");
+        body.put("formattedAddress","Marszałkowska 1, 00-001 Warsaw, Poland");body.put("providerPlaceId","place-precise-1");body.put("locationPrecision","ADDRESS");
+        String id=published(body);
+        assertThat(jdbc.queryForMap("""
+            SELECT v.street,v.building_number,v.postal_code,v.location_precision,v.latitude FROM sober_event e
+            JOIN events_revision r ON r.event_id=e.id AND r.revision=e.published_revision
+            JOIN events_venue v ON v.id=r.venue_id WHERE e.id=?
+            """,UUID.fromString(id)))
+            .containsEntry("street","Marszałkowska").containsEntry("building_number","1").containsEntry("postal_code","00-001").containsEntry("location_precision","ADDRESS");
+    }
+    @Test void derivesCountryAndCityFromConfirmedAddressPoint() throws Exception {
+        var body=input("Derived location");body.remove("countryId");body.remove("cityId");
+        body.put("latitude",48.2090);body.put("longitude",16.3740);body.put("locationPrecision","ADDRESS");
+        body.put("street","Synthetic street");body.put("formattedAddress","Synthetic street 1, Vienna");
+        String id=create(body).path("id").asText();
+        assertThat(jdbc.queryForMap("""
+            SELECT v.city_id,v.country_id,v.location_precision FROM events_revision r JOIN events_venue v ON v.id=r.venue_id WHERE r.event_id=?
+            """,UUID.fromString(id)))
+            .containsEntry("city_id",GeoNamesFixture.city(101)).containsEntry("country_id",GeoNamesFixture.country(1)).containsEntry("location_precision","ADDRESS");
+    }
+    @Test void rejectsAddressWithoutConfirmedPointOrNearbyCity() throws Exception {
+        var noPoint=input("No point");noPoint.remove("countryId");noPoint.remove("cityId");
+        mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(noPoint)))
+            .andExpect(status().isBadRequest());
+        var farAway=input("Far away");farAway.remove("countryId");farAway.remove("cityId");
+        farAway.put("latitude",-60.0);farAway.put("longitude",-120.0);farAway.put("locationPrecision","ADDRESS");
+        mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(farAway)))
+            .andExpect(status().isBadRequest());
+    }
     private JsonNode create(Map<String,Object> body)throws Exception {
         return json.readTree(mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body)))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());

@@ -135,6 +135,7 @@
     "title": "Sober Events",
     "currentLocation": {
       "label": "Current location",
+      "unknown": "Location unavailable",
       "nearPlace": "Near {{place}}",
       "locating": "Finding your location…",
       "unavailable": "Location unavailable"
@@ -240,6 +241,26 @@
     "error": "We could not load events. Please try again.",
     "retry": "Try again",
     "loading": "Finding events…",
+    "view": { "list": "List", "map": "Map" },
+    "map": {
+      "label": "Sober events map",
+      "unavailable": "The map needs a Geoapify key. Ask the administrator to configure it.",
+      "error": "We could not load the map. Please try again.",
+      "empty": "No events match these filters.",
+      "cityOnly": "{{count}} event(s) match these filters but have only a city location, so they cannot be placed on the map. Confirm the exact address in the admin panel to show them here. They remain visible in List view.",
+      "truncated": "Showing {{shown}} of {{total}} events. Narrow the filters to see the rest on the map.",
+      "viewDetails": "View event details",
+      "googleMaps": "Google Maps",
+      "appleMaps": "Apple Maps",
+      "close": "Close",
+      "showOnMap": "Show on map",
+      "modalTitle": "Event location",
+      "modalLabel": "Event location map",
+      "addressUnknown": "Exact address not provided",
+      "openDirections": "Open location in a map app",
+      "chooserTitle": "Open this location in",
+      "cancel": "Cancel"
+    },
     "emptyTitle": "No events found",
     "emptyDescription": "Try a different city, a wider date range or fewer filters. New events appear here after verification and publication.",
     "firstPage": "Go to first page",
@@ -318,7 +339,7 @@
     "locationSettings": {
       "switchLabel": "Location permission",
       "whyTitle": "Why do we need your location?",
-      "explanation": "We use your location only to find nearby events on the main page. Location is read while the app is in use; we do not keep location history or save your coordinates. Consent is saved to your account and you can turn it off at any time. You can still search events by city or country without sharing your location.",
+      "explanation": "We use your location only to find nearby events on the main page. To show the nearest address, your approximate position (rounded to about 100 m) is sent to Geoapify, our address provider. Your exact coordinates are not saved and we do not keep location history. Consent is saved to your account and you can turn it off at any time. You can still search events by city or country without sharing your location.",
       "consentLabel": "Allow the app to use location only to find nearby events",
       "saveError": "Could not save your location preference. Please try again.",
       "sessionHint": "Your choice is saved to your account. Coordinates and location history are not saved.",
@@ -1098,6 +1119,14 @@
   },
   "eventEditor": {
     "title": "Events panel",
+    "location": {
+      "search": "Search an address, venue or landmark",
+      "cityOnly": "This result is only a city. Choose a more precise address or confirm the position before a map marker is shown.",
+      "notSelected": "Select an address from the suggestions to save a precise location.",
+      "confirmRequired": "Select an address and confirm its position on the map before saving.",
+      "mapLabel": "Location preview map",
+      "mapHint": "Drag the marker or click the map to confirm the exact position. Coordinates are saved automatically."
+    },
     "webOnly": "Use the web app to add and edit events.",
     "description": "Event description",
     "organizations": "Your organizers",
@@ -1191,6 +1220,8 @@
     },
     "publish": "Publish event",
     "published": "Event published.",
+    "saveAndPublish": "Save and publish",
+    "publishedDirectly": "Event saved and published.",
     "delete": "Delete event",
     "deleteNamed": "Delete {{title}}",
     "deleteConfirm": "Delete this event? It will disappear from the public catalog and event details.",

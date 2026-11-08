@@ -44,6 +44,14 @@ final class EventValidation {
         if(latitude==null || longitude==null || !Double.isFinite(latitude) || !Double.isFinite(longitude)
             || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) throw bad("Valid latitude and longitude must be supplied together.");
     }
+    static String precision(String value,Double latitude,Double longitude) {
+        String checked=optional(value,8);
+        if(checked==null) return null;
+        checked=checked.toUpperCase(Locale.ROOT);
+        if(!Set.of("ADDRESS","VENUE","CITY").contains(checked)) throw bad("Unsupported location precision.");
+        if(!"CITY".equals(checked) && (latitude==null || longitude==null)) throw bad("Coordinates required for ADDRESS and VENUE precision.");
+        return checked;
+    }
     static void dates(OffsetDateTime start,OffsetDateTime end,String timezone) {
         if(start==null || end==null || !end.toInstant().isAfter(start.toInstant())) throw bad("Offset-aware start and later end required.");
         ZoneId zone;

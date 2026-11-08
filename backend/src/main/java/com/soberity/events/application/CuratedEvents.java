@@ -43,6 +43,7 @@ public class CuratedEvents {
         if(input==null || input.track()==null || input.category()==null || !Set.of("en","pl").contains(Objects.toString(input.locale(),"")))
             throw bad("Classification and supported language required.");
         curatedDates(input.startsAt(),input.endsAt(),input.timezone());coordinates(input.latitude(),input.longitude());
+        String precision=precision(input.locationPrecision(),input.latitude(),input.longitude());
         String title=text(input.title(),300),description=text(input.description(),30000),organizerUrl=url(input.organizerUrl(),true);
         String document=null;
         if(input.descriptionDocument()!=null && !input.descriptionDocument().isNull()) {
@@ -58,7 +59,8 @@ public class CuratedEvents {
         var facts=new ContentFacts(input.track(),input.category(),AlcoholPolicy.ALCOHOL_FREE,rules,input.controls(),true,true,
                 input.startsAt().toInstant(),input.endsAt()==null?null:input.endsAt().toInstant(),input.timezone());
         if(CuratedEventPolicy.assess(facts,true,Instant.now()).readiness()!=CuratedEventPolicy.Readiness.ELIGIBLE)throw bad("Qualified upcoming alcohol-free event required.");
-        var city=locations.selected(input.countryId(),input.cityId());
+        var location=resolveLocation(input);
+        var city=locations.selected(location.countryId(),location.cityId());
         if(input.coverId()==null || !Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_media WHERE id=? AND organizer_id IS NULL)",Boolean.class,input.coverId())))throw bad("Uploaded admin event cover required.");
         int revision=1;
         if(id==null) {
@@ -68,12 +70,14 @@ public class CuratedEvents {
             if("DELETED".equals(existing.get("status")))throw missing();
             revision=((Number)existing.get("current_revision")).intValue()+1;
         }
-        UUID venue=UUID.randomUUID();boolean exact=input.latitude()!=null;
+        UUID venue=UUID.randomUUID();boolean exact=input.latitude()!=null && !"CITY".equals(precision);
         jdbc.update("""
-            INSERT INTO events_venue(id,name,address,city,region,country_code,latitude,longitude,country_id,city_id,city_version,coordinate_source)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO events_venue(id,name,address,city,region,country_code,latitude,longitude,country_id,city_id,city_version,coordinate_source,
+            street,building_number,postal_code,formatted_address,provider_place_id,location_precision)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,venue,Objects.toString(optional(input.venueName(),200),""),Objects.toString(optional(input.address(),500),""),city.get("name"),city.get("region"),city.get("iso_code"),
-            exact?input.latitude():city.get("latitude"),exact?input.longitude():city.get("longitude"),input.countryId(),input.cityId(),city.get("version"),exact?"VENUE":"CITY");
+            exact?input.latitude():city.get("latitude"),exact?input.longitude():city.get("longitude"),location.countryId(),location.cityId(),city.get("version"),exact?"VENUE":"CITY",
+            optional(input.street(),200),optional(input.buildingNumber(),40),optional(input.postalCode(),20),optional(input.formattedAddress(),500),optional(input.providerPlaceId(),200),precision);
         jdbc.update("""
             INSERT INTO events_revision(event_id,revision,author_ref,title,description,locale,track,category_code,alcohol_policy,alcohol_rules,
             alcohol_sold,alcohol_served,alcohol_permitted,beverage_notes,venue_id,starts_at,ends_at,timezone,
@@ -101,11 +105,21 @@ public class CuratedEvents {
         audit(actor,id,"EVENT_DELETED");
         // Joined does not exist before P2-I05; its FK/erasure hook must attach to this transaction then.
     }
+    private record ResolvedLocation(UUID countryId,UUID cityId) { }
+    /** Explicit catalog IDs stay supported; otherwise the country and city come from the confirmed address point. */
+    private ResolvedLocation resolveLocation(CuratedEventInput input) {
+        if(input.countryId()!=null && input.cityId()!=null) return new ResolvedLocation(input.countryId(),input.cityId());
+        if(input.latitude()==null || input.longitude()==null) throw bad("Confirm the address position on the map to set the city.");
+        var place=locations.nearbyPlace(input.latitude(),input.longitude());
+        if(place==null) throw bad("No active catalog city within 20 km of the address.");
+        return new ResolvedLocation((UUID)place.get("country_id"),(UUID)place.get("city_id"));
+    }
     public Map<String,Object> detail(VerifiedToken actor,UUID id) {
         access.admin(actor);var event=lock(id);
         var result=new LinkedHashMap<>(event);
         var content=new LinkedHashMap<>(jdbc.queryForMap("""
             SELECT r.*,v.country_id,v.city_id,v.name AS venue_name,v.address,v.coordinate_source,v.latitude,v.longitude,
+              v.street,v.building_number,v.postal_code,v.formatted_address,v.provider_place_id,v.location_precision,
               c.geoname_id AS city_geoname_id,c.name AS city_name,c.label_en AS city_label_en,c.label_pl AS city_label_pl,c.region,c.district,
               co.geoname_id AS country_geoname_id,co.name AS country_name,co.label_en AS country_label_en,co.label_pl AS country_label_pl
             FROM events_revision r JOIN events_venue v ON v.id=r.venue_id

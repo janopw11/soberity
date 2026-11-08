@@ -23,6 +23,7 @@ import {
   watchPermission,
   LocationFailure,
 } from './location';
+import { reverseLocation, type ReverseLocation } from './reverseGeocode';
 
 type Result = {
   status: 'idle' | 'loading' | 'unavailable' | 'error' | 'ready';
@@ -40,6 +41,7 @@ type LocationContext = {
     latitude: number;
     longitude: number;
     place: NearbyPlace | null;
+    location: ReverseLocation | null;
   } | null;
   enable: () => Promise<void>;
   disable: () => void;
@@ -50,17 +52,6 @@ type LocationContext = {
   refresh: () => Promise<void>;
 };
 const Context = createContext<LocationContext | null>(null);
-// Temporary owner-requested Vienna mode. Keep display and nearby query on the same place.
-// Remove this override when device location and the full city catalog are enabled.
-const MOCK_VIENNA = true;
-const viennaPoint = { latitude: 48.2082, longitude: 16.3738 };
-const viennaPlace: NearbyPlace = {
-  city_id: '2761369',
-  label_en: 'Vienna',
-  label_pl: 'Wiedeń',
-  country_label_en: 'Austria',
-  country_label_pl: 'Austria',
-};
 const empty: Result = { status: 'idle', data: null };
 /** Consent belongs to the account; position remains memory-only and account switches clear it. */
 export function EventLocationProvider({ children }: PropsWithChildren) {
@@ -141,7 +132,7 @@ export function EventLocationSession({
       }
     }, 15000);
     try {
-      const state = MOCK_VIENNA ? 'granted' : await permission();
+      const state = await permission();
       if (!current()) return;
       if (state === 'denied' || state === 'prompt') {
         setDeclined(true);
@@ -149,13 +140,13 @@ export function EventLocationSession({
         return;
       }
       if (state !== 'granted') throw new LocationFailure('unavailable');
-      const point = MOCK_VIENNA ? viennaPoint : await locate(controller.signal);
+      const point = await locate(controller.signal);
       if (!current()) return;
       const approximate = {
         latitude: Math.round(point.latitude * 100) / 100,
         longitude: Math.round(point.longitude * 100) / 100,
       };
-      setCurrentLocation({ ...approximate, place: MOCK_VIENNA ? viennaPlace : null });
+      setCurrentLocation({ ...approximate, place: null, location: null });
       clearTimeout(timeout);
       const networkTimeout = setTimeout(() => {
         if (current()) {
@@ -164,10 +155,18 @@ export function EventLocationSession({
         }
       }, 10000);
       try {
-        const data = await nearbyEvents(point, controller.signal);
+        const locationRequest = reverseLocation(point, controller.signal);
+        const [data, resolved] = await Promise.all([
+          nearbyEvents(point, controller.signal),
+          locationRequest,
+        ]);
         if (current()) {
           setResult({ status: 'ready', data });
-          setCurrentLocation({ ...approximate, place: MOCK_VIENNA ? viennaPlace : data.location ?? null });
+          setCurrentLocation({
+            ...approximate,
+            place: data.location ?? null,
+            location: resolved,
+          });
         }
       } catch {
         if (current()) setResult({ status: 'error', data: null });
@@ -191,7 +190,7 @@ export function EventLocationSession({
     const version = ++consentEpoch.current;
     setRequesting(true);
     setDeclined(false);
-    const state = MOCK_VIENNA ? 'granted' : await requestPermission();
+    const state = await requestPermission();
     if (!alive.current || version !== consentEpoch.current) return;
     setRequesting(false);
     if (state === 'denied' || state === 'prompt') {
@@ -202,10 +201,14 @@ export function EventLocationSession({
     try {
       const token = await getIdToken();
       if (!token) throw new Error('Authentication required');
-      const profile = await profileApi.update(token, { eventLocationConsent: true });
-      if (profile.eventLocationConsent !== true) throw new Error('Consent was not saved');
+      const profile = await profileApi.update(token, {
+        eventLocationConsent: true,
+      });
+      if (profile.eventLocationConsent !== true)
+        throw new Error('Consent was not saved');
     } catch {
-      if (alive.current && version === consentEpoch.current) setConsentError(true);
+      if (alive.current && version === consentEpoch.current)
+        setConsentError(true);
       return;
     }
     if (!alive.current || version !== consentEpoch.current) return;
@@ -234,9 +237,7 @@ export function EventLocationSession({
     const subscription = AppState.addEventListener('change', (state) => {
       foreground.current = state === 'active';
       if (!foreground.current) clear();
-      else if (enabledRef.current && MOCK_VIENNA) {
-        if (home.current || events.current) void refresh();
-      } else if (enabledRef.current) {
+      else if (enabledRef.current) {
         void permission().then((state) => {
           if (!alive.current) return;
           if (state === 'denied' || state === 'prompt') {
@@ -247,7 +248,7 @@ export function EventLocationSession({
       }
     });
     const stop = watchPermission((state) => {
-      if (!MOCK_VIENNA && enabledRef.current && (state === 'denied' || state === 'prompt')) {
+      if (enabledRef.current && (state === 'denied' || state === 'prompt')) {
         setDeclined(true);
         disable();
       }
@@ -260,32 +261,42 @@ export function EventLocationSession({
       subscription.remove();
     };
   }, [clear, disable, refresh]);
-  const saveConsent = useCallback(async (allow: boolean) => {
-    if (!active || savingRef.current) return;
-    desiredConsent.current = allow;
-    savingRef.current = true;
-    setSaving(true);
-    setConsentError(false);
-    try {
-      if (allow) {
-        await enable();
-      } else {
-        disable();
-        const token = await getIdToken();
-        if (!token) throw new Error('Authentication required');
-        const profile = await profileApi.update(token, { eventLocationConsent: false });
-        if (profile.eventLocationConsent !== false) throw new Error('Consent was not saved');
+  const saveConsent = useCallback(
+    async (allow: boolean) => {
+      if (!active || savingRef.current) return;
+      desiredConsent.current = allow;
+      savingRef.current = true;
+      setSaving(true);
+      setConsentError(false);
+      try {
+        if (allow) {
+          await enable();
+        } else {
+          disable();
+          const token = await getIdToken();
+          if (!token) throw new Error('Authentication required');
+          const profile = await profileApi.update(token, {
+            eventLocationConsent: false,
+          });
+          if (profile.eventLocationConsent !== false)
+            throw new Error('Consent was not saved');
+        }
+      } catch {
+        if (alive.current) setConsentError(true);
+      } finally {
+        savingRef.current = false;
+        if (alive.current) setSaving(false);
       }
-    } catch {
-      if (alive.current) setConsentError(true);
-    } finally {
-      savingRef.current = false;
-      if (alive.current) setSaving(false);
-    }
-  }, [active, enable, disable, getIdToken]);
-  const retryConsent = useCallback(() => { void saveConsent(desiredConsent.current); }, [saveConsent]);
+    },
+    [active, enable, disable, getIdToken],
+  );
+  const retryConsent = useCallback(() => {
+    void saveConsent(desiredConsent.current);
+  }, [saveConsent]);
   const enableSaved = useCallback(() => saveConsent(true), [saveConsent]);
-  const disableSaved = useCallback(() => { void saveConsent(false); }, [saveConsent]);
+  const disableSaved = useCallback(() => {
+    void saveConsent(false);
+  }, [saveConsent]);
   useEffect(() => {
     if (!active) return;
     let cancelled = false;
@@ -295,15 +306,24 @@ export function EventLocationSession({
         const token = await getIdToken();
         if (!token) throw new Error('Authentication required');
         const profile = await profileApi.provision(token, null);
-        if (cancelled || !alive.current || version !== consentEpoch.current || savingRef.current) return;
+        if (
+          cancelled ||
+          !alive.current ||
+          version !== consentEpoch.current ||
+          savingRef.current
+        )
+          return;
         enabledRef.current = profile.eventLocationConsent === true;
         setEnabled(enabledRef.current);
-        if (enabledRef.current && (home.current || events.current)) void refresh();
+        if (enabledRef.current && (home.current || events.current))
+          void refresh();
       } catch {
         if (!cancelled && alive.current) setConsentError(true);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [active, getIdToken, refresh]);
   const value = useMemo(
     () => ({

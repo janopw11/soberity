@@ -36,9 +36,20 @@ application restarts were performed.
 
 The P2-I00 policy selects the [GeoNames global dump](https://download.geonames.org/export/dump/readme.txt)
 under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). P2-I01 implements
-the importer and lookup APIs. No provider account/key or on-search external
-request is used. Full worldwide data are intentionally not embedded in Git or
+the importer and lookup APIs. Catalog lookups never call an external provider.
+The only external request is the optional Geoapify reverse geocoding of the
+consented, current position described below. Full worldwide data are intentionally not embedded in Git or
 loaded by Flyway/application startup.
+
+## Current location address (Geoapify reverse geocoding)
+
+With consent on Sober Events, the app resolves the nearest street address with
+the public Geoapify key (`EXPO_PUBLIC_GEOAPIFY_API_KEY`, origin-restricted). Only
+the position rounded to three decimals (about 100 m) leaves the device. The exact
+coordinates are not saved, and no location history is kept. Without the key the
+display falls back to the nearest catalog city from the backend, then to
+"Location unavailable". The nearby event search itself uses the device position
+and never calls Geoapify. Consent text (EN/PL) states this disclosure.
 
 ## Run on the intended database
 

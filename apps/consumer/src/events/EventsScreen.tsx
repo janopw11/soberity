@@ -1,7 +1,8 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+const EventMap = lazy(() => import('./EventMap'));
 import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import {
@@ -66,6 +67,8 @@ export default function EventsScreen() {
     data: EventPage | null;
     error: boolean;
   } | null>(null);
+  const [view, setView] = useState<'list' | 'map'>('list');
+  const canMap = true;
   const appliedFilterCount = [
     applied.values.name.trim(),
     applied.values.category,
@@ -194,7 +197,48 @@ export default function EventsScreen() {
           ) : null}
         </Pressable>
       </View>
-      <CurrentEventLocation />
+      <View style={styles.locationRow}>
+        <View style={styles.locationGrow}>
+          <CurrentEventLocation />
+        </View>
+        {canMap ? (
+          <View
+            accessibilityRole="tablist"
+            style={[
+              styles.viewSwitch,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.surfaceAlt,
+              },
+            ]}
+          >
+            {(['list', 'map'] as const).map((option) => (
+              <Pressable
+                key={option}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: view === option }}
+                onPress={() => setView(option)}
+                style={[
+                  styles.viewOption,
+                  view === option ? { backgroundColor: colors.surface } : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.viewLabel,
+                    {
+                      color:
+                        view === option ? colors.primary : colors.textMuted,
+                    },
+                  ]}
+                >
+                  {t(`events.view.${option}`)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
+      </View>
       <EventFiltersSheet
         visible={filtersOpen}
         title={t('events.filtersTitle')}
@@ -265,7 +309,11 @@ export default function EventsScreen() {
           <Alert variant="danger" message={t('events.dateError')} />
         ) : null}
       </EventFiltersSheet>
-      {error ? (
+      {canMap && view === 'map' ? (
+        <Suspense fallback={<LoadingState label={t('events.loading')} />}>
+          <EventMap query={applied.query} />
+        </Suspense>
+      ) : error ? (
         <EventLoadError onRetry={() => retry((value) => value + 1)} />
       ) : !data ? (
         <LoadingState label={t('events.loading')} />
@@ -356,6 +404,31 @@ function EventLoadError({ onRetry }: { onRetry: () => void }) {
   );
 }
 const styles = StyleSheet.create({
+  locationRow: {
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.space8,
+  },
+  locationGrow: { flex: 1, minWidth: 0 },
+  viewSwitch: {
+    flexDirection: 'row',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.pill,
+    padding: 2,
+    gap: 2,
+  },
+  viewOption: {
+    minHeight: 36,
+    minWidth: 72,
+    paddingHorizontal: spacing.space12,
+    borderRadius: radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewLabel: { fontSize: 13, fontWeight: '600' },
   toolbar: {
     width: '100%',
     maxWidth: 800,

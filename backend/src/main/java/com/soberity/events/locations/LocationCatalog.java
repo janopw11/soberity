@@ -42,8 +42,8 @@ public class LocationCatalog {
         double edge=Math.min(90.0,Math.abs(latitude)+reach);
         double longitudeReach=edge>=89.9?180.0:Math.min(180.0,20.0/(110.0*Math.cos(Math.toRadians(edge))));
         var rows=jdbc.queryForList("""
-            SELECT city_id,label_en,label_pl,country_label_en,country_label_pl FROM (
-              SELECT c.id AS city_id,c.label_en,c.label_pl,co.label_en AS country_label_en,co.label_pl AS country_label_pl,
+            SELECT city_id,country_id,label_en,label_pl,country_label_en,country_label_pl FROM (
+              SELECT c.id AS city_id,co.id AS country_id,c.label_en,c.label_pl,co.label_en AS country_label_en,co.label_pl AS country_label_pl,
                 2*6371.0088*asin(sqrt(least(1.0,greatest(0.0,
                   power(sin(radians(c.latitude-?)/2),2)+cos(radians(?))*cos(radians(c.latitude))*power(sin(radians(c.longitude-?)/2),2))))) AS distance_km
               FROM location_city c JOIN location_country co ON co.id=c.country_id

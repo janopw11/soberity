@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Link,
   useRouter,
@@ -6,7 +13,9 @@ import {
   useLocalSearchParams,
 } from 'expo-router';
 import {
+  Image,
   Linking,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,6 +28,12 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { Alert, Button, Dialog, LoadingState, Screen } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { ReadingText, RichDocument } from '../science/readingUi';
+import { hasPreciseLocation } from './mapModel';
+const DirectionsChooser = lazy(() => import('./DirectionsChooser'));
+/* eslint-disable @typescript-eslint/no-require-imports -- Metro static assets */
+const mapIconLight = require('../../assets/images/map-icon-light.png');
+const mapIconDark = require('../../assets/images/map-icon-dark.png');
+/* eslint-enable @typescript-eslint/no-require-imports */
 import {
   EventActionBar,
   EventBackButton,
@@ -64,10 +79,11 @@ function Detail({ id }: { id: string | null }) {
     if (router.canGoBack()) router.back();
     else router.replace('/events');
   };
-  const { colors } = useThemePreferences();
+  const { colors, theme } = useThemePreferences();
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [organizer, setOrganizer] = useState<PublicOrganizer | null>(null);
   const [organizerFailed, setOrganizerFailed] = useState(false);
+  const [directionsOpen, setDirectionsOpen] = useState(false);
   const [error, setError] = useState<'unavailable' | 'error' | null>(null);
   const [attempt, retry] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -233,6 +249,7 @@ function Detail({ id }: { id: string | null }) {
     );
   const dates = detailDates(event, locale);
   const place = detailLocation(event, language);
+  const mapEvent = hasPreciseLocation(event) ? event : null;
   const price = detailPrice(event, locale);
   const preview = isPreviewListing(event);
   const hostName = organizer?.name?.trim() || event.organizer_name?.trim();
@@ -268,16 +285,53 @@ function Detail({ id }: { id: string | null }) {
           ]}
         >
           <View style={styles.identity}>
-            <Text
-              selectable
-              accessibilityRole="header"
-              style={[
-                width >= 768 ? typography.display : typography.h1,
-                { color: colors.textPrimary },
-              ]}
-            >
-              {event.title?.trim() || t('events.detailTitle')}
-            </Text>
+            <View style={styles.titleRow}>
+              <Text
+                selectable
+                accessibilityRole="header"
+                style={[
+                  styles.titleText,
+                  width >= 768 ? typography.display : typography.h1,
+                  { color: colors.textPrimary },
+                ]}
+              >
+                {event.title?.trim() || t('events.detailTitle')}
+              </Text>
+              {mapEvent ? (
+                <>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t('events.map.showOnMap')}
+                    onPress={() => setDirectionsOpen(true)}
+                    style={({ pressed }) => [
+                      styles.mapButton,
+                      {
+                        borderColor: colors.border,
+                        backgroundColor: pressed
+                          ? colors.surfaceAlt
+                          : colors.surface,
+                      },
+                    ]}
+                  >
+                    <Image
+                      source={theme === 'dark' ? mapIconDark : mapIconLight}
+                      style={styles.mapIcon}
+                      accessibilityIgnoresInvertColors
+                    />
+                  </Pressable>
+                  {directionsOpen ? (
+                    <Suspense fallback={null}>
+                      <DirectionsChooser
+                        title={mapEvent.title}
+                        latitude={mapEvent.latitude}
+                        longitude={mapEvent.longitude}
+                        onClose={() => setDirectionsOpen(false)}
+                      />
+                    </Suspense>
+                  ) : null}
+                </>
+              ) : null}
+            </View>
             <View style={styles.badges}>
               <Text
                 style={[
@@ -319,11 +373,28 @@ function Detail({ id }: { id: string | null }) {
                     { flexBasis: width >= 768 ? '40%' : '100%' },
                   ]}
                 >
-                  <EventInfoRow
-                    icon="location"
-                    value={place.name}
-                    detail={place.detail}
-                  />
+                  {mapEvent ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t('events.map.openDirections')}
+                      onPress={() => setDirectionsOpen(true)}
+                      style={({ pressed }) =>
+                        pressed ? { opacity: 0.7 } : undefined
+                      }
+                    >
+                      <EventInfoRow
+                        icon="location"
+                        value={place.name}
+                        detail={place.detail}
+                      />
+                    </Pressable>
+                  ) : (
+                    <EventInfoRow
+                      icon="location"
+                      value={place.name}
+                      detail={place.detail}
+                    />
+                  )}
                 </View>
               ) : null}
               {price || availability ? (
@@ -431,6 +502,22 @@ function Detail({ id }: { id: string | null }) {
   );
 }
 const styles = StyleSheet.create({
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    gap: spacing.space12,
+  },
+  titleText: { flexShrink: 1, flexGrow: 1 },
+  mapButton: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radii.pill,
+  },
+  mapIcon: { width: 24, height: 24 },
   root: { flex: 1 },
   scroll: { flex: 1 },
   scrollContent: {

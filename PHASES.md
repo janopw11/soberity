@@ -988,6 +988,30 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ---
 
+## P2-I07 — Precise event locations (backend)
+
+**Status:** IN_PROGRESS (zakres backendowy; autocomplete, mapa i UI poza tą iteracją)  
+**Started:** 2026-11-07  
+**Finished:** —  
+**Zależności iteracji:** P2-I01 (lokalizacje globalne), P2-I04 (admin eventów), P2-I06 (kurowane wydarzenia)  
+**Dowód:** `VenuePreciseLocationIT` (4 PASS), `EventVenuePrecisionTest` (5 PASS), `EventsMigrationIT` (PASS). `CuratedEventsApiIT`: 2 testy FAIL przed tą zmianą (`events_revision_immutable` z V17 blokuje UPDATE w testach) — poza zakresem, niezmienione.  
+**Blokery:** Brak; mapa natywna wymaga decyzji o bibliotece (react-native-maps dla iOS/Android, react-leaflet dla web).
+
+**Zakres zadań:**
+
+- [x] `P2-I07-T01` Migracja `V24__venue_precise_location.sql`: addytywne pola `events_venue` (street, building_number, postal_code, formatted_address, provider_place_id, location_precision) bez backfillu i bez UPDATE na append-only tabeli.
+- [x] `P2-I07-T02` Walidacja precyzji i wymagania współrzędnych dla ADDRESS/VENUE w `EventService.venue`; legacy venues zachowują `NULL` precyzji.
+- [ ] `P2-I07-T03` Komponent AddressAutocomplete (Geoapify, web) w edytorze eventu z debounce i anulowaniem nieaktualnych zapytań. **Stan:** kod gotowy (`AddressAutocomplete.web.tsx`, `addressSelection.ts`, integracja w edytorze, zapis pól precyzyjnych w ścieżce kuratorskiej, typecheck/lint/jest modułu OK). Uruchomienie w przeglądarce i kontrola wizualna **NOT VERIFIED**; automatyczny wybór kraju/miasta z katalogu **ZROBIONE** (backend wyprowadza je z potwierdzonego punktu).
+- [ ] `P2-I07-T04` Podgląd mapy i przesuwanie markera w panelu admina; brak numerycznych pól lat/lng w UI. **Stan:** kod gotowy (`LocationPreviewMap.web.tsx`, lazy-load, Geoapify tiles z atrybucją, `placeAddressPoint`: kliknięcie/przeciągnięcie potwierdza pozycję i zamienia CITY na VENUE). Test w przeglądarce **NOT VERIFIED**.
+- [ ] `P2-I07-T05` Mapa Sober Events (widok listy/mapy), marker popup i modal w Event Details. **Stan (web):** przełącznik List/Map (`EventsScreen`), mapa z tymi samymi filtrami i `size=100` (`EventMap.web.tsx`, `mapModel.ts`), tylko precyzyjne punkty dostają marker (`coordinate_source=VENUE`), karta podglądu z linkiem do szczegółów i Google/Apple Maps, fit-to-bounds, stany pusty/błąd/obcięcie, przycisk mapy i modal na Event Details (`EventLocationModal.web.tsx`). **Otwarte:** natywna mapa (react-native-maps, wymaga dev buildu), klastrowanie markerów (brak biblioteki), wszystkie testy UI w przeglądarce **NOT VERIFIED**. Build web `expo export` PASS; testy `mapModel` 3/3 PASS.
+
+**Weryfikacja:**
+
+- [x] `P2-I07-V01` Testy backendowe nowych reguł (precyzja, marker wymaga punktu, zakresy, legacy NULL).
+- [ ] `P2-I07-V02` Testy UI/E2E admin autocomplete, mapy i nawigacji po zaimplementowaniu T03–T05.
+
+---
+
 # Phase 3 — Retention, gry, personalizacja i powiadomienia
 
 **Status fazy:** TODO  

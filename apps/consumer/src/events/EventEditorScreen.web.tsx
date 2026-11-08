@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -15,7 +17,11 @@ import { useAuthStatus } from '../auth/AuthStatusContext';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { CATEGORY_CODES } from './eventsApi';
 import { LocationSelect } from './LocationSelect';
+import AddressAutocomplete from './AddressAutocomplete.web';
+import { placeAddressPoint, type AddressSelection } from './addressSelection';
 import type { LocationRecord } from './discoveryApi';
+
+const LocationPreviewMap = lazy(() => import('./LocationPreviewMap.web'));
 import {
   EventEditorError,
   eventEditorImage,
@@ -48,23 +54,35 @@ const localTime = (value: unknown) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
 const emptyDocument = () => ({ type: 'doc', content: [{ type: 'paragraph' }] });
-function selectedLocation(
+/** Rebuilds the stored selection so an unchanged address keeps its precise point on save. */
+function selectionFromContent(
   content: Record<string, unknown>,
-  kind: 'country' | 'city',
-): LocationRecord {
+): AddressSelection | null {
+  const precision = content.location_precision;
+  if (precision !== 'ADDRESS' && precision !== 'VENUE' && precision !== 'CITY')
+    return null;
+  const exact = precision !== 'CITY';
+  const latitude = Number(content.latitude);
+  const longitude = Number(content.longitude);
+  const hasPoint =
+    content.latitude !== null &&
+    content.longitude !== null &&
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude);
   return {
-    id: String(content[`${kind}_id`]),
-    geoname_id: Number(content[`${kind}_geoname_id`]),
-    name: String(content[`${kind}_name`]),
-    label: String(content[`${kind}_label_en`]),
-    label_en: String(content[`${kind}_label_en`]),
-    label_pl: String(content[`${kind}_label_pl`]),
-    ...(kind === 'city'
-      ? {
-          region: content.region as string | null,
-          district: content.district as string | null,
-        }
-      : {}),
+    formattedAddress: String(
+      content.formatted_address ?? content.address ?? '',
+    ),
+    street: (content.street as string | null) ?? null,
+    buildingNumber: (content.building_number as string | null) ?? null,
+    postalCode: (content.postal_code as string | null) ?? null,
+    city: null,
+    countryCode: null,
+    providerPlaceId: (content.provider_place_id as string | null) ?? null,
+    latitude: exact ? latitude : null,
+    longitude: exact ? longitude : null,
+    center: hasPoint ? { latitude, longitude } : null,
+    locationPrecision: precision,
   };
 }
 export default function EventEditorScreen() {
@@ -83,10 +101,10 @@ export default function EventEditorScreen() {
   const [current, setCurrent] = useState<EditorEvent | null>(null),
     [editing, setEditing] = useState(false),
     [form, setForm] = useState(blank);
-  const [country, setCountry] = useState<LocationRecord | null>(null),
-    [city, setCity] = useState<LocationRecord | null>(null);
   const [cover, setCover] = useState<string | null>(null),
     [preview, setPreview] = useState('');
+  const [geo, setGeo] = useState<AddressSelection | null>(null),
+    [formKey, setFormKey] = useState(0);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [success, setSuccess] = useState(''),
@@ -248,8 +266,8 @@ export default function EventEditorScreen() {
         setCurrent(null);
         setForm(blank());
         setCover(null);
-        setCountry(null);
-        setCity(null);
+        setGeo(null);
+        setFormKey((key) => key + 1);
         editor?.commands.setContent(emptyDocument());
       } else {
         const detail = await eventEditorRequest<EditorEvent>(
@@ -258,8 +276,8 @@ export default function EventEditorScreen() {
           ),
           c = detail.content;
         setCurrent(detail);
-        setCountry(selectedLocation(c, 'country'));
-        setCity(selectedLocation(c, 'city'));
+        setGeo(selectionFromContent(c));
+        setFormKey((key) => key + 1);
         setCover(c.cover_id);
         setForm({
           ...blank(),
@@ -305,8 +323,6 @@ export default function EventEditorScreen() {
       !form.title.trim() ||
       !form.organizerUrl.trim() ||
       !form.start ||
-      !country ||
-      !city ||
       !form.rules.trim() ||
       !form.drinks.trim() ||
       !form.source.trim() ||
@@ -317,7 +333,11 @@ export default function EventEditorScreen() {
       !form.beverageConfirmed
     ) {
       setError(t('eventEditor.required'));
-      return;
+      return null;
+    }
+    if (!geo || geo.latitude === null || geo.longitude === null) {
+      setError(t('eventEditor.location.confirmRequired'));
+      return null;
     }
     const start = new Date(
       current && form.start === localTime(current.content.starts_at)
@@ -340,7 +360,7 @@ export default function EventEditorScreen() {
           end <= start))
     ) {
       setError(t('eventEditor.dateError'));
-      return;
+      return null;
     }
     const saved = await eventEditorRequest<EditorEvent>(
       await token(),
@@ -348,20 +368,16 @@ export default function EventEditorScreen() {
       current ? 'PUT' : 'POST',
       {
         expectedVersion: current?.version ?? null,
-        countryId: country.id,
-        cityId: city.id,
         venueName: form.name,
         address: form.address,
-        latitude:
-          current?.content.coordinate_source === 'VENUE' &&
-          current.content.city_id === city.id
-            ? current.content.latitude
-            : null,
-        longitude:
-          current?.content.coordinate_source === 'VENUE' &&
-          current.content.city_id === city.id
-            ? current.content.longitude
-            : null,
+        street: geo?.street ?? null,
+        buildingNumber: geo?.buildingNumber ?? null,
+        postalCode: geo?.postalCode ?? null,
+        formattedAddress: geo?.formattedAddress || null,
+        providerPlaceId: geo?.providerPlaceId ?? null,
+        locationPrecision: geo?.locationPrecision ?? null,
+        latitude: geo?.latitude ?? null,
+        longitude: geo?.longitude ?? null,
         title: form.title,
         description: editor.getText(),
         descriptionDocument: editor.getJSON(),
@@ -395,6 +411,21 @@ export default function EventEditorScreen() {
     setCurrent(saved);
     setDirty(false);
     setSuccess(t('eventEditor.saved'));
+    await refresh();
+    return saved;
+  };
+  /** Saves the edited event and publishes it in one action; publication is still validated by the database. */
+  const saveAndPublish = async () => {
+    const saved = await save();
+    if (!saved) return;
+    await eventEditorRequest(await token(), `/${saved.id}/publish`, 'POST', {
+      expectedVersion: saved.version,
+    });
+    setCurrent(
+      await eventEditorRequest<EditorEvent>(await token(), `/${saved.id}`),
+    );
+    setDirty(false);
+    setSuccess(t('eventEditor.publishedDirectly'));
     await refresh();
   };
   const remove = (item: { id: string; version: number }) => {
@@ -734,25 +765,57 @@ export default function EventEditorScreen() {
                     </select>
                   </label>
                   {input('name')}
-                  {input('address')}
-                  <LocationSelect
-                    kind="countries"
-                    value={country}
-                    onChange={(value) => {
-                      setCountry(value);
-                      setCity(null);
-                      setDirty(true);
-                    }}
-                  />
-                  <LocationSelect
-                    kind="cities"
-                    countryId={country?.id}
-                    value={city}
-                    onChange={(value) => {
-                      setCity(value);
-                      setDirty(true);
-                    }}
-                  />
+                  <label>
+                    {t('eventEditor.fields.address')}
+                    <AddressAutocomplete
+                      key={formKey}
+                      initialValue={form.address}
+                      disabled={busy}
+                      onInput={(text) => {
+                        setGeo((previous) =>
+                          previous?.formattedAddress === text ? previous : null,
+                        );
+                        update('address', text);
+                      }}
+                      onSelect={(selection) => {
+                        setGeo(selection);
+                        update('address', selection.formattedAddress);
+                      }}
+                    />
+                  </label>
+                  {geo?.locationPrecision === 'CITY' ? (
+                    <p className="ev-hint" role="status">
+                      {t('eventEditor.location.cityOnly')}
+                    </p>
+                  ) : !geo && form.address.trim() ? (
+                    <p className="ev-hint" role="status">
+                      {t('eventEditor.location.notSelected')}
+                    </p>
+                  ) : null}
+                  {geo?.center && process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY ? (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <Suspense fallback={null}>
+                        <LocationPreviewMap
+                          apiKey={process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}
+                          latitude={geo.center.latitude}
+                          longitude={geo.center.longitude}
+                          zoom={geo.latitude === null ? 12 : 16}
+                          onPlace={(latitude, longitude) => {
+                            setGeo((previous) =>
+                              previous
+                                ? placeAddressPoint(
+                                    previous,
+                                    latitude,
+                                    longitude,
+                                  )
+                                : previous,
+                            );
+                            setDirty(true);
+                          }}
+                        />
+                      </Suspense>
+                    </div>
+                  ) : null}
                 </div>
               </section>
               <section>
@@ -777,10 +840,20 @@ export default function EventEditorScreen() {
               <button
                 disabled={busy}
                 onClick={() => {
-                  void act(save);
+                  void act(async () => {
+                    await save();
+                  });
                 }}
               >
                 {t('eventEditor.save')}
+              </button>
+              <button
+                disabled={busy}
+                onClick={() => {
+                  void act(saveAndPublish);
+                }}
+              >
+                {t('eventEditor.saveAndPublish')}
               </button>
               {current?.status === 'DRAFT' ? (
                 <button
@@ -820,4 +893,4 @@ export default function EventEditorScreen() {
     </div>
   );
 }
-const css = `.ev-viewport{flex:1;min-height:0;height:100%;width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch}.ev-viewport:focus-visible{outline:2px solid var(--ev-focusRing);outline-offset:-2px}.ev-panel{max-width:1120px;width:100%;margin:0 auto;padding:${spacing.space24}px ${spacing.space16}px;color:var(--ev-textPrimary);font-family:system-ui,sans-serif;box-sizing:border-box}.ev-panel *{box-sizing:border-box}.ev-panel header,.ev-actions,.ev-panel nav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ev-panel h1{font-size:${typography.h2.fontSize}px;color:var(--ev-primary)}.ev-panel h2{font-size:${typography.h3.fontSize}px}.ev-panel section{padding:16px;border:1px solid var(--ev-border);border-radius:${radii.lg}px;background:var(--ev-surface);margin:16px 0}.ev-panel fieldset{border:0;padding:0;min-width:0}.ev-panel label{display:flex;flex-direction:column;gap:8px;margin:12px 0;color:var(--ev-primary);font-size:14px}.ev-panel input,.ev-panel textarea,.ev-panel select{min-height:48px;width:100%;padding:12px;border:1px solid var(--ev-border);border-radius:8px;background:var(--ev-surface);color:var(--ev-textPrimary);font:inherit;min-width:0}.ev-panel textarea{min-height:100px;resize:vertical}.ev-panel button,.ev-panel summary,.ev-panel a{min-height:48px;padding:12px;color:var(--ev-primary);font:inherit;cursor:pointer;border:1px solid var(--ev-border);border-radius:8px;background:var(--ev-surface);overflow-wrap:anywhere}.ev-panel button:hover:not(:disabled){background:var(--ev-surfaceAlt)}.ev-panel :focus-visible{outline:2px solid var(--ev-focusRing);outline-offset:2px}.ev-panel button:disabled{opacity:.5;cursor:default}.ev-panel .ev-check{flex-direction:row;align-items:center;color:var(--ev-textPrimary)}.ev-check input{width:24px;min-height:24px;flex-shrink:0}.ev-panel .ev-error{color:var(--ev-danger)}.ev-panel .ev-success{color:var(--ev-success)}.ev-event{display:flex;width:100%;justify-content:space-between;gap:16px;margin:8px 0;text-align:left}.ev-library-filters{margin-top:16px!important}.ev-library-filters legend{color:var(--ev-primary);font-size:14px}.ev-event-summary{display:flex;flex-direction:column;gap:4px;min-width:0}.ev-event-summary strong{overflow-wrap:anywhere}.ev-event-location{color:var(--ev-textSecondary);font-size:14px}.ev-library-row{display:flex;align-items:center;gap:8px}.ev-library-row .ev-event{flex:1;min-width:0}.ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:0 16px}.ev-editor{border:1px solid var(--ev-border);border-radius:12px;overflow:hidden}.ev-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--ev-surfaceAlt)}.ev-toolbar button{font-size:14px}.ev-prose{padding:16px;min-height:280px;line-height:1.6;overflow-wrap:anywhere}.ev-prose p{margin:0 0 12px}.ev-preview{display:block;width:100%;max-width:480px;aspect-ratio:16/9;object-fit:cover;border-radius:12px}.ev-actions{justify-content:flex-end}.ev-panel p{line-height:1.5}`;
+const css = `.ev-viewport{flex:1;min-height:0;height:100%;width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch}.ev-viewport:focus-visible{outline:2px solid var(--ev-focusRing);outline-offset:-2px}.ev-panel{max-width:1120px;width:100%;margin:0 auto;padding:${spacing.space24}px ${spacing.space16}px;color:var(--ev-textPrimary);font-family:system-ui,sans-serif;box-sizing:border-box}.ev-panel *{box-sizing:border-box}.ev-panel header,.ev-actions,.ev-panel nav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ev-panel h1{font-size:${typography.h2.fontSize}px;color:var(--ev-primary)}.ev-panel h2{font-size:${typography.h3.fontSize}px}.ev-panel section{padding:16px;border:1px solid var(--ev-border);border-radius:${radii.lg}px;background:var(--ev-surface);margin:16px 0}.ev-panel fieldset{border:0;padding:0;min-width:0}.ev-panel label{display:flex;flex-direction:column;gap:8px;margin:12px 0;color:var(--ev-primary);font-size:14px}.ev-panel input,.ev-panel textarea,.ev-panel select{min-height:48px;width:100%;padding:12px;border:1px solid var(--ev-border);border-radius:8px;background:var(--ev-surface);color:var(--ev-textPrimary);font:inherit;min-width:0}.ev-panel textarea{min-height:100px;resize:vertical}.ev-panel button,.ev-panel summary,.ev-panel a{min-height:48px;padding:12px;color:var(--ev-primary);font:inherit;cursor:pointer;border:1px solid var(--ev-border);border-radius:8px;background:var(--ev-surface);overflow-wrap:anywhere}.ev-panel button:hover:not(:disabled){background:var(--ev-surfaceAlt)}.ev-panel :focus-visible{outline:2px solid var(--ev-focusRing);outline-offset:2px}.ev-panel button:disabled{opacity:.5;cursor:default}.ev-panel .ev-check{flex-direction:row;align-items:center;color:var(--ev-textPrimary)}.ev-check input{width:24px;min-height:24px;flex-shrink:0}.ev-panel .ev-error{color:var(--ev-danger)}.ev-panel .ev-success{color:var(--ev-success)}.ev-event{display:flex;width:100%;justify-content:space-between;gap:16px;margin:8px 0;text-align:left}.ev-library-filters{margin-top:16px!important}.ev-library-filters legend{color:var(--ev-primary);font-size:14px}.ev-event-summary{display:flex;flex-direction:column;gap:4px;min-width:0}.ev-event-summary strong{overflow-wrap:anywhere}.ev-event-location{color:var(--ev-textSecondary);font-size:14px}.ev-library-row{display:flex;align-items:center;gap:8px}.ev-library-row .ev-event{flex:1;min-width:0}.ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:0 16px}.ev-editor{border:1px solid var(--ev-border);border-radius:12px;overflow:hidden}.ev-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--ev-surfaceAlt)}.ev-toolbar button{font-size:14px}.ev-prose{padding:16px;min-height:280px;line-height:1.6;overflow-wrap:anywhere}.ev-prose p{margin:0 0 12px}.ev-preview{display:block;width:100%;max-width:480px;aspect-ratio:16/9;object-fit:cover;border-radius:12px}.ev-actions{justify-content:flex-end}.ev-panel p{line-height:1.5}.ev-panel .ev-hint{margin:4px 0 12px;font-size:14px;color:var(--ev-textSecondary)}.ev-panel .geoapify-autocomplete-items{max-height:240px;overflow-y:auto;margin:4px 0 0;padding:4px 0;border:1px solid var(--ev-border);border-radius:${radii.md}px;background:var(--ev-surface);z-index:10}.ev-panel .geoapify-autocomplete-items div{min-height:48px;padding:12px;color:var(--ev-textPrimary);font:inherit;font-size:14px;cursor:pointer;border:0;border-radius:0;background:transparent}.ev-panel .geoapify-autocomplete-items div:hover,.ev-panel .geoapify-autocomplete-items .active{background:var(--ev-surfaceAlt)}.ev-map{position:relative;z-index:0;margin:4px 0 12px}.ev-map-canvas{height:240px;width:100%;border:1px solid var(--ev-border);border-radius:${radii.md}px;overflow:hidden}.ev-map-pin{background:transparent;border:0}.ev-map-pin span{display:block;width:20px;height:20px;border-radius:50%;background:var(--ev-primary);border:3px solid var(--ev-surface);box-shadow:0 1px 4px rgba(0,0,0,.35)}`;

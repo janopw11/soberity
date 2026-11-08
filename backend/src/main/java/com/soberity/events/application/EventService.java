@@ -25,8 +25,14 @@ public class EventService {
     public UUID venue(VerifiedToken actor,UUID organizerId,VenueInput input) {
         access.member(actor,organizerId);organizers.lock(organizerId);
         if(input==null) throw bad("Venue required.");coordinates(input.latitude(),input.longitude());
+        String precision=precision(input.locationPrecision(),input.latitude(),input.longitude());
         UUID id=UUID.randomUUID();
-        jdbc.update("INSERT INTO events_venue(id,organizer_id,name,address,city,region,country_code,latitude,longitude) VALUES (?,?,?,?,?,?,?,?,?)",id,organizerId,text(input.name(),200),text(input.address(),500),text(input.city(),150),optional(input.region(),150),country(input.countryCode()),input.latitude(),input.longitude());
+        jdbc.update("""
+            INSERT INTO events_venue(id,organizer_id,name,address,city,region,country_code,latitude,longitude,
+            street,building_number,postal_code,formatted_address,provider_place_id,location_precision)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """,id,organizerId,text(input.name(),200),text(input.address(),500),text(input.city(),150),optional(input.region(),150),country(input.countryCode()),input.latitude(),input.longitude(),
+            optional(input.street(),200),optional(input.buildingNumber(),40),optional(input.postalCode(),20),optional(input.formattedAddress(),500),optional(input.providerPlaceId(),200),precision);
         audit(actor,organizerId,null,"VENUE_CREATED");return id;
     }
     public Map<String,Object> venueDetail(VerifiedToken actor,UUID organizerId,UUID id) {
