@@ -29,7 +29,7 @@ public class EventCatalog {
         @com.fasterxml.jackson.annotation.JsonAnySetter
         public void unsupported(String name,Object value){throw new IllegalArgumentException("Unsupported nearby field.");}
     }
-    private static final String FIELDS="""
+    static final String FIELDS="""
         e.id,e.status,e.published_at,r.title,r.description,r.description_document,r.locale,r.track,r.category_code,
         r.alcohol_policy,r.alcohol_rules,r.beverage_notes,r.starts_at,r.ends_at,r.timezone,r.organizer_url,
         r.cover_id,m.alt_text AS cover_alt_text,r.price_kind,r.price_minor,r.currency,r.accessibility,
@@ -37,12 +37,12 @@ public class EventCatalog {
         v.name AS venue_name,v.address,c.name AS city,c.label_en AS city_en,c.label_pl AS city_pl,c.region,
         co.iso_code AS country_code,v.country_id,v.city_id,v.coordinate_source,v.latitude,v.longitude
         """;
-    private static final String JOIN="""
+    static final String JOIN="""
         FROM sober_event e JOIN events_revision r ON r.event_id=e.id AND r.revision=e.published_revision
         JOIN events_venue v ON v.id=r.venue_id JOIN location_city c ON c.id=v.city_id AND c.country_id=v.country_id
         JOIN location_country co ON co.id=v.country_id JOIN events_media m ON m.id=r.cover_id
         """;
-    private static final String ELIGIBLE="""
+    static final String ELIGIBLE="""
         e.curated AND e.status='PUBLISHED' AND e.current_revision=e.published_revision
         AND c.active AND co.active AND c.version=v.city_version
         AND r.alcohol_policy='ALCOHOL_FREE' AND r.alcohol_sold=false AND r.alcohol_served=false AND r.alcohol_permitted=false

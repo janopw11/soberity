@@ -1,11 +1,12 @@
 import 'leaflet/dist/leaflet.css';
-import { divIcon, latLngBounds } from 'leaflet';
+import { Control, divIcon, DomEvent, DomUtil, latLngBounds } from 'leaflet';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CircleMarker,
   MapContainer,
   Marker,
+  Popup,
   TileLayer,
   useMap,
 } from 'react-leaflet';
@@ -140,15 +141,24 @@ export default function EventMap({ query }: Props) {
           border: `1px solid ${colors.border}`,
         }}
       >
+        <style>{`.ev-popup .leaflet-popup-content-wrapper{background:${colors.surface};color:${colors.textPrimary};border:1px solid ${colors.border};border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.18)}.ev-popup .leaflet-popup-tip{background:${colors.surface}}.ev-popup .leaflet-popup-content{margin:0;width:auto!important}`}</style>
         <MapContainer
           center={[20, 0]}
           zoom={2}
           scrollWheelZoom={false}
+          zoomControl={false}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             url={`https://maps.geoapify.com/v1/tile/${theme === 'dark' ? 'dark-matter' : 'positron'}/{z}/{x}/{y}.png?apiKey=${apiKey}`}
             attribution={ATTRIBUTION}
+          />
+          <ZoomButtons
+            zoomInLabel={t('events.map.zoomIn')}
+            zoomOutLabel={t('events.map.zoomOut')}
+            surface={colors.surface}
+            border={colors.border}
+            primary={colors.primary}
           />
           <FitToEvents targets={fitTargets} />
           {origin ? (
@@ -172,17 +182,70 @@ export default function EventMap({ query }: Props) {
               eventHandlers={{ click: () => setSelectedId(event.id) }}
             />
           ))}
+          {selected ? (
+            <Popup
+              position={[selected.latitude, selected.longitude]}
+              autoPan
+              closeButton={false}
+              className="ev-popup"
+              eventHandlers={{ remove: () => setSelectedId(null) }}
+            >
+              <EventPreviewDialog
+                event={selected}
+                locale={i18n.resolvedLanguage === 'pl' ? 'pl' : 'en'}
+                onClose={() => setSelectedId(null)}
+              />
+            </Popup>
+          ) : null}
         </MapContainer>
-        {selected ? (
-          <EventPreviewDialog
-            event={selected}
-            locale={i18n.resolvedLanguage === 'pl' ? 'pl' : 'en'}
-            onClose={() => setSelectedId(null)}
-          />
-        ) : null}
       </div>
     </section>
   );
+}
+
+/** Zoom in/out buttons in the bottom-right corner, styled with the Soberity theme. */
+function ZoomButtons({
+  zoomInLabel,
+  zoomOutLabel,
+  surface,
+  border,
+  primary,
+}: {
+  zoomInLabel: string;
+  zoomOutLabel: string;
+  surface: string;
+  border: string;
+  primary: string;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    const control = new Control({ position: 'bottomright' });
+    control.onAdd = () => {
+      const box = DomUtil.create('div');
+      box.style.cssText =
+        'display:flex;flex-direction:column;gap:6px;margin:0 12px 12px 0';
+      const buttons: Array<[string, string, () => void]> = [
+        ['+', zoomInLabel, () => map.zoomIn()],
+        ['−', zoomOutLabel, () => map.zoomOut()],
+      ];
+      for (const [text, label, action] of buttons) {
+        const button = DomUtil.create('button', '', box);
+        button.type = 'button';
+        button.textContent = text;
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        button.style.cssText = `width:40px;height:40px;border-radius:12px;border:1px solid ${border};background:${surface};color:${primary};font:600 20px system-ui,sans-serif;cursor:pointer;padding:0`;
+        button.addEventListener('click', action);
+      }
+      DomEvent.disableClickPropagation(box);
+      return box;
+    };
+    control.addTo(map);
+    return () => {
+      control.remove();
+    };
+  }, [map, zoomInLabel, zoomOutLabel, surface, border, primary]);
+  return null;
 }
 
 function FitToEvents({

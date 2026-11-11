@@ -249,11 +249,13 @@ export function EventActionBar({
   busy,
   onPress,
   notice,
+  variant = 'primary',
 }: {
   label?: string | undefined;
   busy: boolean;
   onPress: () => void;
   notice?: string | undefined;
+  variant?: 'primary' | 'secondary';
 }) {
   const { colors } = useThemePreferences();
   const { t } = useTranslation();
@@ -279,6 +281,7 @@ export function EventActionBar({
         {label ? (
           <Button
             label={label}
+            variant={variant}
             disabled={busy}
             onPress={onPress}
             style={styles.primaryAction}

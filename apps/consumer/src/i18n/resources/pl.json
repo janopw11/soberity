@@ -246,6 +246,16 @@
     "retry": "Spróbuj ponownie",
     "loading": "Szukamy wydarzeń…",
     "view": { "list": "Lista", "map": "Mapa" },
+    "going": {
+      "action": "Idę na trzeźwo",
+      "active": "Idę na trzeźwo ✓",
+      "guestCta": "Zaloguj się, aby zaznaczyć: idę na trzeźwo",
+      "note": "Tylko prywatna notatka w Soberity. Bez rezerwacji i biletu, organizator nie dostaje żadnej informacji.",
+      "error": "Nie udało się zaktualizować. Spróbuj ponownie.",
+      "profileRow": "Idę na trzeźwo",
+      "profileTitle": "Idę na trzeźwo",
+      "profileEmpty": "Brak wydarzeń. Otwórz wydarzenie i wybierz „Idę na trzeźwo”, aby dodać je tutaj."
+    },
     "map": {
       "label": "Mapa wydarzeń bez alkoholu",
       "unavailable": "Mapa wymaga klucza Geoapify. Poproś administratora o jego konfigurację.",
@@ -262,6 +272,8 @@
       "modalLabel": "Mapa lokalizacji wydarzenia",
       "addressUnknown": "Dokładny adres nie został podany",
       "openDirections": "Otwórz lokalizację w aplikacji map",
+      "zoomIn": "Przybliż",
+      "zoomOut": "Oddal",
       "chooserTitle": "Otwórz tę lokalizację w",
       "cancel": "Anuluj"
     },

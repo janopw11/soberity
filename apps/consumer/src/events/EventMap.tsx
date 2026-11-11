@@ -2,12 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Image,
+  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
-import MapView, { Marker, UrlTile } from 'react-native-maps';
+import MapView, { Marker, UrlTile, type Region } from 'react-native-maps';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import EventPreviewDialog from './EventPreviewDialog';
 import {
@@ -29,6 +30,8 @@ type Props = { query: string };
 type PreciseEvent = DiscoveryEvent & PreciseCoordinates;
 
 const ATTRIBUTION = '© Geoapify · © OpenMapTiles · © OpenStreetMap';
+/** Visible latitude span after a tap: about 1 km, street level. */
+const FOCUS_SPAN = 0.01;
 
 /**
  * Native map of the Sober Events filters (iOS and Android). Uses Geoapify tiles when the public
@@ -38,8 +41,32 @@ export default function EventMap({ query }: Props) {
   const { t, i18n } = useTranslation();
   const { theme, colors } = useThemePreferences();
   const { height } = useWindowDimensions();
+  const frameHeight = Math.min(520, Math.round(height * 0.6));
   const apiKey = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
   const mapRef = useRef<MapView>(null);
+  const regionRef = useRef<Region | null>(null);
+
+  /** Halves (zoom in) or doubles (zoom out) the visible span around the current centre. */
+  const zoomBy = (factor: number) => {
+    const current = regionRef.current ?? {
+      latitude: 20,
+      longitude: 0,
+      latitudeDelta: 120,
+      longitudeDelta: 120,
+    };
+    const latitudeDelta = Math.min(
+      170,
+      Math.max(0.002, current.latitudeDelta * factor),
+    );
+    const longitudeDelta = Math.min(
+      170,
+      Math.max(0.002, current.longitudeDelta * factor),
+    );
+    mapRef.current?.animateToRegion(
+      { ...current, latitudeDelta, longitudeDelta },
+      250,
+    );
+  };
   const [result, setResult] = useState<{
     key: string;
     data: EventPage | null;
@@ -49,6 +76,8 @@ export default function EventMap({ query }: Props) {
   // iOS also reports a marker tap as a map tap; ignore that echo so the selected card stays open.
   const lastMarkerTap = useRef(0);
   const [mapReady, setMapReady] = useState(false);
+  // The overview fit runs once per result set, so it cannot override a marker focus.
+  const fittedFor = useRef<PreciseEvent[] | null>(null);
   const requestKey = mapEventsQuery(query);
 
   useEffect(() => {
@@ -89,6 +118,8 @@ export default function EventMap({ query }: Props) {
 
   useEffect(() => {
     if (!mapReady || fitTargets.length === 0) return;
+    if (fittedFor.current === points) return;
+    fittedFor.current = points;
     mapRef.current?.fitToCoordinates(
       fitTargets.map((point) => ({
         latitude: point.latitude,
@@ -138,7 +169,7 @@ export default function EventMap({ query }: Props) {
         style={[
           styles.frame,
           {
-            height: Math.min(520, Math.round(height * 0.6)),
+            height: frameHeight,
             borderColor: colors.border,
           },
         ]}
@@ -153,6 +184,9 @@ export default function EventMap({ query }: Props) {
             longitudeDelta: 120,
           }}
           onMapReady={() => setMapReady(true)}
+          onRegionChangeComplete={(region) => {
+            regionRef.current = region;
+          }}
           onPress={() => {
             if (Date.now() - lastMarkerTap.current < 400) return;
             setSelectedId(null);
@@ -196,6 +230,16 @@ export default function EventMap({ query }: Props) {
               onPress={() => {
                 lastMarkerTap.current = Date.now();
                 setSelectedId(event.id);
+                // Centre the map exactly on the event's coordinates at a fixed street-level span.
+                mapRef.current?.animateToRegion(
+                  {
+                    latitude: event.latitude,
+                    longitude: event.longitude,
+                    latitudeDelta: FOCUS_SPAN,
+                    longitudeDelta: FOCUS_SPAN,
+                  },
+                  350,
+                );
               }}
             />
           ))}
@@ -205,6 +249,30 @@ export default function EventMap({ query }: Props) {
             {ATTRIBUTION}
           </Text>
         ) : null}
+        <View style={styles.zoomColumn}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('events.map.zoomIn')}
+            onPress={() => zoomBy(0.5)}
+            style={[
+              styles.zoomButton,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.zoomLabel, { color: colors.primary }]}>+</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('events.map.zoomOut')}
+            onPress={() => zoomBy(2)}
+            style={[
+              styles.zoomButton,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.zoomLabel, { color: colors.primary }]}>−</Text>
+          </Pressable>
+        </View>
         {selected ? (
           <EventPreviewDialog
             event={selected}
@@ -301,4 +369,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
   },
+  zoomColumn: {
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
+    gap: 6,
+  },
+  zoomButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoomLabel: { fontSize: 20, fontWeight: '600', lineHeight: 24 },
 });

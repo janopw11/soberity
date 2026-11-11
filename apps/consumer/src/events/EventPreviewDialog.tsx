@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   card: {
     position: 'absolute',
     left: 12,
-    right: 12,
+    right: 68,
     bottom: 12,
     gap: 8,
     padding: 12,

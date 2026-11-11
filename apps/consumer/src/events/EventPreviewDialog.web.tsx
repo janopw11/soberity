@@ -31,24 +31,13 @@ export function EventPreviewDialog({ event, locale, onClose }: Props) {
       aria-modal="false"
       aria-labelledby="event-preview-title"
       style={{
-        position: 'absolute',
-        left: '50%',
-        bottom: 12,
-        zIndex: 500,
-        width: 'min(300px, calc(100% - 24px))',
-        transform: 'translateX(-50%)',
         display: 'grid',
         gap: 8,
+        width: 240,
         padding: 12,
-        borderRadius: 14,
-        background: colors.surface,
         color: colors.textPrimary,
-        border: `1px solid ${colors.border}`,
-        boxShadow: '0 6px 18px rgba(0,0,0,0.18)',
-        animation: 'ev-preview-in 160ms ease-out',
       }}
     >
-      <style>{`@keyframes ev-preview-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}`}</style>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ display: 'grid', gap: 2, minWidth: 0, flex: 1 }}>
           <strong

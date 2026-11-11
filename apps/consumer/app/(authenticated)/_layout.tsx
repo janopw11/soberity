@@ -20,9 +20,18 @@ export default function AuthenticatedLayout() {
           headerTitle: () => <AppLogo />,
         }}
       />
-      <Stack.Screen name="editorial-events" options={{ title: t('eventEditor.title') }} />
-      <Stack.Screen name="editorial-weekly" options={{ title: t('weekly.editorTitle') }} />
-      <Stack.Screen name="editorial-quizzes" options={{ title: t('learning.editor.title') }} />
+      <Stack.Screen
+        name="editorial-events"
+        options={{ title: t('eventEditor.title') }}
+      />
+      <Stack.Screen
+        name="editorial-weekly"
+        options={{ title: t('weekly.editorTitle') }}
+      />
+      <Stack.Screen
+        name="editorial-quizzes"
+        options={{ title: t('learning.editor.title') }}
+      />
       <Stack.Screen
         name="editorial-evidence"
         options={{ title: t('editorial.evidence') }}
@@ -31,7 +40,10 @@ export default function AuthenticatedLayout() {
         name="editorial"
         options={{ title: t('editorial.title') }}
       />
-      <Stack.Screen name="about" options={{ title: t('about.title'), headerTitle: () => <AboutTitle /> }} />
+      <Stack.Screen
+        name="about"
+        options={{ title: t('about.title'), headerTitle: () => <AboutTitle /> }}
+      />
       <Stack.Screen name="account" options={{ title: t('account.title') }} />
       <Stack.Screen
         name="account-personal-data"
@@ -42,6 +54,10 @@ export default function AuthenticatedLayout() {
         options={{ title: t('account.sections.password') }}
       />
       <Stack.Screen
+        name="account-going"
+        options={{ title: t('events.going.profileTitle') }}
+      />
+      <Stack.Screen
         name="account-preferences"
         options={{ title: t('account.sections.preferences') }}
       />
@@ -49,11 +65,10 @@ export default function AuthenticatedLayout() {
   );
 }
 
-
 function AboutTitle() {
   const { t } = useTranslation();
   const { colors, theme } = useThemePreferences();
-  const aboutItem = navigationItems.find(item => item.id === 'about')!;
+  const aboutItem = navigationItems.find((item) => item.id === 'about')!;
   return (
     <View style={styles.aboutTitle}>
       <Image
@@ -64,14 +79,21 @@ function AboutTitle() {
         importantForAccessibility="no"
         accessibilityIgnoresInvertColors
       />
-      <Text accessibilityRole="header" style={[styles.aboutLabel, { color: colors.primary }]}>
+      <Text
+        accessibilityRole="header"
+        style={[styles.aboutLabel, { color: colors.primary }]}
+      >
         {t('about.title')}
       </Text>
     </View>
   );
 }
 const styles = StyleSheet.create({
-  aboutTitle: { flexDirection: 'row', alignItems: 'center', gap: spacing.space8 },
+  aboutTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.space8,
+  },
   aboutIcon: { width: 32, height: 32 },
   aboutLabel: { ...typography.h3, flexShrink: 1 },
 });

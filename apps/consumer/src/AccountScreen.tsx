@@ -32,6 +32,17 @@ export default function AccountScreen() {
       <View style={styles.stack}>
         <SettingsGroup>
           <SettingsRow
+            icon="calendar"
+            label={t('events.going.profileRow')}
+            showChevron
+            onPress={() => router.push('/account-going')}
+            testID="account-row-going"
+          />
+        </SettingsGroup>
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <SettingsGroup>
+          <SettingsRow
             icon="person"
             label={t('account.sections.personalData')}
             showChevron

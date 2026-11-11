@@ -79,6 +79,26 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(farAway)))
             .andExpect(status().isBadRequest());
     }
+    @Test void goingDeclarationIsIdempotentPrivateAndListsOnlyOwnUpcomingEvents() throws Exception {
+        String eventId=published(input("Going A"));
+        String me=user(false),other=user(false);
+        mvc.perform(get("/api/v1/me/event-interests")).andExpect(status().isUnauthorized());
+        mvc.perform(put("/api/v1/me/event-interests/"+eventId).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        mvc.perform(put("/api/v1/me/event-interests/"+eventId).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/me/event-interests/"+eventId).header("Authorization","Bearer "+me)).andExpect(jsonPath("$.declared").value(true));
+        mvc.perform(get("/api/v1/me/event-interests/"+eventId).header("Authorization","Bearer "+other)).andExpect(jsonPath("$.declared").value(false));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM events_interest WHERE event_id=?",Long.class,UUID.fromString(eventId))).isEqualTo(1L);
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+me)).andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.items[0].id").value(eventId));
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+other)).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(delete("/api/v1/me/event-interests/"+eventId).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+me)).andExpect(jsonPath("$.total").value(0));
+    }
+    @Test void goingRequiresAPublishedUpcomingEvent() throws Exception {
+        String me=user(false);
+        String draft=create(input("Draft going")).path("id").asText();
+        mvc.perform(put("/api/v1/me/event-interests/"+draft).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
+        mvc.perform(put("/api/v1/me/event-interests/"+UUID.randomUUID()).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
+    }
     private JsonNode create(Map<String,Object> body)throws Exception {
         return json.readTree(mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body)))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());

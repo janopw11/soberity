@@ -242,6 +242,16 @@
     "retry": "Try again",
     "loading": "Finding events…",
     "view": { "list": "List", "map": "Map" },
+    "going": {
+      "action": "Going Sober",
+      "active": "Going Sober ✓",
+      "guestCta": "Sign in to mark you're Going Sober",
+      "note": "Only a private note in Soberity. No booking or ticket, and the organizer is not notified.",
+      "error": "We could not update this. Please try again.",
+      "profileRow": "Going Sober",
+      "profileTitle": "Going Sober",
+      "profileEmpty": "No events yet. Open an event and tap Going Sober to add it here."
+    },
     "map": {
       "label": "Sober events map",
       "unavailable": "The map needs a Geoapify key. Ask the administrator to configure it.",
@@ -258,6 +268,8 @@
       "modalLabel": "Event location map",
       "addressUnknown": "Exact address not provided",
       "openDirections": "Open location in a map app",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
       "chooserTitle": "Open this location in",
       "cancel": "Cancel"
     },

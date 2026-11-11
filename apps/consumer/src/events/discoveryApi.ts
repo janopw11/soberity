@@ -57,7 +57,7 @@ export async function nearbyEvents(
       latitude: point.latitude,
       longitude: point.longitude,
       page: 0,
-      size: 3,
+      size: 2,
     }),
   });
   if (!response.ok) throw new EventRequestError(response.status);

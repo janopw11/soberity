@@ -29,6 +29,7 @@ import { Alert, Button, Dialog, LoadingState, Screen } from '../ui';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { ReadingText, RichDocument } from '../science/readingUi';
 import { hasPreciseLocation } from './mapModel';
+import { EventGoingButton } from './EventGoingButton';
 const DirectionsChooser = lazy(() => import('./DirectionsChooser'));
 /* eslint-disable @typescript-eslint/no-require-imports -- Metro static assets */
 const mapIconLight = require('../../assets/images/map-icon-light.png');
@@ -450,6 +451,7 @@ function Detail({ id }: { id: string | null }) {
         style={{ backgroundColor: colors.surface }}
       >
         <EventActionBar
+          variant={nextAction?.kind === 'tickets' ? 'secondary' : 'primary'}
           label={
             nextAction
               ? t(
@@ -468,6 +470,11 @@ function Detail({ id }: { id: string | null }) {
             setConfirmedAction(nextAction);
           }}
         />
+        {event ? (
+          <View style={styles.goingBar}>
+            <EventGoingButton eventId={event.id} />
+          </View>
+        ) : null}
       </SafeAreaView>
       <Dialog
         visible={Boolean(confirmedAction)}
@@ -518,6 +525,10 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
   },
   mapIcon: { width: 24, height: 24 },
+  goingBar: {
+    paddingHorizontal: spacing.space16,
+    paddingBottom: spacing.space12,
+  },
   root: { flex: 1 },
   scroll: { flex: 1 },
   scrollContent: {
