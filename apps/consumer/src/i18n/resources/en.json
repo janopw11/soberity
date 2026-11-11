@@ -626,6 +626,12 @@
       "previewHint": "Open the feature preview.",
       "unavailable": "This feature is coming soon. For now, this card shows a preview."
     },
+    "weeklyCommunityHighlight": "Weekly Community Highlight",
+    "communityHighlight": {
+      "title": "Shared moments, sober connections",
+      "description": "Stories and moments from the Soberity community will appear here when Community launches.",
+      "preview": "Preview · Coming soon"
+    },
     "todaysSpotlight": "Today's spotlight",
     "interactiveDiscovery": "Interactive discovery",
     "eventsNearYou": "Nearest events",

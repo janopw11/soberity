@@ -61,7 +61,12 @@ public class EventCatalog {
         Instant from=input.from(),now=Instant.now();
         if(dateScope!=DateScope.ANY && (from==null || from.isBefore(now)))from=now;
         var args=new ArrayList<Object>();var where=new StringBuilder(ELIGIBLE);
-        add(where,args,"r.starts_at>=?",from==null?null:Timestamp.from(from));
+        if(dateScope!=DateScope.ANY && input.to()!=null && !input.to().isAfter(now))
+            return Map.of("items",List.of(),"total",0L,"page",input.page(),"size",input.size());
+        if(from!=null) {
+            where.append(" AND (r.ends_at>? OR (r.ends_at IS NULL AND r.starts_at>=?))");
+            args.add(Timestamp.from(from));args.add(Timestamp.from(from));
+        }
         add(where,args,"r.starts_at<?",input.to()==null?null:Timestamp.from(input.to()));
         add(where,args,"v.country_id=?",input.countryId());add(where,args,"v.city_id=?",input.cityId());
         if(input.cityId()!=null && input.countryId()==null)throw bad("City filter requires its country.");
@@ -85,7 +90,7 @@ public class EventCatalog {
         int page=input.page()==null?0:input.page(),size=input.size()==null?20:input.size();pagination(page,size);
         var args=new ArrayList<Object>(List.of(input.latitude(),input.latitude(),input.longitude(),Timestamp.from(Instant.now())));
         String distance="2*6371.0088*asin(sqrt(least(1.0,greatest(0.0,power(sin(radians(v.latitude-?)/2),2)+cos(radians(?))*cos(radians(v.latitude))*power(sin(radians(v.longitude-?)/2),2)))))";
-        String query="SELECT "+FIELDS+","+distance+" AS distance_km "+JOIN+" WHERE "+ELIGIBLE+" AND r.starts_at>=?";
+        String query="SELECT "+FIELDS+","+distance+" AS distance_km "+JOIN+" WHERE "+ELIGIBLE+" AND coalesce(r.ends_at,r.starts_at)>?";
         if(input.locale()!=null){query+=" AND r.locale=?";args.add(input.locale());}
         args.add(properties.nearbyRadiusKm());
         var result=new LinkedHashMap<>(page("SELECT * FROM ("+query+") candidates WHERE distance_km<=?+1e-7",args,"distance_km,starts_at,id",page,size));

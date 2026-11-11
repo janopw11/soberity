@@ -75,6 +75,7 @@ export function EventGoingButton({ eventId }: { eventId: string }) {
         loading={loading}
         disabled={loading}
         testID="event-going-button"
+        style={styles.action}
       />
       <Text style={[styles.note, { color: colors.textMuted }]}>
         {t('events.going.note')}
@@ -87,6 +88,12 @@ export function EventGoingButton({ eventId }: { eventId: string }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: spacing.space8 },
+  wrap: {
+    gap: spacing.space8,
+    width: '100%',
+    maxWidth: 360,
+    alignSelf: 'center',
+  },
+  action: { minHeight: 52, width: '100%', maxWidth: 360, flexShrink: 1 },
   note: { ...typography.caption },
 });

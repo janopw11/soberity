@@ -265,10 +265,32 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         }
         assertThat(jdbc.queryForObject("SELECT count(*) FROM events_audit WHERE event_id=? AND action='EVENT_DELETED'",Long.class,UUID.fromString(id))).isEqualTo(1);
     }
+    /** Simulate elapsed time only in the isolated test DB; production revision immutability stays enabled. */
+    private void moveFixtureTime(String sql,Object... args) {
+        jdbc.execute((org.springframework.jdbc.core.ConnectionCallback<Void>) connection -> {
+            boolean autoCommit=connection.getAutoCommit();
+            connection.setAutoCommit(false);
+            try {
+                try(var statement=connection.createStatement()) {
+                    statement.execute("SET LOCAL session_replication_role = replica");
+                }
+                try(var statement=connection.prepareStatement(sql)) {
+                    for(int i=0;i<args.length;i++)statement.setObject(i+1,args[i]);
+                    statement.executeUpdate();
+                }
+                connection.commit();
+            } catch(java.sql.SQLException error) {
+                connection.rollback();throw error;
+            } finally {
+                connection.setAutoCommit(autoCommit);
+            }
+            return null;
+        });
+    }
     @Test void startedEventsLeaveUpcomingAndNearbyButExplicitPastSearchStillWorks()throws Exception {
         var body=input("Just started "+UUID.randomUUID());
         String id=published(body);
-        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()-interval '1 hour' WHERE event_id=?",UUID.fromString(id));
+        moveFixtureTime("UPDATE events_revision SET starts_at=clock_timestamp()-interval '1 hour' WHERE event_id=?",UUID.fromString(id));
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString())).andExpect(jsonPath("$.total").value(0));
         mvc.perform(get("/api/v1/events").param("q",body.get("title").toString()).param("dateScope","ANY"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
@@ -278,14 +300,43 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         mvc.perform(post("/api/v1/events/nearby").contentType("application/json").content("{\"latitude\":48.2082,\"longitude\":16.3738}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.items[*].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem(id))));
     }
+    @Test void ongoingEventsRemainVisibleUntilTheirEndAcrossCatalogNearbyAndGoing()throws Exception {
+        String prefix="Ongoing-"+UUID.randomUUID(),me=user(false);
+        String id=published(input(prefix));
+        moveFixtureTime("UPDATE events_revision SET starts_at=clock_timestamp()-interval '2 days',ends_at=clock_timestamp()+interval '4 days' WHERE event_id=?",UUID.fromString(id));
+        mvc.perform(get("/api/v1/events").param("q",prefix).param("size","1"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.items[0].id").value(id));
+        mvc.perform(get("/api/v1/events").param("q",prefix)
+            .param("from",java.time.Instant.now().plusSeconds(86400).toString())
+            .param("to",java.time.Instant.now().plusSeconds(2*86400).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(get("/api/v1/events").param("q",prefix)
+            .param("from",java.time.Instant.now().plusSeconds(5*86400).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/events").param("q",prefix)
+            .param("to",java.time.Instant.now().minusSeconds(86400).toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.total").value(0));
+        String nearby="{\"latitude\":48.2082,\"longitude\":16.3738,\"size\":100}";
+        mvc.perform(post("/api/v1/events/nearby").contentType("application/json").content(nearby))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.items[*].id").value(org.hamcrest.Matchers.hasItem(id)));
+        mvc.perform(put("/api/v1/me/event-interests/"+id).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+me))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].id").value(id));
+        moveFixtureTime("UPDATE events_revision SET ends_at=clock_timestamp()-interval '1 second' WHERE event_id=?",UUID.fromString(id));
+        mvc.perform(get("/api/v1/events").param("q",prefix)).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(post("/api/v1/events/nearby").contentType("application/json").content(nearby))
+            .andExpect(jsonPath("$.items[*].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem(id))));
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+me)).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(put("/api/v1/me/event-interests/"+id).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
+    }
     @Test void upcomingExcludesPastEventsBeforeCountingAndPaginationEvenWithPastDateBounds()throws Exception {
         String prefix="UpcomingOnly-"+UUID.randomUUID();
         String started=published(input(prefix+" started without end")),ended=published(input(prefix+" ended"));
         String first=published(input(prefix+" tomorrow")),second=published(input(prefix+" day after"));
-        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()-interval '2 days' WHERE event_id IN (?,?)",UUID.fromString(started),UUID.fromString(ended));
-        jdbc.update("UPDATE events_revision SET ends_at=clock_timestamp()-interval '1 day' WHERE event_id=?",UUID.fromString(ended));
-        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()+interval '1 day' WHERE event_id=?",UUID.fromString(first));
-        jdbc.update("UPDATE events_revision SET starts_at=clock_timestamp()+interval '2 days' WHERE event_id=?",UUID.fromString(second));
+        moveFixtureTime("UPDATE events_revision SET starts_at=clock_timestamp()-interval '2 days' WHERE event_id IN (?,?)",UUID.fromString(started),UUID.fromString(ended));
+        moveFixtureTime("UPDATE events_revision SET ends_at=clock_timestamp()-interval '1 day' WHERE event_id=?",UUID.fromString(ended));
+        moveFixtureTime("UPDATE events_revision SET starts_at=clock_timestamp()+interval '1 day' WHERE event_id=?",UUID.fromString(first));
+        moveFixtureTime("UPDATE events_revision SET starts_at=clock_timestamp()+interval '2 days' WHERE event_id=?",UUID.fromString(second));
         for(String from:List.of("",java.time.Instant.now().minusSeconds(7*86400).toString())) {
             for(int page=0;page<2;page++)mvc.perform(get("/api/v1/events").param("q",prefix).param("dateScope","UPCOMING")
                 .param("from",from).param("to",java.time.Instant.now().plusSeconds(3*86400).toString()).param("size","1").param("page",""+page))

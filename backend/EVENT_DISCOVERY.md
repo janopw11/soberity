@@ -8,10 +8,14 @@ Updated 2026-11-05. This supersedes the unverified 2026-11-04 handoff. Backend p
 
 Apply combines event name, category, country/city IDs and inclusive calendar-day dates. The final day becomes the next local midnight, preserving 23/25-hour DST days. Invalid/reversed dates are rejected. Clear resets filters and pagination. Public results use the backend's fixed soonest-first ordering, 12 per page; no unsupported sort/price/region query parameters. UI language localizes dictionary labels and dates without filtering out events in other languages. Requests have deadlines, cancellation and stale-response guards. Loading, empty and network failure are separate states.
 
-The Sober Events page always requests `dateScope=UPCOMING`: events whose start
-instant has passed are excluded before counting and pagination. “Any date” removes
-calendar bounds while retaining this rule. Date ranges that begin in the past
-are restricted to upcoming starts; entirely past ranges return the empty state.
+The Sober Events page requests `dateScope=UPCOMING`: both future and ongoing events
+remain visible until their explicit end instant (exclusive). With no end, the start
+instant remains the cutoff; no duration is inferred. Filtering happens before counting
+and pagination. Calendar ranges match overlapping event durations, rather than only
+start dates. “Any date” removes calendar bounds while retaining the unended rule;
+entirely past ranges return the empty state. Nearby and private Going Sober lists use
+the same end-based cutoff, and ongoing events still accept Going Sober declarations.
+Updated by owner request on 2026-11-11.
 
 Cards retain existing Ocean tokens, sober party/rave categories, real covers or neutral fallback, event timezone and detail links. Optional end date and missing organizer/price are supported. Joined belongs to P2-I05; the broader detail/organizer experience remains P2-I03.
 

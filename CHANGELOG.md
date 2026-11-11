@@ -1,3 +1,7 @@
+## 2026-11-11
+
+- Wydarzenia wielodniowe pozostają widoczne do podanej godziny zakończenia w katalogu, pobliskich wydarzeniach i prywatnej liście Going Sober. Filtry dat uwzględniają nakładanie się okresów, a Going Sober można zaznaczyć także podczas wydarzenia. Bez daty końca zachowano dotychczasową granicę rozpoczęcia. Testy API: 20/20 PASS na izolowanym PostgreSQL, w tym trwające/zakończone wydarzenia, zakresy dat, paginacja i prywatność.
+
 ## 2026-11-06
 
 - Naprawiono panel wydarzeń administratora (P2-I04): używa API admina zamiast zablokowanego API organizatora. Dodawanie, edycja, bezpośrednia publikacja i usuwanie z potwierdzeniem nie wymagają konta ani weryfikacji organizatora. Globalny wybór kraj → miasto, opcjonalny koniec, rich opis, EN/PL i niezależny dostęp w Profilu. Zweryfikowano konto właściciela w development Firebase i nadano lokalny grant Events admin; backend zrestartowany bez nowych migracji. Backend: 34 unit/architecture i 13 IT PASS; web z kontrolowanym API: 10/10 desktop/mobile, EN/PL, light/dark PASS; lint/format PASS. Pełny typecheck blokuje wcześniejszy błąd SideMenu.tsx:163. Natywne runtime i pełny odbiór P2-I04 pozostają otwarte.

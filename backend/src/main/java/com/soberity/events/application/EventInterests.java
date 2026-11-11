@@ -29,7 +29,7 @@ public class EventInterests {
     public void declare(VerifiedToken actor, UUID eventId) {
         Boolean upcoming = jdbc.queryForObject(
                 "SELECT EXISTS(SELECT 1 " + EventCatalog.JOIN + " WHERE e.id=? AND " + EventCatalog.ELIGIBLE
-                        + " AND r.starts_at>clock_timestamp())",
+                        + " AND coalesce(r.ends_at,r.starts_at)>clock_timestamp())",
                 Boolean.class,
                 eventId);
         if (!Boolean.TRUE.equals(upcoming)) {
@@ -52,13 +52,13 @@ public class EventInterests {
                 access.ref(actor)));
     }
 
-    /** The caller's own upcoming, still-eligible declarations, soonest first. */
+    /** The caller's own upcoming or ongoing, still-eligible declarations, soonest first. */
     public Map<String, Object> mine(VerifiedToken actor, int page, int size) {
         if (page < 0 || page > 100000 || size < 1 || size > 100) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid pagination.");
         }
         String ref = access.ref(actor);
-        String where = " WHERE i.user_ref=? AND " + EventCatalog.ELIGIBLE + " AND r.starts_at>clock_timestamp()";
+        String where = " WHERE i.user_ref=? AND " + EventCatalog.ELIGIBLE + " AND coalesce(r.ends_at,r.starts_at)>clock_timestamp()";
         String from = EventCatalog.JOIN + " JOIN events_interest i ON i.event_id=e.id";
         List<Map<String, Object>> items = jdbc.queryForList(
                 "SELECT " + EventCatalog.FIELDS + from + where + " ORDER BY r.starts_at,e.id LIMIT ? OFFSET ?",

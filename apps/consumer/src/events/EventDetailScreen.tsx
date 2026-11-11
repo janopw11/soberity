@@ -445,37 +445,37 @@ function Detail({ id }: { id: string | null }) {
             <Alert variant="danger" message={t('events.detail.actionError')} />
           ) : null}
         </View>
+        <SafeAreaView
+          edges={['bottom']}
+          style={{ backgroundColor: colors.surface }}
+        >
+          <EventActionBar
+            variant={nextAction?.kind === 'tickets' ? 'secondary' : 'primary'}
+            label={
+              nextAction
+                ? t(
+                    nextAction.kind === 'tickets'
+                      ? 'events.detail.getTickets'
+                      : 'events.detail.viewOrganizer',
+                  )
+                : undefined
+            }
+            busy={busy}
+            notice={
+              organizerLoading ? t('events.detail.organizerLoading') : undefined
+            }
+            onPress={() => {
+              setActionError(false);
+              setConfirmedAction(nextAction);
+            }}
+          />
+          {event ? (
+            <View style={styles.goingBar}>
+              <EventGoingButton eventId={event.id} />
+            </View>
+          ) : null}
+        </SafeAreaView>
       </ScrollView>
-      <SafeAreaView
-        edges={['bottom']}
-        style={{ backgroundColor: colors.surface }}
-      >
-        <EventActionBar
-          variant={nextAction?.kind === 'tickets' ? 'secondary' : 'primary'}
-          label={
-            nextAction
-              ? t(
-                  nextAction.kind === 'tickets'
-                    ? 'events.detail.getTickets'
-                    : 'events.detail.viewOrganizer',
-                )
-              : undefined
-          }
-          busy={busy}
-          notice={
-            organizerLoading ? t('events.detail.organizerLoading') : undefined
-          }
-          onPress={() => {
-            setActionError(false);
-            setConfirmedAction(nextAction);
-          }}
-        />
-        {event ? (
-          <View style={styles.goingBar}>
-            <EventGoingButton eventId={event.id} />
-          </View>
-        ) : null}
-      </SafeAreaView>
       <Dialog
         visible={Boolean(confirmedAction)}
         title={t('events.detail.externalTitle')}

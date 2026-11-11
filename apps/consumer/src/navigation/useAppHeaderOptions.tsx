@@ -13,18 +13,20 @@ function HeaderMenu() {
   const pathname = usePathname();
   const { category } = useGlobalSearchParams<{ category?: string }>();
   const inQuizCategory = pathname === '/science/quizzes' && Boolean(category);
+  const inEvents = pathname === '/events' || pathname === '/events/';
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.leftActions}>
       <SideMenu />
-      {inQuizCategory || (pathname !== '/' && router.canGoBack()) ? (
+      {inEvents || inQuizCategory || (pathname !== '/' && router.canGoBack()) ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('navigation.goBack')}
           onPress={() => {
-            if (inQuizCategory) router.setParams({ category: undefined });
+            if (inEvents) router.replace('/');
+            else if (inQuizCategory) router.setParams({ category: undefined });
             else router.back();
           }}
           onFocus={() => setFocused(true)}

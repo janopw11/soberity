@@ -923,8 +923,8 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P2-I05 — Private join intent & Joined filter
 
-**Status:** TODO  
-**Started:** —  
+**Status:** IN_PROGRESS — oznaczenie Going Sober na kartach; runtime NOT VERIFIED
+**Started:** 2026-11-11 (bieżąca korekta UI; wcześniejszy zapis API zachowany)
 **Finished:** —  
 **Zależności iteracji:** P2-I01, P2-I02, P2-I03, P2-I04
 
@@ -2914,3 +2914,31 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-07 | RUN.md — komendy uruchomienia | Dokumentacja ukończona; iteracje bez zmian | Dodano RUN.md: wymagania, web/iOS/Android, backend helper + PostgreSQL, pełny Compose demo Auth, porty/CORS i zatrzymanie usług. | Porównanie z package.json, helperem i Compose; Prettier RUN.md PASS, git diff --check zmian PASS. Usług i testów runtime nie uruchamiano. CHANGELOG bez wpisu: drobna dokumentacja. Następny krok: odbiór P2-I03/P2-I04 na polecenie właściciela. |
 
 | 2026-11-11 | P2-I03 — kolejność Going Sober | IN_PROGRESS / runtime NOT VERIFIED | EventDetailScreen: Going Sober pod Tickets, z dolnym odstępem. AccountScreen: osobna pierwsza grupa Going Sober i separator przed ustawieniami. EN: spójna pisownia Going Sober. | ESLint obu ekranów PASS; git diff --check PASS. Web/iOS/Android nie uruchamiano; ręcznie sprawdzić szczegóły wydarzenia i profil w EN/PL oraz obu motywach. Checkboxy i Finished bez zmian. CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I03. |
+
+| 2026-11-11 | P2-I03 — przewijana końcowa sekcja akcji | IN_PROGRESS / runtime NOT VERIFIED | EventDetailScreen: blok Tickets i Going Sober przeniesiony do ScrollView jako ostatnia sekcja strony; zachowana kolejność i dolna safe area. BRANDING uzupełniony. | ESLint ekranu i git diff --check PASS. Web/iOS/Android nie uruchamiano; do ręcznego sprawdzenia przewijanie do końca wydarzenia. Checkboxy bez zmian. CHANGELOG bez wpisu: drobna korekta układu. Następny krok: odbiór P2-I03. |
+
+| 2026-11-11 | P2-I05 — oznaczenie Going Sober na kartach | IN_PROGRESS / runtime NOT VERIFIED | EventCard pobiera prywatny stan dla widocznego wydarzenia na focus; EventTicket pokazuje etykietę EN/PL z checkmarkiem i opisem dostępności. Brak współdzielonego cache; ochrona przed odpowiedziami poprzedniego konta. EventCard.test.tsx i BRANDING. | 3/3 testy Jest PASS (bez Watchman po błędzie uprawnień), ESLint PASS, git diff --check PASS. Typecheck blokuje wcześniejszy SideMenu.tsx:163 TS2339. Web/iOS/Android NOT VERIFIED: sprawdzić zapis/cofnięcie → powrót na listę, oba motywy i języki. Checkboxy bez zmian. CHANGELOG bez wpisu: niewielkie rozszerzenie UI przed odbiorem wizualnym. Następny krok: odbiór P2-I05, bez startu kolejnej iteracji. |
+
+| 2026-11-11 | P2-I02 — powrót z katalogu do Home | Korekta / runtime NOT VERIFIED | useAppHeaderOptions: strzałka na /events jest zawsze widoczna dla zalogowanego użytkownika i wykonuje replace do /, niezależnie od historii stosu. | ESLint PASS; kontrola diff po usunięciu końcowych spacji w poprzednim wpisie. Web/iOS/Android nie uruchamiano; ręcznie sprawdzić menu → Sober Events → strzałka → Home i bezpośrednie wejście /events. Historyczne DONE P2-I02 bez zmian; CHANGELOG bez wpisu: drobna korekta przed odbiorem runtime. Następny krok: odbiór korekty P2-I02. |
+
+| 2026-11-11 | P2-I05 — stylistyka oznaczenia Going Sober | IN_PROGRESS / runtime NOT VERIFIED | EventTicket: jasny tekst i cienka obwódka eventImageText, bez białego tła i zieleni; pill i odstępy dopasowane do kategorii. BRANDING uaktualniony. | ESLint i git diff --check PASS. Web/iOS/Android nie uruchamiano; do odbioru wizualnego na kartach EN/PL. Checkboxy bez zmian. CHANGELOG bez wpisu: drobna korekta wizualna. Następny krok: odbiór P2-I05. |
+
+| 2026-11-11 | P2-I05 — symboliczny badge Going Sober | IN_PROGRESS / runtime NOT VERIFIED | EventTicket: wspólny IconHint pill jak Article of the week, ikona check zamiast tekstu; dymek EN/PL, niezależny od linku karty, miejsce zarezerwowane przy kategorii. BRANDING uzupełniony. | Prettier, ESLint i git diff --check PASS. Web/iOS/Android i interakcje dymka na karcie NOT VERIFIED. CHANGELOG bez wpisu: drobna korekta UI; checkboxy bez zmian. Następny krok: odbiór P2-I05. |
+
+| 2026-11-11 | P2-I05 — okrągły badge przed kategorią | IN_PROGRESS / runtime NOT VERIFIED | EventTicket: symbol Going Sober po lewej stronie kategorii; IconHint: opcjonalny wariant circle 28×28, prosty check i dymek wyrównany do lewej. BRANDING uzupełniony. | ESLint i git diff --check PASS. Web/iOS/Android nie uruchamiano. CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I05. |
+
+| 2026-11-11 | P2-I05 — mniejsze koło Going Sober | IN_PROGRESS / runtime NOT VERIFIED | IconHint: koło 24×24 zamiast 28×28, bez zmiany obszaru dotykowego. | Bez testów runtime; drobna korekta rozmiaru. CHANGELOG bez wpisu. Następny krok: odbiór wizualny P2-I05. |
+
+| 2026-11-11 | P2-I05 — badge bez białej obwódki | IN_PROGRESS / runtime NOT VERIFIED | IconHint: przezroczysta ramka wariantu circle w zwykłym stanie, zachowany focus. BRANDING uzupełniony. | Odbiór wizualny nieuruchomiony; CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I05. |
+
+| 2026-11-11 | P2-I05 — badge mniejszy o około 20% | IN_PROGRESS / runtime NOT VERIFIED | IconHint: koło 19×19; EventTicket: check 13 px. Obszar dotykowy zachowany; BRANDING uzupełniony. | Bez testów runtime. CHANGELOG bez wpisu: drobna korekta rozmiaru. Następny krok: odbiór wizualny P2-I05. |
+
+| 2026-11-11 | P2-I05 — kategoria bliżej badge’a | IN_PROGRESS / runtime NOT VERIFIED | EventTicket: odstęp zarezerwowany przed kategorią zmniejszony z 48 do 32 px. | Bez testów runtime. CHANGELOG bez wpisu: drobna korekta odstępu. Następny krok: odbiór wizualny P2-I05. |
+
+| 2026-11-11 | P2-I05 — korekta odstępu kategorii | IN_PROGRESS / runtime NOT VERIFIED | EventTicket: padding przed kategorią 40 px zamiast 32 px, zgodnie z korektą właściciela. | Bez testów runtime. CHANGELOG bez wpisu: drobna korekta odstępu. Następny krok: odbiór wizualny P2-I05. |
+
+| 2026-11-11 | P2-I02 — widoczność przez cały okres wydarzenia | Poprawka API zweryfikowana; UI runtime NOT VERIFIED | EventCatalog: koniec zamiast początku jako granica, nakładanie zakresów dat, puste zakresy przeszłe; nearby i EventInterests spójne dla trwających wydarzeń. CuratedEventsApiIT: nowy scenariusz oraz naprawa symulacji upływu czasu w izolowanej bazie, bez zmiany produkcyjnej ochrony rewizji. EVENT_DISCOVERY i CHANGELOG uzupełnione. | Maven verify z CuratedEventsApiIT: 20/20 PASS na izolowanym PostgreSQL (pierwsza próba blokowana przez sandbox Dockera, następna ujawniła niepoprawne mutacje fixture; poprawiono). git diff --check PASS. Brak nowych migracji. Web/iOS/Android nie uruchamiano; ręcznie sprawdzić trwające wydarzenie i filtr dnia. Historyczne statusy/checklisty bez zmian. Następny krok: odbiór korekty P2-I02. |
+
+**Runtime korekty P2-I02, 2026-11-11:** lokalny backend zrestartowany na :8090; readiness HTTP 200 / UP. Flyway potwierdził aktualną V25, bez nowych migracji. Log: `/tmp/soberity-ongoing-backend.log`.
+
+| 2026-11-11 | Korekta Home i P2-I03 — Community preview / rozmiar Going Sober | Implementacja / runtime NOT VERIFIED | WelcomeScreen + nowy WeeklyCommunityHighlight: statyczny mock zastępuje rotację funkcji, nagłówek EN/PL i ikona people, istniejące assety community obu motywów. EventGoingButton: maks. 360 px i min. 52 px jak Tickets; komentarz EventDetailParts dostosowany do scrolla. EN/PL i BRANDING uzupełnione. | Prettier zmienionych komponentów/tłumaczeń, ESLint czterech komponentów oraz git diff --check PASS. Web/iOS/Android nie uruchamiano; ręcznie sprawdzić Home i szczegóły wydarzenia w EN/PL oraz obu motywach. Brak rozpoczęcia modułu Community lub zamknięcia iteracji. CHANGELOG bez wpisu: mock i drobna korekta UI przed odbiorem. Następny krok: odbiór Home oraz korekty P2-I03. |

@@ -243,7 +243,7 @@ export function EventOrganizer({
     </View>
   );
 }
-/** Fixed in the screen's flex layout, outside the ScrollView, so it never covers its content. */
+/** Ticket action in the final, scrollable section of event details. */
 export function EventActionBar({
   label,
   busy,

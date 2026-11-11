@@ -23,6 +23,7 @@ import { radii, spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 import { SettingsIcon } from '../ui';
+import { IconHint } from '../ui/IconHint';
 import { eventImageUri, type DiscoveryEvent } from './eventsApi';
 
 /** Real Home ticket. Preserve the approved image/stub geometry and first-ticket reduced-motion animation. */
@@ -31,6 +32,7 @@ export function EventTicket({
   reveal,
   animationPlayed,
   showPreview = false,
+  going = false,
   compactBadges = false,
   testID = 'nearby-ticket',
 }: {
@@ -38,6 +40,7 @@ export function EventTicket({
   reveal: boolean;
   animationPlayed: RefObject<boolean>;
   showPreview?: boolean;
+  going?: boolean;
   compactBadges?: boolean;
   testID?: string;
 }) {
@@ -187,151 +190,53 @@ export function EventTicket({
     }),
   };
   return (
-    <Link href={{ pathname: '/events/[id]', params: { id: event.id } }} asChild>
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel={[
-          event.title,
-          compactBadges ? accessibleDate : date,
-          compactBadges ? t(`events.badgeStatus.${status}`) : event.timezone,
-          city,
-        ]
-          .filter(Boolean)
-          .join(', ')}
-        testID={testID}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onPressIn={() => setPressed(true)}
-        onPressOut={() => setPressed(false)}
-        style={StyleSheet.flatten([
-          styles.ticket,
-          {
-            borderWidth: 2,
-            borderColor: focused ? colors.focusRing : 'transparent',
-            borderRadius: radii.sm,
-            opacity: pressed ? 0.94 : 1,
-          },
-        ])}
-        onLayout={(event) => {
-          const { width, height } = event.nativeEvent.layout;
-          setSize((previous) =>
-            previous.width === width && previous.height === height
-              ? previous
-              : { width, height },
-          );
-        }}
+    <View style={styles.ticketWrap}>
+      <Link
+        href={{ pathname: '/events/[id]', params: { id: event.id } }}
+        asChild
       >
-        <View
-          style={[
-            styles.main,
-            compactBadges && styles.mainWithoutStub,
-            { borderColor: colors.border, backgroundColor: colors.surfaceAlt },
-          ]}
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={[
+            event.title,
+            going ? t('events.going.active') : null,
+            compactBadges ? accessibleDate : date,
+            compactBadges ? t(`events.badgeStatus.${status}`) : event.timezone,
+            city,
+          ]
+            .filter(Boolean)
+            .join(', ')}
+          testID={testID}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          style={StyleSheet.flatten([
+            styles.ticket,
+            {
+              borderWidth: 2,
+              borderColor: focused ? colors.focusRing : 'transparent',
+              borderRadius: radii.sm,
+              opacity: pressed ? 0.94 : 1,
+            },
+          ])}
+          onLayout={(event) => {
+            const { width, height } = event.nativeEvent.layout;
+            setSize((previous) =>
+              previous.width === width && previous.height === height
+                ? previous
+                : { width, height },
+            );
+          }}
         >
-          {size.width > 0 && photograph && !failed ? (
-            <Image
-              onError={() => setFailed(true)}
-              source={photograph}
-              resizeMode="cover"
-              accessible={false}
-              style={[styles.photo, { width: size.width, height: size.height }]}
-            />
-          ) : null}
           <View
             style={[
-              styles.mainContent,
-              { backgroundColor: colors.eventImageScrim },
-            ]}
-          >
-            <View style={compactBadges ? styles.badgeRow : undefined}>
-              <View
-                style={[styles.category, { backgroundColor: colors.primary }]}
-              >
-                <Text
-                  style={[styles.categoryText, { color: colors.onPrimary }]}
-                >
-                  {t(`events.categories.${event.category_code}`)}
-                </Text>
-              </View>
-              {compactBadges ? (
-                <>
-                  <View
-                    style={[
-                      styles.dateBadge,
-                      { backgroundColor: colors.surfaceAlt },
-                    ]}
-                  >
-                    <Text
-                      accessibilityLabel={accessibleDate}
-                      style={[styles.dateText, { color: colors.primary }]}
-                    >
-                      {compactDate}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: colors.surface },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusText,
-                        {
-                          color:
-                            status === 'CANCELLED'
-                              ? colors.danger
-                              : colors.textMuted,
-                        },
-                      ]}
-                    >
-                      {t(`events.badgeStatus.${status}`)}
-                    </Text>
-                  </View>
-                </>
-              ) : null}
-            </View>
-            {!photograph || failed ? (
-              <View accessible={false}>
-                <SettingsIcon
-                  name="calendar"
-                  color={colors.eventImageText}
-                  size={24}
-                />
-              </View>
-            ) : null}
-            <View style={styles.copy}>
-              <Text
-                accessibilityRole="header"
-                style={[styles.title, { color: colors.eventImageText }]}
-              >
-                {event.title}
-              </Text>
-              <Text style={[styles.location, { color: colors.eventImageText }]}>
-                {[event.venue_name, city, event.country_code]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </Text>
-              {showPreview && !compactBadges ? (
-                <Text
-                  style={[styles.location, { color: colors.eventImageText }]}
-                >
-                  {date} · {event.timezone}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        </View>
-        {compactBadges ? null : (
-          <Animated.View
-            onLayout={(event) => setStubWidth(event.nativeEvent.layout.width)}
-            style={[
-              styles.stub,
+              styles.main,
+              compactBadges && styles.mainWithoutStub,
               {
                 borderColor: colors.border,
                 backgroundColor: colors.surfaceAlt,
               },
-              animatedStyle,
             ]}
           >
             {size.width > 0 && photograph && !failed ? (
@@ -342,46 +247,170 @@ export function EventTicket({
                 accessible={false}
                 style={[
                   styles.photo,
-                  {
-                    left: -(size.width - stubWidth),
-                    width: size.width,
-                    height: size.height,
-                  },
+                  { width: size.width, height: size.height },
                 ]}
               />
             ) : null}
             <View
-              pointerEvents="none"
               style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: colors.eventImageScrim },
-              ]}
-            />
-            <View
-              style={[
-                styles.stubContent,
+                styles.mainContent,
                 { backgroundColor: colors.eventImageScrim },
               ]}
             >
               <View
-                style={[styles.stamp, { borderColor: colors.eventImageText }]}
+                style={[styles.badgeRow, going && styles.badgeRowWithGoing]}
               >
-                <Text
-                  style={[styles.preview, { color: colors.eventImageText }]}
+                <View
+                  style={[styles.category, { backgroundColor: colors.primary }]}
                 >
-                  {showPreview ? t('events.ticketPreview') : date}
-                </Text>
+                  <Text
+                    style={[styles.categoryText, { color: colors.onPrimary }]}
+                  >
+                    {t(`events.categories.${event.category_code}`)}
+                  </Text>
+                </View>
+                {compactBadges ? (
+                  <>
+                    <View
+                      style={[
+                        styles.dateBadge,
+                        { backgroundColor: colors.surfaceAlt },
+                      ]}
+                    >
+                      <Text
+                        accessibilityLabel={accessibleDate}
+                        style={[styles.dateText, { color: colors.primary }]}
+                      >
+                        {compactDate}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: colors.surface },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.statusText,
+                          {
+                            color:
+                              status === 'CANCELLED'
+                                ? colors.danger
+                                : colors.textMuted,
+                          },
+                        ]}
+                      >
+                        {t(`events.badgeStatus.${status}`)}
+                      </Text>
+                    </View>
+                  </>
+                ) : null}
               </View>
-              {showPreview ? null : (
-                <Text style={[styles.zone, { color: colors.eventImageText }]}>
-                  {event.timezone}
+              {!photograph || failed ? (
+                <View accessible={false}>
+                  <SettingsIcon
+                    name="calendar"
+                    color={colors.eventImageText}
+                    size={24}
+                  />
+                </View>
+              ) : null}
+              <View style={styles.copy}>
+                <Text
+                  accessibilityRole="header"
+                  style={[styles.title, { color: colors.eventImageText }]}
+                >
+                  {event.title}
                 </Text>
-              )}
+                <Text
+                  style={[styles.location, { color: colors.eventImageText }]}
+                >
+                  {[event.venue_name, city, event.country_code]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </Text>
+                {showPreview && !compactBadges ? (
+                  <Text
+                    style={[styles.location, { color: colors.eventImageText }]}
+                  >
+                    {date} · {event.timezone}
+                  </Text>
+                ) : null}
+              </View>
             </View>
-          </Animated.View>
-        )}
-      </Pressable>
-    </Link>
+          </View>
+          {compactBadges ? null : (
+            <Animated.View
+              onLayout={(event) => setStubWidth(event.nativeEvent.layout.width)}
+              style={[
+                styles.stub,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: colors.surfaceAlt,
+                },
+                animatedStyle,
+              ]}
+            >
+              {size.width > 0 && photograph && !failed ? (
+                <Image
+                  onError={() => setFailed(true)}
+                  source={photograph}
+                  resizeMode="cover"
+                  accessible={false}
+                  style={[
+                    styles.photo,
+                    {
+                      left: -(size.width - stubWidth),
+                      width: size.width,
+                      height: size.height,
+                    },
+                  ]}
+                />
+              ) : null}
+              <View
+                pointerEvents="none"
+                style={[
+                  StyleSheet.absoluteFill,
+                  { backgroundColor: colors.eventImageScrim },
+                ]}
+              />
+              <View
+                style={[
+                  styles.stubContent,
+                  { backgroundColor: colors.eventImageScrim },
+                ]}
+              >
+                <View
+                  style={[styles.stamp, { borderColor: colors.eventImageText }]}
+                >
+                  <Text
+                    style={[styles.preview, { color: colors.eventImageText }]}
+                  >
+                    {showPreview ? t('events.ticketPreview') : date}
+                  </Text>
+                </View>
+                {showPreview ? null : (
+                  <Text style={[styles.zone, { color: colors.eventImageText }]}>
+                    {event.timezone}
+                  </Text>
+                )}
+              </View>
+            </Animated.View>
+          )}
+        </Pressable>
+      </Link>
+      {going ? (
+        <View
+          testID="event-going-badge"
+          style={styles.goingBadge}
+        >
+          <IconHint text={t('events.going.action')} circle>
+            <SettingsIcon name="check" size={13} color={colors.onPrimary} />
+          </IconHint>
+        </View>
+      ) : null}
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -412,6 +441,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.space8,
   },
+  ticketWrap: { width: '100%', position: 'relative', zIndex: 1 },
+  badgeRowWithGoing: { paddingLeft: spacing.space40 },
+  goingBadge: { position: 'absolute', top: spacing.space8, left: spacing.space12, zIndex: 2 },
   dateBadge: {
     borderRadius: radii.sm,
     paddingHorizontal: spacing.space8,

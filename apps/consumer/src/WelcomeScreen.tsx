@@ -4,7 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { spacing } from '@soberity/design-tokens';
 import { Screen } from './ui';
-import { DailySpotlight } from './DailySpotlight';
+import { WeeklyCommunityHighlight } from './WeeklyCommunityHighlight';
 import { ChapterHeading } from './ChapterHeading';
 import WeeklyScienceCard from './discovery/WeeklyScienceCard';
 import { NearbyEvents } from './events/NearbyEvents';
@@ -26,14 +26,13 @@ export default function WelcomeScreen() {
   return (
     <Screen maxWidth={800}>
       <CurrentEventLocation />
-      <NearbyEvents
-        reveal={revealTicket}
-        animationPlayed={animationPlayed}
-      />
+      <NearbyEvents reveal={revealTicket} animationPlayed={animationPlayed} />
       <WeeklyScienceCard />
       <View style={styles.section}>
-        <ChapterHeading icon="sun">{t('home.todaysSpotlight')}</ChapterHeading>
-        <DailySpotlight />
+        <ChapterHeading icon="people">
+          {t('home.weeklyCommunityHighlight')}
+        </ChapterHeading>
+        <WeeklyCommunityHighlight />
       </View>
     </Screen>
   );

@@ -8,10 +8,11 @@ type IconHintProps = {
   children: ReactNode;
   /** Border badge: accessible target, right-aligned popover below the icon. */
   pill?: boolean;
+  circle?: boolean;
 };
 
 /** Hover/focus hints with a separately toggleable tap state on every platform. */
-export function IconHint({ text, children, pill = false }: IconHintProps) {
+export function IconHint({ text, children, pill = false, circle = false }: IconHintProps) {
   const { colors } = useThemePreferences();
   const id = useId();
   const [hovered, setHovered] = useState(false);
@@ -37,16 +38,16 @@ export function IconHint({ text, children, pill = false }: IconHintProps) {
     } : {})}
     style={[
       styles.wrap,
-      pill && styles.pillTarget,
+      (pill || circle) && styles.pillTarget,
     ]}
   >
-    {pill ? <View style={[styles.pill, { backgroundColor: colors.primary, borderColor: focused ? colors.focusRing : colors.surface }]}>{children}</View> : children}
+    {pill || circle ? <View style={[styles.pill, circle && styles.circle, { backgroundColor: colors.primary, borderColor: focused ? colors.focusRing : circle ? 'transparent' : colors.surface }]}>{children}</View> : children}
     {visible ? <View
       nativeID={id}
       pointerEvents="none"
       importantForAccessibility="no"
       {...(Platform.OS === 'web' ? { role: 'tooltip' as const } : {})}
-      style={[styles.bubble, pill ? styles.bubbleBelow : styles.bubbleAbove, { backgroundColor: colors.textPrimary }]}
+      style={[styles.bubble, circle ? styles.bubbleBelowLeft : pill ? styles.bubbleBelow : styles.bubbleAbove, { backgroundColor: colors.textPrimary }]}
     >
       <Text style={[styles.text, { color: colors.background }]}>{text}</Text>
     </View> : null}
@@ -56,6 +57,8 @@ const styles = StyleSheet.create({
   wrap: { minWidth: 22, minHeight: 22, justifyContent: 'center' },
   pillTarget: { minWidth: 48, minHeight: 44, alignItems: 'center' },
   pill: { minWidth: 36, minHeight: 28, justifyContent: 'center', alignItems: 'center', borderRadius: radii.pill, borderWidth: 2, paddingHorizontal: spacing.space8, paddingVertical: spacing.space4 },
+  circle: { width: 19, height: 19, minWidth: 19, minHeight: 19, paddingHorizontal: 0, paddingVertical: 0 },
+  bubbleBelowLeft: { top: '100%', left: 0, marginTop: spacing.space8 },
   bubble: { position: 'absolute', width: 200, maxWidth: 240, paddingHorizontal: spacing.space12, paddingVertical: spacing.space8, borderRadius: radii.sm, zIndex: 30, elevation: 4 },
   bubbleAbove: { bottom: '100%', left: 0, marginBottom: spacing.space8 },
   bubbleBelow: { top: '100%', right: 0, marginTop: spacing.space8 },

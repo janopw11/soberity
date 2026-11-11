@@ -632,6 +632,12 @@
       "previewHint": "Otwórz podgląd funkcji.",
       "unavailable": "Ta funkcja pojawi się wkrótce. Na razie karta prezentuje jej podgląd."
     },
+    "weeklyCommunityHighlight": "Co tydzień ze społeczności",
+    "communityHighlight": {
+      "title": "Wspólne chwile, trzeźwe znajomości",
+      "description": "Historie i chwile ze społeczności Soberity pojawią się tutaj po jej uruchomieniu.",
+      "preview": "Podgląd · Wkrótce"
+    },
     "todaysSpotlight": "Dzisiejszy wybór",
     "interactiveDiscovery": "Interaktywne odkrywanie",
     "eventsNearYou": "Wydarzenia w pobliżu",
