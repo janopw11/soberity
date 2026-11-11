@@ -333,18 +333,6 @@ function Detail({ id }: { id: string | null }) {
                 </>
               ) : null}
             </View>
-            <View style={styles.badges}>
-              <Text
-                style={[
-                  styles.category,
-                  { color: colors.primary, backgroundColor: colors.surfaceAlt },
-                ]}
-              >
-                {t(`events.categories.${event.category_code}`, {
-                  defaultValue: event.category_code,
-                })}
-              </Text>
-            </View>
             {event.status === 'CANCELLED' ? (
               <Alert variant="warning" message={t('events.detail.cancelled')} />
             ) : !eventIsActive(event, now) && !preview ? (
@@ -550,19 +538,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: radii.xl,
   },
   identity: { gap: spacing.space16 },
-  badges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.space12,
-    alignItems: 'center',
-  },
-  category: {
-    ...typography.label,
-    paddingVertical: spacing.space4,
-    paddingHorizontal: spacing.space12,
-    borderRadius: radii.pill,
-    overflow: 'hidden',
-  },
   facts: {
     flexDirection: 'row',
     flexWrap: 'wrap',

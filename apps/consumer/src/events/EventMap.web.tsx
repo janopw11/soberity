@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import { Control, divIcon, DomEvent, DomUtil, latLngBounds } from 'leaflet';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CircleMarker,
@@ -9,6 +9,7 @@ import {
   Popup,
   TileLayer,
   useMap,
+  useMapEvents,
 } from 'react-leaflet';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 import { useEventLocation } from './EventLocationContext';
@@ -21,6 +22,8 @@ import {
 } from './mapModel';
 import { EventPreviewDialog } from './EventPreviewDialog.web';
 import { eventImageUri, eventsGet, type EventPage } from './eventsApi';
+
+import { clusterMapEvents, CLUSTER_MAX_ZOOM } from './mapClusters';
 
 type Props = { query: string };
 
@@ -173,15 +176,11 @@ export default function EventMap({ query }: Props) {
               }}
             />
           ) : null}
-          {points.map((event) => (
-            <Marker
-              key={event.id}
-              position={[event.latitude, event.longitude]}
-              icon={markerIcons.get(event.id)}
-              title={event.title}
-              eventHandlers={{ click: () => setSelectedId(event.id) }}
-            />
-          ))}
+          <ClusteredMarkers
+            points={points}
+            icons={markerIcons}
+            onSelect={setSelectedId}
+          />
           {selected ? (
             <Popup
               position={[selected.latitude, selected.longitude]}
@@ -200,6 +199,112 @@ export default function EventMap({ query }: Props) {
         </MapContainer>
       </div>
     </section>
+  );
+}
+
+function ClusteredMarkers({
+  points,
+  icons,
+  onSelect,
+}: {
+  points: Array<
+    import('./eventsApi').DiscoveryEvent &
+      import('./mapModel').PreciseCoordinates
+  >;
+  icons: Map<string, ReturnType<typeof divIcon>>;
+  onSelect: (id: string | null) => void;
+}) {
+  const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  const [zoom, setZoom] = useState(2);
+  const [opened, setOpened] = useState<string | null>(null);
+  const map = useMapEvents({
+    zoomend: () => {
+      setZoom(map.getZoom());
+      setOpened(null);
+      onSelect(null);
+    },
+  });
+  useEffect(() => {
+    setZoom(map.getZoom());
+  }, [map]);
+  const groups = useMemo(() => clusterMapEvents(points, zoom), [points, zoom]);
+  return (
+    <>
+      {groups.map((group) => {
+        const event = group.events[0]!;
+        if (group.events.length === 1)
+          return (
+            <Marker
+              key={group.id}
+              position={[event.latitude, event.longitude]}
+              icon={icons.get(event.id)}
+              title={event.title}
+              eventHandlers={{ click: () => onSelect(event.id) }}
+            />
+          );
+        const label = t('events.map.cluster', { count: group.events.length });
+        const icon = divIcon({
+          className: 'ev-cluster-icon',
+          iconSize: [48, 48],
+          iconAnchor: [24, 24],
+          html: `<div style="width:48px;height:48px;border-radius:50%;box-sizing:border-box;border:3px solid ${colors.surface};background:${colors.primary};color:${colors.onPrimary};display:flex;align-items:center;justify-content:center;font:600 16px system-ui">${group.events.length}</div>`,
+        });
+        return (
+          <Fragment key={group.id}>
+            <Marker
+              position={[group.latitude, group.longitude]}
+              icon={icon}
+              title={label}
+              alt={label}
+              eventHandlers={{
+                click: () => {
+                  onSelect(null);
+                  if (zoom >= CLUSTER_MAX_ZOOM) setOpened(group.id);
+                  else
+                    map.setView(
+                      [group.latitude, group.longitude],
+                      Math.min(CLUSTER_MAX_ZOOM, zoom + 2),
+                    );
+                },
+              }}
+            />
+            {opened === group.id ? (
+              <Popup position={[group.latitude, group.longitude]}>
+                <div
+                  style={{
+                    maxHeight: 240,
+                    overflowY: 'auto',
+                    display: 'grid',
+                    gap: 8,
+                  }}
+                >
+                  {group.events.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      style={{
+                        minHeight: 48,
+                        background: colors.surface,
+                        color: colors.primary,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 8,
+                      }}
+                      onClick={() => {
+                        setOpened(null);
+                        onSelect(item.id);
+                      }}
+                    >
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
+              </Popup>
+            ) : null}
+          </Fragment>
+        );
+      })}
+    </>
   );
 }
 

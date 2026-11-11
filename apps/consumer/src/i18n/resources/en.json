@@ -253,6 +253,7 @@
       "profileEmpty": "No events yet. Open an event and tap Going Sober to add it here."
     },
     "map": {
+      "cluster": "Events in this group: {{count}}",
       "label": "Sober events map",
       "unavailable": "The map needs a Geoapify key. Ask the administrator to configure it.",
       "error": "We could not load the map. Please try again.",

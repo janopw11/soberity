@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -26,6 +27,13 @@ import {
 } from './mapModel';
 import { useEventLocation } from './EventLocationContext';
 
+import { Dialog, Button } from '../ui';
+import {
+  clusterMapEvents,
+  CLUSTER_MAX_ZOOM,
+  zoomForLongitudeSpan,
+} from './mapClusters';
+
 type Props = { query: string };
 type PreciseEvent = DiscoveryEvent & PreciseCoordinates;
 
@@ -45,6 +53,10 @@ export default function EventMap({ query }: Props) {
   const apiKey = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
   const mapRef = useRef<MapView>(null);
   const regionRef = useRef<Region | null>(null);
+  const [mapWidth, setMapWidth] = useState(320);
+  const [longitudeDelta, setLongitudeDelta] = useState(120);
+  const [clusterId, setClusterId] = useState<string | null>(null);
+  const zoom = zoomForLongitudeSpan(mapWidth, longitudeDelta);
 
   /** Halves (zoom in) or doubles (zoom out) the visible span around the current centre. */
   const zoomBy = (factor: number) => {
@@ -100,6 +112,8 @@ export default function EventMap({ query }: Props) {
     () => (data?.items ?? []).filter(hasPreciseLocation) as PreciseEvent[],
     [data],
   );
+  const groups = useMemo(() => clusterMapEvents(points, zoom), [points, zoom]);
+  const openedCluster = groups.find((group) => group.id === clusterId);
   const selected = points.find((event) => event.id === selectedId) ?? null;
   const { enabled, currentLocation } = useEventLocation();
   const originLatitude = enabled ? (currentLocation?.latitude ?? null) : null;
@@ -166,6 +180,7 @@ export default function EventMap({ query }: Props) {
       ) : null}
       <View
         accessibilityLabel={t('events.map.label')}
+        onLayout={(event) => setMapWidth(event.nativeEvent.layout.width)}
         style={[
           styles.frame,
           {
@@ -186,6 +201,8 @@ export default function EventMap({ query }: Props) {
           onMapReady={() => setMapReady(true)}
           onRegionChangeComplete={(region) => {
             regionRef.current = region;
+            setLongitudeDelta(region.longitudeDelta);
+            setClusterId(null);
           }}
           onPress={() => {
             if (Date.now() - lastMarkerTap.current < 400) return;
@@ -220,29 +237,82 @@ export default function EventMap({ query }: Props) {
               />
             </Marker>
           ) : null}
-          {points.map((event) => (
-            <EventMarker
-              key={event.id}
-              event={event}
-              initial={t(`events.categories.${event.category_code}`)
-                .charAt(0)
-                .toUpperCase()}
-              onPress={() => {
-                lastMarkerTap.current = Date.now();
-                setSelectedId(event.id);
-                // Centre the map exactly on the event's coordinates at a fixed street-level span.
-                mapRef.current?.animateToRegion(
-                  {
-                    latitude: event.latitude,
-                    longitude: event.longitude,
-                    latitudeDelta: FOCUS_SPAN,
-                    longitudeDelta: FOCUS_SPAN,
-                  },
-                  350,
-                );
-              }}
-            />
-          ))}
+          {groups.map((group) => {
+            const event = group.events[0]!;
+            if (group.events.length > 1)
+              return (
+                <Marker
+                  key={`${group.id}-${theme}`}
+                  coordinate={group}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  accessibilityLabel={t('events.map.cluster', {
+                    count: group.events.length,
+                  })}
+                  onPress={() => {
+                    lastMarkerTap.current = Date.now();
+                    setSelectedId(null);
+                    if (zoom >= CLUSTER_MAX_ZOOM) setClusterId(group.id);
+                    else {
+                      const current = regionRef.current;
+                      const factor =
+                        2 ** (Math.min(CLUSTER_MAX_ZOOM, zoom + 2) - zoom);
+                      mapRef.current?.animateToRegion(
+                        {
+                          latitude: group.latitude,
+                          longitude: group.longitude,
+                          latitudeDelta:
+                            (current?.latitudeDelta ?? 120) / factor,
+                          longitudeDelta: longitudeDelta / factor,
+                        },
+                        350,
+                      );
+                    }
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.cluster,
+                      {
+                        backgroundColor: colors.primary,
+                        borderColor: colors.surface,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.markerInitial,
+                        { color: colors.onPrimary },
+                      ]}
+                    >
+                      {group.events.length}
+                    </Text>
+                  </View>
+                </Marker>
+              );
+            return (
+              <EventMarker
+                key={event.id}
+                event={event}
+                initial={t(`events.categories.${event.category_code}`)
+                  .charAt(0)
+                  .toUpperCase()}
+                onPress={() => {
+                  lastMarkerTap.current = Date.now();
+                  setSelectedId(event.id);
+                  // Centre the map exactly on the event's coordinates at a fixed street-level span.
+                  mapRef.current?.animateToRegion(
+                    {
+                      latitude: event.latitude,
+                      longitude: event.longitude,
+                      latitudeDelta: FOCUS_SPAN,
+                      longitudeDelta: FOCUS_SPAN,
+                    },
+                    350,
+                  );
+                }}
+              />
+            );
+          })}
         </MapView>
         {apiKey ? (
           <Text style={styles.attribution} accessibilityRole="text">
@@ -273,6 +343,28 @@ export default function EventMap({ query }: Props) {
             <Text style={[styles.zoomLabel, { color: colors.primary }]}>−</Text>
           </Pressable>
         </View>
+        <Dialog
+          visible={Boolean(openedCluster)}
+          title={t('events.map.cluster', {
+            count: openedCluster?.events.length ?? 0,
+          })}
+          closeLabel={t('events.close')}
+          onClose={() => setClusterId(null)}
+        >
+          <ScrollView style={{ maxHeight: 300 }}>
+            {openedCluster?.events.map((event) => (
+              <Button
+                key={event.id}
+                variant="secondary"
+                label={event.title}
+                onPress={() => {
+                  setClusterId(null);
+                  setSelectedId(event.id);
+                }}
+              />
+            ))}
+          </ScrollView>
+        </Dialog>
         {selected ? (
           <EventPreviewDialog
             event={selected}
@@ -363,6 +455,14 @@ const styles = StyleSheet.create({
   },
   markerImage: { width: '100%', height: '100%' },
   markerInitial: { fontSize: 16, fontWeight: '600' },
+  cluster: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   userDot: {
     width: 16,
     height: 16,

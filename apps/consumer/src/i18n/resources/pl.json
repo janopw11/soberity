@@ -257,6 +257,7 @@
       "profileEmpty": "Brak wydarzeń. Otwórz wydarzenie i wybierz „Idę na trzeźwo”, aby dodać je tutaj."
     },
     "map": {
+      "cluster": "Wydarzenia w tej grupie: {{count}}",
       "label": "Mapa wydarzeń bez alkoholu",
       "unavailable": "Mapa wymaga klucza Geoapify. Poproś administratora o jego konfigurację.",
       "error": "Nie udało się wczytać mapy. Spróbuj ponownie.",
