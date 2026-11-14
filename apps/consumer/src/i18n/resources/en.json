@@ -1429,7 +1429,7 @@
     "next": "Next",
     "admin": "Manage Sober Circles",
     "backAdmin": "Back to Events administration",
-    "adminError": "Could not complete the request. Check your administrator access and the required fields.",
+    "adminError": "Could not complete the request. Please try again.",
     "conflict": "This Circle changed or its slug is already in use. Reload the Circle before saving again.",
     "saved": "Circle saved.",
     "create": "Create Circle",
@@ -1459,7 +1459,13 @@
       "OUTDOORS": "Outdoor Adventures",
       "ART": "Art",
       "GAMES": "Games & Social Activities"
-    }
+    },
+    "invalidFields": "Check the Circle fields and correct the highlighted values.",
+    "requiredField": "Fill in this required field.",
+    "slugHelp": "For example: sober-coffee-warsaw. Use a–z, 0–9 and single hyphens between words.",
+    "invalidSlug": "Use lowercase a–z, numbers and single hyphens between words, up to 100 characters. No spaces or accented letters.",
+    "accessDenied": "Your account does not have permission to manage Circles.",
+    "sessionExpired": "Your session has expired. Sign in again."
   },
   "discussions": {
     "title": "Science Discussions",

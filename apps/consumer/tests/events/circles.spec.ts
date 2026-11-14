@@ -332,6 +332,20 @@ test('existing administration creates edits associates and deactivates Circles',
   ).toBeVisible();
   await page.getByRole('switch', { name: 'Active', exact: true }).click();
   await page.getByRole('checkbox', { name: /Synthetic sober rave/ }).check();
+  await page
+    .getByRole('textbox', { name: /^Unique slug/ })
+    .fill('Invalid Slug');
+  await page.getByRole('button', { name: 'Save Circle', exact: true }).click();
+  await expect(
+    page.getByText(
+      'Use lowercase a–z, numbers and single hyphens between words, up to 100 characters. No spaces or accented letters.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(state.get()).toBeNull();
+  await page
+    .getByRole('textbox', { name: /^Unique slug/ })
+    .fill('new-fixture-circle');
   await page.getByRole('button', { name: 'Save Circle', exact: true }).click();
   await expect(page.getByText('Circle saved.', { exact: true })).toBeVisible();
   expect(state.get()?.event_ids).toEqual([event.id]);

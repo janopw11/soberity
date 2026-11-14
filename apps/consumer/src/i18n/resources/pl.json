@@ -1455,7 +1455,7 @@
     "next": "Następna",
     "admin": "Zarządzaj kręgami Sober",
     "backAdmin": "Wróć do zarządzania wydarzeniami",
-    "adminError": "Nie udało się wykonać operacji. Sprawdź uprawnienia administratora i wymagane pola.",
+    "adminError": "Nie udało się wykonać operacji. Spróbuj ponownie.",
     "conflict": "Krąg został zmieniony lub slug jest już zajęty. Wczytaj krąg ponownie przed zapisem.",
     "saved": "Zapisano krąg.",
     "create": "Utwórz krąg",
@@ -1485,7 +1485,13 @@
       "OUTDOORS": "Przygody w plenerze",
       "ART": "Sztuka",
       "GAMES": "Gry i spotkania"
-    }
+    },
+    "invalidFields": "Sprawdź pola kręgu i popraw zaznaczone wartości.",
+    "requiredField": "Uzupełnij to wymagane pole.",
+    "slugHelp": "Na przykład: kawa-bez-alkoholu-warszawa. Użyj a–z, 0–9 i pojedynczych łączników między słowami.",
+    "invalidSlug": "Użyj małych liter a–z, cyfr i pojedynczych łączników między słowami, maksymalnie 100 znaków. Bez spacji i polskich znaków.",
+    "accessDenied": "Twoje konto nie ma uprawnień do zarządzania kręgami.",
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
   },
   "discussions": {
     "title": "Dyskusje naukowe",

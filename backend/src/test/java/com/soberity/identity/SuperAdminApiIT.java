@@ -11,12 +11,28 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class SuperAdminApiIT extends AbstractIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
     @Autowired EventAccess events;
+
+    @Test void superAdminCanSaveCircleAndInvalidSlugIsValidationFailure() throws Exception {
+        String uid=user(true,true);
+        String body="""
+            {"name":"Test circle","slug":"%s","description":"Meet for coffee",
+             "category":"COFFEE","guidelines":"Respect everyone","active":true,
+             "coverId":null,"eventIds":[],"expectedVersion":null}
+            """;
+        mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+uid)
+            .contentType("application/json").content(body.formatted("Invalid Slug")))
+            .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+uid)
+            .contentType("application/json").content(body.formatted("coffee-"+UUID.randomUUID())))
+            .andExpect(status().isCreated()).andExpect(jsonPath("$.name").value("Test circle"));
+    }
 
     private String user(boolean verified, boolean grant) throws Exception {
         String uid="super-admin-"+UUID.randomUUID();

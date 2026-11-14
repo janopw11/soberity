@@ -1,5 +1,7 @@
 ## 2026-11-14
 
+- Naprawiono mylący komunikat zapisu Circle: formularz wskazuje błędny slug i brakujące wymagane pola; błędy danych, sesji, uprawnień i konfliktu mają osobne komunikaty EN/PL. Zapis poprawnego Circle przez SUPER_ADMIN zweryfikowany testem API. Backend39+5, walidacja16 i web desktop/mobile2/2 PASS; pełny typecheck blokuje niezwiązany błąd CommunityCards.tsx:117.
+
 - SUPER_ADMIN (rozszerzenie P0-I05): zaufana rola w PostgreSQL agreguje dostęp do redakcji, wydarzeń, Circles i moderacji dyskusji. Cofnięcie działa od następnego żądania; usunięcie konta usuwa grant. Zachowano weryfikację e-maila, prywatność, reguły własności i niezależną recenzję. Migracja V29, instrukcja nadawania/cofania oraz testy bezpieczeństwa: 39 unit/architecture +61 IT PASS. Aktywowano lokalnie i nadano rolę kontu wskazanemu przez właściciela po sprawdzeniu UID w Firebase dev; readiness UP, anonimowy admin401. Ręczny odbiór panelu web/iOS/Android pozostaje NOT VERIFIED.
 
 ## 2026-11-13

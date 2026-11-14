@@ -15,11 +15,11 @@ import {
 } from '../events/eventEditorApi';
 import {
   circleCategories,
-  CircleError,
   circleRequest,
   type Circle,
   type CirclePage,
 } from './circlesApi';
+import { circleAdminErrorKey, circleFormErrors } from './circleAdminValidation';
 
 const blank = () => ({
   name: '',
@@ -59,6 +59,8 @@ function Workspace() {
     [success, setSuccess] = useState(false),
     [alt, setAlt] = useState('');
   const [coverPreview, setCoverPreview] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const fieldErrors = circleFormErrors(form);
   useEffect(() => {
     let active = true;
     let url = '';
@@ -96,8 +98,8 @@ function Workspace() {
           await token(),
         );
         if (active) setLibrary(data);
-      } catch {
-        if (active) setError(t('circles.adminError'));
+      } catch (e) {
+        if (active) setError(t(circleAdminErrorKey(e)));
       }
     })();
     return () => {
@@ -132,13 +134,7 @@ function Workspace() {
     try {
       await task();
     } catch (e) {
-      setError(
-        t(
-          e instanceof CircleError && e.status === 409
-            ? 'circles.conflict'
-            : 'circles.adminError',
-        ),
-      );
+      setError(t(circleAdminErrorKey(e)));
     } finally {
       setBusy(false);
     }
@@ -150,6 +146,7 @@ function Workspace() {
         await token(),
       );
       setCurrent(data);
+      setSubmitted(false);
       setForm({
         name: data.name,
         slug: data.slug,
@@ -166,6 +163,11 @@ function Workspace() {
     });
   const save = () =>
     void run(async () => {
+      setSubmitted(true);
+      if (Object.values(fieldErrors).some(Boolean)) {
+        setError(t('circles.invalidFields'));
+        return;
+      }
       const data = await circleRequest<Circle>(
         `/admin/circles${current ? `/${current.id}` : ''}`,
         await token(),
@@ -211,6 +213,7 @@ function Workspace() {
             onPress={() => {
               setCurrent(null);
               setForm(blank());
+              setSubmitted(false);
               setAlt('');
               setEditing(true);
               setSuccess(false);
@@ -249,6 +252,11 @@ function Workspace() {
         <>
           <TextField
             label={t('circles.name')}
+            errorText={
+              submitted && fieldErrors.name
+                ? t('circles.requiredField')
+                : undefined
+            }
             value={form.name}
             editable={!busy}
             maxLength={120}
@@ -256,6 +264,12 @@ function Workspace() {
           />
           <TextField
             label={t('circles.slug')}
+            helperText={t('circles.slugHelp')}
+            errorText={
+              submitted && fieldErrors.slug
+                ? t('circles.invalidSlug')
+                : undefined
+            }
             value={form.slug}
             editable={!busy}
             maxLength={100}
@@ -264,6 +278,11 @@ function Workspace() {
           />
           <TextField
             label={t('circles.description')}
+            errorText={
+              submitted && fieldErrors.description
+                ? t('circles.requiredField')
+                : undefined
+            }
             value={form.description}
             editable={!busy}
             multiline
@@ -282,6 +301,11 @@ function Workspace() {
           />
           <TextField
             label={t('circles.guidelines')}
+            errorText={
+              submitted && fieldErrors.guidelines
+                ? t('circles.requiredField')
+                : undefined
+            }
             value={form.guidelines}
             editable={!busy}
             multiline

@@ -1462,6 +1462,8 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P5-I00C — Community Phase 3: Sober Circles
 
+**Naprawa 2026-11-14 — zapis Circle:** zgłoszona odpowiedź 400 `Invalid circle fields.` nie oznacza odmowy roli. Potwierdzono aktywny grant właściciela i gotowość API. Formularz waliduje wymagane pola i format sluga, pokazuje błędy przy polach oraz przykład EN/PL; rozdzielono komunikaty 400/401/403/409 i błędy sieci. Test SuperAdminApiIT potwierdza POST Circle 201 dla SUPER_ADMIN i 400 dla niepoprawnego sluga. Weryfikacja: Maven39 unit/architecture +5 IT PASS, Jest16/16 PASS, Playwright admin desktop/mobile-web EN2/2 PASS (błędny slug → poprawa → zapis/edycja), ESLint/Prettier/diff PASS. Pełny typecheck blokuje zastany `CommunityCards.tsx:117` (`absoluteFillObject`); w zmienionych plikach brak błędów TS. iOS/Android oraz manualny odbiór właściciela NOT VERIFIED. Status iteracji pozostaje IN_PROGRESS, bez rozpoczęcia kolejnej.
+
 **Follow-up 2026-11-14:** owner-requested directory refactor: Ocean header with people icon; Events filter sheet for circle-name search, category and My/All, draft/apply/reset state and page reset. Existing API reused. IN_PROGRESS pending browser verification; native runtime NOT VERIFIED. No new iteration started.
 
 **Status:** IN_PROGRESS — implementation and automated acceptance complete; native/manual acceptance NOT VERIFIED.
@@ -2357,6 +2359,8 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+**2026-11-14 — P5-I00C / naprawa walidacji zapisu Circle:** kod i testy automatyczne gotowe; właściwy komunikat przy slugu zamiast sugestii braku uprawnień. Następny krok: odświeżyć formularz i ponowić zapis z poprawnym slugiem. Pełny typecheck blokuje niezwiązany CommunityCards.tsx:117; native/manual NOT VERIFIED.
+
 **2026-11-14 — rozszerzenie P0-I05 / SUPER_ADMIN:** backend DONE; T06/T07/V03 zweryfikowane (39 unit + 61 IT), lokalna V29 i grant dla wskazanego konta aktywne, readiness UP / anonymous admin 401. Następny krok: odbiór panelu w sesji właściciela (web/iOS/Android NOT VERIFIED); bez startu kolejnej iteracji.
 
 **2026-11-13 — P5-I00D / Community Phase4:** Science Discussions implemented; backend39+62, client10 and browser22 PASS; static checks/web/native exports PASS. V28 only in isolated test database. Native/manual and live application activation pending. Community remains without Events. Stop after Phase4; no My Activities dashboard.
@@ -3063,3 +3067,5 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-13 | P5-I00D — Community Phase4: Science Discussions | IN_PROGRESS / native manual acceptance pending | V28 topic/comment/audit; public directory, private commenting/participated API, existing reviewer moderation, ArticleScreen links and real Hub data. T01–T03 and V01–V03 checked; V04 pending. | Backend39+62, client10, browser22/22, typecheck/lint/format/diff and web/native exports PASS. Device probe: booted iOS, no Android device; native flow NOT VERIFIED. Application DB unchanged; prior map failure remains open. CHANGELOG/API/plan/branding updated. Next: P5-I00D activation/manual native acceptance; no Phase5. |
 
 | 2026-11-14 | P0-I05 — rozszerzenie SUPER_ADMIN | DONE backend; T06/T07/V03 | ApplicationRoles, V29, EditorialService/EventAccess, testy SuperAdmin/Editorial i SUPER_ADMIN.md. Maven 39 unit +61 IT PASS, diff check PASS. Lokalna migracja V29 i grant konta wskazanego przez właściciela po odczycie Firebase UID; readiness UP, anonymous admin401. CHANGELOG uzupełniony. | Ręczny odbiór sesji web/iOS/Android NOT VERIFIED; odświeżyć panel. Bez produkcji i bez kolejnej iteracji. |
+
+| 2026-11-14 | P5-I00C — walidacja zapisu Circle | IN_PROGRESS; korekta zweryfikowana automatycznie | CircleAdminScreen, circleAdminValidation +16 testów, EN/PL, test web admin2/2, SuperAdminApiIT: POST201/invalid slug400; backend39+5 PASS, ESLint/Prettier/diff PASS. PHASES/BRANDING/CHANGELOG zaktualizowane. | Typecheck: zastany CommunityCards.tsx:117; native/manual NOT VERIFIED. Następny krok: odbiór zapisu właściciela; bez kolejnej iteracji. |
