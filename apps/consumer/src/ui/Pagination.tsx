@@ -11,16 +11,24 @@ export function Pagination({
   total,
   label,
   onPageChange,
+  compact = false,
 }: {
   page: number;
   size: number;
   total: number;
   label: string;
   onPageChange: (page: number) => void;
+  compact?: boolean;
 }) {
   const { colors } = useThemePreferences();
   return (
-    <View style={[styles.pagination, { backgroundColor: colors.surfaceAlt }]}>
+    <View
+      style={[
+        styles.pagination,
+        compact && styles.compactPagination,
+        { backgroundColor: colors.surfaceAlt },
+      ]}
+    >
       <PageArrow
         direction="previous"
         disabled={page === 0}
@@ -28,7 +36,11 @@ export function Pagination({
       />
       <Text
         accessibilityLiveRegion="polite"
-        style={[styles.pageLabel, { color: colors.textSecondary }]}
+        style={[
+          styles.pageLabel,
+          compact && styles.compactLabel,
+          { color: colors.textSecondary },
+        ]}
       >
         {label}
       </Text>
@@ -100,6 +112,7 @@ const styles = StyleSheet.create({
     padding: spacing.space4,
     gap: spacing.space4,
   },
+  compactPagination: { padding: 2, gap: 2 },
   pageArrow: {
     width: 48,
     minHeight: 48,
@@ -110,4 +123,5 @@ const styles = StyleSheet.create({
   },
   arrowLeft: { transform: [{ rotate: '180deg' }] },
   pageLabel: { ...typography.small, flexShrink: 1, textAlign: 'center' },
+  compactLabel: { fontSize: 12 },
 });

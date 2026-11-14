@@ -944,13 +944,10 @@
     "browse": "Czytaj więcej artykułów",
     "back": "Wróć do Discover",
     "page": "Strona {{page}} z {{pages}} · {{count}} publikacja",
-    "page_few": "Strona {{page}} z {{pages}} · {{count}} publikacje",
-    "page_many": "Strona {{page}} z {{pages}} · {{count}} publikacji",
-    "page_other": "Strona {{page}} z {{pages}} · {{count}} publikacji",
-    "page_one": "Strona {{page}} z {{pages}} · {{count}} krąg",
     "page_few": "Strona {{page}} z {{pages}} · {{count}} kręgi",
     "page_many": "Strona {{page}} z {{pages}} · {{count}} kręgów",
     "page_other": "Strona {{page}} z {{pages}} · {{count}} kręgu",
+    "page_one": "Strona {{page}} z {{pages}} · {{count}} krąg",
     "previous": "Poprzednia",
     "next": "Następna",
     "notFound": "Ta publikacja jest niedostępna lub została wycofana.",
@@ -1418,6 +1415,11 @@
     }
   },
   "circles": {
+    "findPeople": "Znajdź swoich ludzi",
+    "discoverySubtitle": "Poznaj osoby, które dzielą Twoje zainteresowania i styl życia.",
+    "exploreCircles": "Odkrywaj kręgi",
+    "beFirst": "Dołącz jako pierwsza osoba",
+    "pageLabel": "Strona {{page}} z {{pages}}",
     "openFilters": "Filtruj kręgi",
     "apply": "Pokaż kręgi",
     "scope": "Kręgi",
@@ -1427,7 +1429,7 @@
     "mine": "Moje kręgi",
     "search": "Szukaj kręgów",
     "searchShort": "Szukaj",
-    "searchPlaceholder": "Szukaj kręgów…",
+    "searchPlaceholder": "Szukaj społeczności…",
     "allCategories": "Wszystkie kategorie",
     "category": "Kategoria",
     "join": "Dołącz do kręgu",
@@ -1491,7 +1493,11 @@
     "slugHelp": "Na przykład: kawa-bez-alkoholu-warszawa. Użyj a–z, 0–9 i pojedynczych łączników między słowami.",
     "invalidSlug": "Użyj małych liter a–z, cyfr i pojedynczych łączników między słowami, maksymalnie 100 znaków. Bez spacji i polskich znaków.",
     "accessDenied": "Twoje konto nie ma uprawnień do zarządzania kręgami.",
-    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+    "activeMembers_one": "{{count}} aktywna osoba",
+    "activeMembers_few": "{{count}} aktywne osoby",
+    "activeMembers_many": "{{count}} aktywnych osób",
+    "activeMembers_other": "{{count}} aktywnej osoby"
   },
   "discussions": {
     "title": "Dyskusje naukowe",

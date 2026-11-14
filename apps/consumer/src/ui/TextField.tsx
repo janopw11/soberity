@@ -17,6 +17,8 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
   /** Smaller visual treatment for filter bars; other forms keep their defaults. */
   compact?: boolean;
+  /** Hides the visual label while retaining it as the input's accessible name. */
+  hideLabel?: boolean;
   helperText?: string;
   errorText?: string | undefined;
   /** Adds a show/hide toggle for password-style fields. */
@@ -37,6 +39,7 @@ type TextFieldProps = Omit<TextInputProps, 'style'> & {
 export function TextField({
   label,
   compact = false,
+  hideLabel = false,
   helperText,
   errorText,
   secureToggle = false,
@@ -67,15 +70,17 @@ export function TextField({
       ]}
       testID={testID}
     >
-      <Text
-        style={[
-          styles.label,
-          compact && styles.compactLabel,
-          accentLabel && { color: colors.primary },
-        ]}
-      >
-        {label}
-      </Text>
+      {!hideLabel ? (
+        <Text
+          style={[
+            styles.label,
+            compact && styles.compactLabel,
+            accentLabel && { color: colors.primary },
+          ]}
+        >
+          {label}
+        </Text>
+      ) : null}
       <View
         style={[
           grouped ? styles.groupedInputRow : styles.inputRow,

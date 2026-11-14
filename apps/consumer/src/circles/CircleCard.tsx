@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  ImageBackground,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { radii, spacing, typography } from '@soberity/design-tokens';
@@ -124,74 +132,85 @@ export function CircleMembership({
     </View>
   );
 }
-export function CircleCard({
-  circle,
-  onChanged,
-}: {
-  circle: Circle;
-  onChanged: () => void;
-}) {
+export function CircleCard({ circle }: { circle: Circle }) {
   const { colors } = useThemePreferences();
   const { t } = useTranslation();
   const router = useRouter();
+  const [coverFailed, setCoverFailed] = useState(false);
+  useEffect(() => setCoverFailed(false), [circle.cover_id]);
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
-    >
-      <CircleCover circle={circle} />
-      <View style={styles.copy}>
-        <Text style={[styles.small, { color: colors.primary }]}>
-          {t(`circles.categories.${circle.category}`)}
-        </Text>
-        <Text
-          accessibilityRole="header"
-          style={[styles.title, { color: colors.textPrimary }]}
-        >
-          {circle.name}
-        </Text>
-        <Text
-          numberOfLines={3}
-          style={[styles.body, { color: colors.textSecondary }]}
-        >
-          {circle.description}
-        </Text>
-        <Text
-          accessibilityLiveRegion="polite"
-          style={[styles.small, { color: colors.textMuted }]}
-        >
-          {t('circles.members', { count: circle.member_count })}
-          {circle.joined ? ` · ${t('circles.joined')}` : ''}
-        </Text>
-        {!circle.active ? (
-          <Text style={{ color: colors.textMuted }}>
-            {t('circles.inactive')}
-          </Text>
+    <View style={styles.item}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={circle.name}
+        accessibilityHint={t('circles.details')}
+        onPress={() =>
+          router.push({ pathname: '/circles/[id]', params: { id: circle.id } })
+        }
+        style={({ pressed }) => [
+          styles.card,
+          {
+            borderColor: colors.border,
+            transform: [{ scale: pressed ? 0.97 : 1 }],
+          },
+        ]}
+      >
+        {circle.cover_id && !coverFailed ? (
+          <ImageBackground
+            source={{ uri: circleImage(circle.cover_id) }}
+            imageStyle={styles.cardImage}
+            onError={() => setCoverFailed(true)}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            accessibilityLabel={circle.cover_alt ?? circle.name}
+          />
         ) : (
-          <Button
-            label={t('circles.details')}
-            variant="tertiary"
-            onPress={() =>
-              router.push({
-                pathname: '/circles/[id]',
-                params: { id: circle.id },
-              })
-            }
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: colors.surfaceAlt },
+            ]}
           />
         )}
-        <CircleMembership circle={circle} onChanged={onChanged} />
-      </View>
+      </Pressable>
+      <Text
+        numberOfLines={2}
+        adjustsFontSizeToFit
+        accessibilityRole="header"
+        style={[styles.title, { color: colors.primary }]}
+      >
+        {circle.name}
+      </Text>
+      <Text style={[styles.memberCount, { color: colors.textSecondary }]}>
+        {circle.member_count === 0
+          ? t('circles.beFirst')
+          : t('circles.activeMembers', { count: circle.member_count })}
+      </Text>
     </View>
   );
 }
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: radii.xl, overflow: 'hidden', flex: 1 },
-  cover: { width: '100%', height: 176 },
+  item: { width: '100%', alignItems: 'center', gap: spacing.space8 },
+  card: {
+    width: '88%',
+    borderWidth: 1,
+    borderRadius: radii.pill,
+    overflow: 'hidden',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.space16,
+    ...Platform.select({ web: { transition: 'transform 140ms ease-out' } }),
+  },
+  cardImage: { borderRadius: radii.pill },
+  cover: { width: '100%', height: 176, resizeMode: 'cover' },
   fallback: { alignItems: 'center', justifyContent: 'center' },
-  copy: { padding: spacing.space16, gap: spacing.space8 },
-  title: { ...typography.h3 },
+  copy: { alignItems: 'center', gap: spacing.space12, maxWidth: '100%' },
+  title: {
+    ...typography.bodyStrong,
+    textAlign: 'center',
+    paddingHorizontal: spacing.space8,
+  },
   small: { ...typography.small },
-  body: { ...typography.body },
+  memberCount: { ...typography.small, textAlign: 'center' },
 });

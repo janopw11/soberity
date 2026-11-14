@@ -99,7 +99,7 @@ function CirclesTitle() {
   const { colors } = useThemePreferences();
   return (
     <View style={styles.aboutTitle}>
-      <SettingsIcon name="people" color={colors.primary} size={28} />
+      <SettingsIcon name="people" color={colors.primary} size={22} />
       <Text
         accessibilityRole="header"
         style={[styles.aboutLabel, { color: colors.primary }]}

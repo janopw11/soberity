@@ -1462,6 +1462,12 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 ## P5-I00C — Community Phase 3: Sober Circles
 
+
+**Brief redesignu Sober Circles — wdrożenie UI 2026-11-14:** wprowadzono nagłówek Find your people, wyszukiwarkę bez widocznej etykiety, scrollowane chipsy dla istniejących kategorii, Explore circles, dwukolumnowe mniejsze koła ze zdjęciami, nazwą w środku i liczbą członków pod spodem; empty count ma przyjazny tekst. Uporządkowano label paginacji, dodano kompaktowy wariant wizualny, mniejszą ikonę nagłówka i stan pressed. UI-only, bez testów/buildów zgodnie z poleceniem; niezamknięta iteracja P5-I00C pozostaje IN_PROGRESS, kontrast/ruch/natywne NOT VERIFIED.
+
+**Korekta właściciela 2026-11-14 — Circle cards:** dwie okrągłe karty w rzędzie, tylko nazwa i liczba aktywnych członków, obraz okładki jako tło z kontrastową warstwą. Cała karta otwiera szczegóły. Implementacja niezweryfikowana testami na wyraźne polecenie właściciela; nie zamknięto P5-I00C.
+**Korekta właściciela 2026-11-14 — wyszukiwanie poza modalem:** pole nazwy po lewej i ikona filtrów po prawej w jednym responsywnym rzędzie; debounce500 ms/Enter, reset strony wyników, zachowane łączenie z kategorią i Moje/Wszystkie. Modal i jego licznik dotyczą tylko tych dwóch filtrów, reset nie usuwa wyszukiwania. CircleScreen/testy przeglądarkowe/BRANDING; wynik w dzienniku sesji. Bieżąca iteracja nadal IN_PROGRESS; native/manual NOT VERIFIED.
+
 **Naprawa 2026-11-14 — zapis Circle:** zgłoszona odpowiedź 400 `Invalid circle fields.` nie oznacza odmowy roli. Potwierdzono aktywny grant właściciela i gotowość API. Formularz waliduje wymagane pola i format sluga, pokazuje błędy przy polach oraz przykład EN/PL; rozdzielono komunikaty 400/401/403/409 i błędy sieci. Test SuperAdminApiIT potwierdza POST Circle 201 dla SUPER_ADMIN i 400 dla niepoprawnego sluga. Weryfikacja: Maven39 unit/architecture +5 IT PASS, Jest16/16 PASS, Playwright admin desktop/mobile-web EN2/2 PASS (błędny slug → poprawa → zapis/edycja), ESLint/Prettier/diff PASS. Pełny typecheck blokuje zastany `CommunityCards.tsx:117` (`absoluteFillObject`); w zmienionych plikach brak błędów TS. iOS/Android oraz manualny odbiór właściciela NOT VERIFIED. Status iteracji pozostaje IN_PROGRESS, bez rozpoczęcia kolejnej.
 
 **Follow-up 2026-11-14:** owner-requested directory refactor: Ocean header with people icon; Events filter sheet for circle-name search, category and My/All, draft/apply/reset state and page reset. Existing API reused. IN_PROGRESS pending browser verification; native runtime NOT VERIFIED. No new iteration started.
@@ -2358,6 +2364,10 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. PASS obejmuje wyłącznie zakres opisany w dowodzie. Nie zamieniaj `NOT VERIFIED` na `PASS` bez rzeczywistego uruchomienia testu. Wyniki szczegółowe: `docs/testing/phase-0-results.md`, lokalne dowody `docs/testing/P0-I12/`.
 
 # 5. Aktualny punkt pracy
+
+**2026-11-14 — P5-I00C / Sober Circles discovery UI:** implementacja redesignu z briefu ukończona bez uruchamiania testów i buildów. Weryfikacja funkcjonalna, wizualna i platform native pozostaje NOT VERIFIED.
+
+**2026-11-14 — P5-I00C / pasek wyszukiwania:** pole nazwy przeniesione na stronę po lewej od ikony filtrów. Następny krok: odbiór układu właściciela i niewykonane kontrole native. Bez kolejnej iteracji.
 
 **2026-11-14 — P5-I00C / naprawa walidacji zapisu Circle:** kod i testy automatyczne gotowe; właściwy komunikat przy slugu zamiast sugestii braku uprawnień. Następny krok: odświeżyć formularz i ponowić zapis z poprawnym slugiem. Pełny typecheck blokuje niezwiązany CommunityCards.tsx:117; native/manual NOT VERIFIED.
 

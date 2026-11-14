@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Pressable,
   Text,
@@ -26,7 +26,7 @@ import { circleCategories, type CirclePage } from './circlesApi';
 import { useCircleData } from './useCircleData';
 import { CircleCard } from './CircleCard';
 
-const emptyFilters = { q: '', category: '', mine: false };
+const emptyFilters = { category: '', mine: false };
 
 export function CircleList({ preview = false }: { preview?: boolean }) {
   const { t } = useTranslation();
@@ -39,10 +39,23 @@ export function CircleList({ preview = false }: { preview?: boolean }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterButtonFocused, setFilterButtonFocused] = useState(false);
   const [filterButtonHovered, setFilterButtonHovered] = useState(false);
-  const { category, mine, q } = applied;
-  const appliedFilterCount = [q, category, mine].filter(Boolean).length;
+  const { category, mine } = applied;
+  const [search, setSearch] = useState('');
+  const [q, setQuery] = useState('');
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setQuery(search.trim());
+      setPage(0);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [search]);
+  const submitSearch = () => {
+    setQuery(search.trim());
+    setPage(0);
+  };
+  const appliedFilterCount = [category, mine].filter(Boolean).length;
   const apply = () => {
-    setApplied({ ...draft, q: draft.q.trim() });
+    setApplied(draft);
     setPage(0);
     setFiltersOpen(false);
   };
@@ -56,64 +69,96 @@ export function CircleList({ preview = false }: { preview?: boolean }) {
     `${mine ? '/me/circles' : '/circles'}?${params}`,
   );
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, !preview && styles.fillScreen]}>
       {!preview ? (
         <>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('circles.openFilters')}
-            accessibilityState={{ expanded: filtersOpen }}
-            accessibilityValue={{
-              text: t('events.appliedFilters', { count: appliedFilterCount }),
-            }}
-            testID="circles-open-filters"
-            onFocus={() => setFilterButtonFocused(true)}
-            onBlur={() => setFilterButtonFocused(false)}
-            onHoverIn={() => setFilterButtonHovered(true)}
-            onHoverOut={() => setFilterButtonHovered(false)}
-            onPress={() => {
-              setDraft(applied);
-              setFiltersOpen(true);
-            }}
-            style={({ pressed }) => [
-              styles.filterButton,
-              {
-                backgroundColor:
-                  pressed || filterButtonHovered
-                    ? colors.surfaceAlt
-                    : 'transparent',
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.filterFace,
+          <View style={styles.intro}>
+            <Text
+              accessibilityRole="header"
+              style={[styles.pageTitle, { color: colors.primary }]}
+            >
+              {t('circles.findPeople')}
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {t('circles.discoverySubtitle')}
+            </Text>
+          </View>
+          <View style={styles.searchRow}>
+            <View style={styles.searchField}>
+              <TextField
+                compact
+                variant="soft"
+                accentLabel
+                leadingIcon="search"
+                label={t('circles.search')}
+                hideLabel
+                placeholder={t('circles.searchPlaceholder')}
+                maxLength={120}
+                value={search}
+                onChangeText={setSearch}
+                returnKeyType="search"
+                onSubmitEditing={submitSearch}
+              />
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('circles.openFilters')}
+              accessibilityState={{ expanded: filtersOpen }}
+              accessibilityValue={{
+                text: t('events.appliedFilters', { count: appliedFilterCount }),
+              }}
+              testID="circles-open-filters"
+              onFocus={() => setFilterButtonFocused(true)}
+              onBlur={() => setFilterButtonFocused(false)}
+              onHoverIn={() => setFilterButtonHovered(true)}
+              onHoverOut={() => setFilterButtonHovered(false)}
+              onPress={() => {
+                setDraft(applied);
+                setFiltersOpen(true);
+              }}
+              style={({ pressed }) => [
+                styles.filterButton,
                 {
-                  backgroundColor: colors.listSurface,
-                  borderColor: filterButtonFocused
-                    ? colors.focusRing
-                    : 'transparent',
+                  backgroundColor:
+                    pressed || filterButtonHovered
+                      ? colors.surfaceAlt
+                      : 'transparent',
                 },
               ]}
             >
-              <SettingsIcon name="filter" color={colors.primary} size={18} />
-            </View>
-            {appliedFilterCount > 0 ? (
               <View
-                pointerEvents="none"
                 style={[
-                  styles.filterCount,
-                  { backgroundColor: colors.primary },
+                  styles.filterFace,
+                  {
+                    backgroundColor: colors.listSurface,
+                    borderColor: filterButtonFocused
+                      ? colors.focusRing
+                      : 'transparent',
+                  },
                 ]}
               >
-                <Text
-                  style={[styles.filterCountLabel, { color: colors.onPrimary }]}
-                >
-                  {appliedFilterCount}
-                </Text>
+                <SettingsIcon name="filter" color={colors.primary} size={18} />
               </View>
-            ) : null}
-          </Pressable>
+              {appliedFilterCount > 0 ? (
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.filterCount,
+                    { backgroundColor: colors.primary },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.filterCountLabel,
+                      { color: colors.onPrimary },
+                    ]}
+                  >
+                    {appliedFilterCount}
+                  </Text>
+                </View>
+              ) : null}
+            </Pressable>
+          </View>
           <EventFiltersSheet
             visible={filtersOpen}
             title={t('events.filtersTitle')}
@@ -130,19 +175,6 @@ export function CircleList({ preview = false }: { preview?: boolean }) {
               </View>
             }
           >
-            <TextField
-              compact
-              variant="soft"
-              accentLabel
-              leadingIcon="search"
-              label={t('circles.search')}
-              placeholder={t('circles.searchPlaceholder')}
-              maxLength={120}
-              value={draft.q}
-              onChangeText={(q) => setDraft((previous) => ({ ...previous, q }))}
-              returnKeyType="search"
-              onSubmitEditing={apply}
-            />
             <EventSelect
               label={t('circles.category')}
               value={draft.category}
@@ -188,13 +220,8 @@ export function CircleList({ preview = false }: { preview?: boolean }) {
       ) : (
         <View style={styles.grid}>
           {data.items.map((circle) => (
-            <View
-              key={circle.id}
-              style={{
-                width: width >= 1000 ? '32%' : width >= 700 ? '48%' : '100%',
-              }}
-            >
-              <CircleCard circle={circle} onChanged={reload} />
+            <View key={circle.id} style={styles.gridItem}>
+              <CircleCard circle={circle} />
             </View>
           ))}
         </View>
@@ -206,30 +233,47 @@ export function CircleList({ preview = false }: { preview?: boolean }) {
           onPress={() => router.push('/circles')}
         />
       ) : data && data.items.length > 0 ? (
-        <Pagination
-          page={data.page}
-          size={data.size}
-          total={data.total}
-          onPageChange={setPage}
-          label={t('circles.page', {
-            page: data.page + 1,
-            pages: Math.max(1, Math.ceil(data.total / Math.max(1, data.size))),
-            count: data.total,
-          })}
-        />
+        <View style={styles.paginationFooter}>
+          <Pagination
+            compact
+            page={data.page}
+            size={data.size}
+            total={data.total}
+            onPageChange={setPage}
+            label={t('circles.pageLabel', {
+              page: data.page + 1,
+              pages: Math.max(
+                1,
+                Math.ceil(data.total / Math.max(1, data.size)),
+              ),
+            })}
+          />
+        </View>
       ) : null}
     </View>
   );
 }
 export default function CirclesScreen() {
   return (
-    <Screen>
+    <Screen contentStyle={styles.screenContent}>
       <CircleList />
     </Screen>
   );
 }
 const styles = StyleSheet.create({
   section: { gap: spacing.space16 },
+  screenContent: { flexGrow: 1 },
+  fillScreen: { flexGrow: 1 },
+  paginationFooter: { marginTop: 'auto', paddingTop: spacing.space16 },
+  intro: { gap: spacing.space4, paddingBottom: spacing.space4 },
+  pageTitle: { ...typography.h2 },
+  subtitle: { ...typography.body },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.space8,
+  },
+  searchField: { flex: 1, minWidth: 0 },
   filterButton: {
     width: 48,
     height: 48,
@@ -265,5 +309,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.space12 },
+  gridItem: { width: '48%', paddingVertical: spacing.space4 },
   body: { ...typography.body },
 });

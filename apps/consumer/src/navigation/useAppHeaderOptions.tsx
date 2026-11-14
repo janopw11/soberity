@@ -14,6 +14,7 @@ function HeaderMenu() {
   const { category } = useGlobalSearchParams<{ category?: string }>();
   const inQuizCategory = pathname === '/science/quizzes' && Boolean(category);
   const inEvents = pathname === '/events' || pathname === '/events/';
+  const inCommunity = pathname === '/community' || pathname === '/community/';
   const { t } = useTranslation();
   const { colors } = useThemePreferences();
   const [focused, setFocused] = useState(false);
@@ -25,7 +26,7 @@ function HeaderMenu() {
           accessibilityRole="button"
           accessibilityLabel={t('navigation.goBack')}
           onPress={() => {
-            if (inEvents) router.replace('/');
+            if (inEvents || inCommunity) router.replace('/');
             else if (inQuizCategory) router.setParams({ category: undefined });
             else router.back();
           }}

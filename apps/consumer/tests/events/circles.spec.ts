@@ -167,7 +167,11 @@ for (const language of ['en', 'pl'])
       const state = await circlesFixture(page);
       await login(page);
       await page.goto('/community');
-      await page.getByRole('button', { name: /Sober Circles/ }).click();
+      await page
+        .getByRole('button', {
+          name: language === 'pl' ? /Kręgi Sober/ : /Sober Circles/,
+        })
+        .click();
       await expect(page).toHaveURL(/\/circles$/);
       const openFilters = () =>
         page.getByTestId('circles-open-filters').click();
@@ -178,17 +182,18 @@ for (const language of ['en', 'pl'])
             exact: true,
           })
           .click();
-      await openFilters();
       const search = page.getByRole('textbox', {
         name: language === 'pl' ? 'Szukaj kręgów' : 'Search Circles',
         exact: true,
       });
-      await search.fill('discard this draft');
-      await page.getByTestId('events-filters-dialog-close').click();
-      await openFilters();
-      await expect(search).toHaveValue('');
+      await expect(search).toBeVisible();
+      const searchBox = await search.boundingBox();
+      const filterBox = await page
+        .getByTestId('circles-open-filters')
+        .boundingBox();
+      expect(searchBox!.x + searchBox!.width).toBeLessThanOrEqual(filterBox!.x);
       await page.screenshot({
-        path: info.outputPath('circle-filters.png'),
+        path: info.outputPath('circle-search-row.png'),
         fullPage: true,
       });
       await search.fill('missing');
@@ -196,8 +201,14 @@ for (const language of ['en', 'pl'])
       await expect(
         page.getByRole('heading', { name: 'Fixture runners', exact: true }),
       ).toHaveCount(0);
-      await openFilters();
       await search.fill('runners');
+      await expect(
+        page.getByRole('heading', { name: 'Fixture runners', exact: true }),
+      ).toBeVisible();
+      await openFilters();
+      await expect(page.getByRole('dialog').getByRole('textbox')).toHaveCount(
+        0,
+      );
       await page
         .getByRole('button', {
           name: language === 'pl' ? /^Kategoria:/ : /^Category:/,
