@@ -55,8 +55,12 @@ public class SecurityConfig {
                                 "/api/v1/evidence/sources/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/discover/weekly/current", "/api/v1/discover/weekly/*").permitAll()
                         .requestMatchers("/api/v1/discover/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/discussions", "/api/v1/discussions/*", "/api/v1/discussions/*/comments").permitAll()
+                        .requestMatchers("/api/v1/discussions/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/circles", "/api/v1/circles/*", "/api/v1/circles/*/events", "/api/v1/circles/media/*").permitAll()
+                        .requestMatchers("/api/v1/circles/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events", "/api/v1/events/categories",
-                                "/api/v1/events/*", "/api/v1/events/media/*").permitAll()
+                                "/api/v1/events/*", "/api/v1/events/*/participation", "/api/v1/events/media/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/nearby").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/locations/countries", "/api/v1/locations/cities", "/api/v1/locations/metadata").permitAll()
                         .requestMatchers("/api/v1/locations/**", "/api/v1/organizer/**", "/api/v1/moderation/**").denyAll()

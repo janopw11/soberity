@@ -1,6 +1,7 @@
 package com.soberity.events.application;
 
 import com.soberity.identity.token.VerifiedToken;
+import com.soberity.identity.security.ApplicationRoles;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,7 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class EventAccess {
     private final JdbcTemplate jdbc;
-    public EventAccess(JdbcTemplate jdbc) { this.jdbc=jdbc; }
+    private final ApplicationRoles applicationRoles;
+    public EventAccess(JdbcTemplate jdbc, ApplicationRoles applicationRoles) {
+        this.jdbc=jdbc;
+        this.applicationRoles=applicationRoles;
+    }
     public void verified(VerifiedToken actor) {
         if(actor==null || !actor.emailVerified()) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Verified identity required.");
         // Serialize private actions against the existing account-erasure boundary.
@@ -24,16 +29,19 @@ public class EventAccess {
     }
     public void admin(VerifiedToken actor) {
         verified(actor);
+        if(applicationRoles.isSuperAdmin(actor)) return;
         if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_admin WHERE firebase_uid=? AND active)",Boolean.class,actor.uid())))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Events administrator required.");
     }
     public void member(VerifiedToken actor,UUID organizerId) {
         verified(actor);
+        if(applicationRoles.isSuperAdmin(actor)) return;
         if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_membership WHERE organizer_id=? AND firebase_uid=?)",Boolean.class,organizerId,actor.uid())))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Organizer not found.");
     }
     public boolean isModerator(VerifiedToken actor) {
         verified(actor);
+        if(applicationRoles.isSuperAdmin(actor)) return true;
         return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM events_moderator WHERE firebase_uid=? AND active)",Boolean.class,actor.uid()));
     }
     public void moderator(VerifiedToken actor) {

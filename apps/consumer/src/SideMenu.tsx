@@ -46,11 +46,13 @@ export default function SideMenu() {
       style={styles.toggle}
     >
       <Image
-        source={theme === 'dark'
-          // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
-          ? require('../assets/images/menu-icon-ocean-dark.png')
-          // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
-          : require('../assets/images/menu-icon-ocean-light.png')}
+        source={
+          theme === 'dark'
+            ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
+              require('../assets/images/menu-icon-ocean-dark.png')
+            : // eslint-disable-next-line @typescript-eslint/no-require-imports -- Metro static asset
+              require('../assets/images/menu-icon-ocean-light.png')
+        }
         style={styles.menuIcon}
         resizeMode="contain"
         accessibilityIgnoresInvertColors
@@ -63,7 +65,7 @@ export default function SideMenu() {
   const item = (
     id: string,
     image: number,
-    href?: '/' | '/science' | '/events' | '/about',
+    href?: '/' | '/science' | '/events' | '/about' | '/community',
   ) => {
     const label = t(`navigation.features.${id}`);
     if (id === 'science') {
@@ -73,10 +75,14 @@ export default function SideMenu() {
           accessibilityRole="button"
           accessibilityLabel={label}
           accessibilityState={{ expanded: scienceExpanded }}
-          onPress={() => setScienceExpanded(value => !value)}
+          onPress={() => setScienceExpanded((value) => !value)}
           onFocus={() => setFocused(id)}
           onBlur={() => setFocused(null)}
-          style={({ pressed }) => [styles.item, pressed && styles.pressed, focused === id && styles.focused]}
+          style={({ pressed }) => [
+            styles.item,
+            pressed && styles.pressed,
+            focused === id && styles.focused,
+          ]}
         >
           <Image
             source={image}
@@ -87,7 +93,11 @@ export default function SideMenu() {
             importantForAccessibility="no"
           />
           <Text style={styles.label}>{label}</Text>
-          <SettingsIcon name={scienceExpanded ? 'chevronDown' : 'chevron'} color={colors.primary} size={20} />
+          <SettingsIcon
+            name={scienceExpanded ? 'chevronDown' : 'chevron'}
+            color={colors.primary}
+            size={20}
+          />
         </Pressable>
       );
     }
@@ -151,35 +161,62 @@ export default function SideMenu() {
             <ScrollView contentContainerStyle={styles.content}>
               {navigationItems.map((entry) => (
                 <View key={entry.id}>
-                  {item(entry.id, theme === 'dark' && 'imageDark' in entry ? entry.imageDark : entry.image, 'href' in entry ? entry.href : undefined)}
+                  {item(
+                    entry.id,
+                    theme === 'dark' && 'imageDark' in entry
+                      ? entry.imageDark
+                      : entry.image,
+                    'href' in entry ? entry.href : undefined,
+                  )}
                   {entry.id === 'science' && scienceExpanded ? (
                     <View style={styles.submenu}>
                       {scienceNavigationItems.map((section) => {
                         const id = `science-${section.id}`;
-                        const selected = section.id === 'articles'
-                          ? pathname === '/science' || /^\/science\/(post|article|evidence)\//.test(pathname)
-                          : section.id === 'quizzes'
-                            ? pathname === section.href || pathname.startsWith('/science/quiz/') || pathname === '/science/learn'
-                            : pathname === section.href;
+                        const selected =
+                          section.id === 'articles'
+                            ? pathname === '/science' ||
+                              /^\/science\/(post|article|evidence)\//.test(
+                                pathname,
+                              )
+                            : section.id === 'quizzes'
+                              ? pathname === section.href ||
+                                pathname.startsWith('/science/quiz/') ||
+                                pathname === '/science/learn'
+                              : false;
                         return (
                           <Pressable
                             key={section.id}
                             accessibilityRole="link"
                             accessibilityState={{ selected }}
-                            onPress={() => { close(); router.replace(section.href); }}
+                            onPress={() => {
+                              close();
+                              router.replace(section.href);
+                            }}
                             onFocus={() => setFocused(id)}
                             onBlur={() => setFocused(null)}
-                            style={({ pressed }) => [styles.item, styles.submenuItem, selected && styles.selected, pressed && styles.pressed, focused === id && styles.focused]}
+                            style={({ pressed }) => [
+                              styles.item,
+                              styles.submenuItem,
+                              selected && styles.selected,
+                              pressed && styles.pressed,
+                              focused === id && styles.focused,
+                            ]}
                           >
                             <Image
-                              source={theme === 'dark' && 'imageDark' in section ? section.imageDark : section.image}
+                              source={
+                                theme === 'dark' && 'imageDark' in section
+                                  ? section.imageDark
+                                  : section.image
+                              }
                               style={styles.iconImage}
                               resizeMode="contain"
                               accessibilityIgnoresInvertColors
                               accessible={false}
                               importantForAccessibility="no"
                             />
-                            <Text style={styles.label}>{t(`navigation.scienceSections.${section.id}`)}</Text>
+                            <Text style={styles.label}>
+                              {t(`navigation.scienceSections.${section.id}`)}
+                            </Text>
                           </Pressable>
                         );
                       })}

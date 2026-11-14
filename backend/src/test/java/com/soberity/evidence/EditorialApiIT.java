@@ -70,8 +70,16 @@ class EditorialApiIT extends AbstractIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT reason FROM editorial_audit WHERE material_id=? AND action='ARCHIVED'",String.class,id)).isEqualTo("Synthetic withdrawal reason");
         assertThatThrownBy(()->jdbc.update("DELETE FROM editorial_audit WHERE material_id=?",id)).isInstanceOf(DataAccessException.class);
     }
+    @Test void superAdminCannotSelfApproveOrPublish() throws Exception {
+        String author=user();
+        jdbc.update("INSERT INTO application_role(firebase_uid,role,granted_by) VALUES (?,'SUPER_ADMIN','test')",author);
+        assertNoSelfApproval(author);
+    }
     @Test void evenDualRoleAuthorCannotSelfApproveOrPublish() throws Exception {
-        String author=user("AUTHOR","REVIEWER");UUID id=create(author);cite(author,id);send(author,material(id,"submit"),new Reason("Submit"));
+        assertNoSelfApproval(user("AUTHOR","REVIEWER"));
+    }
+    private void assertNoSelfApproval(String author) throws Exception {
+        UUID id=create(author);cite(author,id);send(author,material(id,"submit"),new Reason("Submit"));
         mvc.perform(post("/api/v1/editorial"+material(id,"review")).header("Authorization","Bearer "+author).contentType("application/json").content(json.writeValueAsString(new Decision(ReviewDecision.APPROVED,"Self approval",false,null))))
                 .andExpect(status().isForbidden());
         String reviewer=user("REVIEWER");send(reviewer,material(id,"review"),new Decision(ReviewDecision.APPROVED,"Independent approval",false,null));

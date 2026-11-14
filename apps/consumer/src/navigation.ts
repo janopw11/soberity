@@ -23,6 +23,7 @@ export const navigationItems = [
   },
   {
     id: 'community',
+    href: '/community',
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require
     image: require('../assets/images/community-icon-light.png') as number,
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- static asset require

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** The signed-in user's own "going" declarations. Lives under /me so the public event routes stay closed. */
+/** The signed-in user's own RSVP. Private state and mutations remain under /me; counts have a separate public endpoint. */
 @RestController
 @RequestMapping("/api/v1/me/event-interests")
 public class EventInterestController {
@@ -34,7 +34,7 @@ public class EventInterestController {
 
     @GetMapping("/{eventId}")
     public Map<String, Object> state(@AuthenticationPrincipal VerifiedToken actor, @PathVariable UUID eventId) {
-        return Map.of("declared", interests.declared(actor, eventId));
+        return interests.state(actor, eventId);
     }
 
     @PutMapping("/{eventId}")

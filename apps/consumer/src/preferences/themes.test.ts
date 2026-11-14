@@ -51,6 +51,9 @@ describe('theme tokens', () => {
       expect(
         contrast(palette.primary, palette.onPrimary),
       ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(palette.success, palette.onPrimary),
+      ).toBeGreaterThanOrEqual(4.5);
       expect(contrast(palette.danger, palette.onDanger)).toBeGreaterThanOrEqual(
         4.5,
       );

@@ -51,7 +51,7 @@ for (const [language, theme] of [
     );
     await page.goto('/events');
     await page
-      .getByRole('button', {
+      .getByRole('tab', {
         name: language === 'en' ? 'Map' : 'Mapa',
         exact: true,
       })

@@ -62,6 +62,7 @@ function RootNavigator() {
           />
         </Stack.Protected>
         <Stack.Screen name="science" options={{ headerShown: false }} />
+        <Stack.Screen name="discussions" options={{ headerShown: false }} />
         <Stack.Screen name="events" options={{ headerShown: false }} />
         <Stack.Screen
           name="+not-found"

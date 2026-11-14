@@ -1,3 +1,21 @@
+## 2026-11-14
+
+- SUPER_ADMIN (rozszerzenie P0-I05): zaufana rola w PostgreSQL agreguje dostęp do redakcji, wydarzeń, Circles i moderacji dyskusji. Cofnięcie działa od następnego żądania; usunięcie konta usuwa grant. Zachowano weryfikację e-maila, prywatność, reguły własności i niezależną recenzję. Migracja V29, instrukcja nadawania/cofania oraz testy bezpieczeństwa: 39 unit/architecture +61 IT PASS. Aktywowano lokalnie i nadano rolę kontu wskazanemu przez właściciela po sprawdzeniu UID w Firebase dev; readiness UP, anonimowy admin401. Ręczny odbiór panelu web/iOS/Android pozostaje NOT VERIFIED.
+
+## 2026-11-13
+
+- Community Phase4 (P5-I00D): dyskusje powiązane z istniejącymi artykułami, katalog z tematami/wyszukiwaniem/sortowaniem, komentarze i odpowiedzi jednego poziomu, usuwanie własnych wypowiedzi oraz moderacja przez istniejącą rolę REVIEWER. Artykuły mają link z rzeczywistym licznikiem, Hub pokazuje prawdziwe dyskusje i nadal nie zawiera wydarzeń. V28 dodaje tematy, komentarze i audyt; tożsamości pozostają prywatne, usuwanie konta czyści treść, opinie/doświadczenia są oddzielone od materiałów naukowych. Backend39+62, klient10, web22/22 i static/build/export checks PASS. Migracja wyłącznie na izolowanej bazie testowej; native/manual oraz aktywacja lokalnej aplikacji pozostają otwarte. Bez My Activities dashboard.
+
+- Na polecenie właściciela usunięto z Community kafel Discover Events i listę wydarzeń wraz z pobieraniem Events API. Wydarzenia pozostają w osobnej zakładce Sober Events. Typecheck/lint oraz web desktop/mobile EN/PL light/dark8/8 PASS.
+
+- Community Phase 3 (P5-I00C): Sober Circles — katalog z wyszukiwaniem/kategoriami, szczegóły i powiązane istniejące wydarzenia, trwałe Join/Leave z rzeczywistymi licznikami oraz realna sekcja Hubu. Rozszerzono istniejący panel Events admin o tworzenie/edycję/aktywację, okładki i powiązania Eventów. V27 dodaje Circle, członkostwa, relacje i audyt; unikalność, współbieżność, prywatność i usuwanie relacji konta chroni backend. Backend39+29, klient35 oraz34 scenariusze web zweryfikowane (4 timeouty nawigacji/sesji w zbiorczym przebiegu; ponowienie5/5 PASS bez zmian kodu); typecheck/lint/format i eksporty web/iOS/Android PASS. Migracja tylko w izolowanej bazie testowej; native/manual acceptance otwarte. Wcześniejszy błąd podglądu mapy pozostaje otwarty. Bez Science Discussions.
+
+- Community Phase 2 (P5-I00B): rozszerzono istniejące Going Sober o licznik uczestników, Join Event / Cancel RSVP i odświeżanie rzeczywistego stanu serwera. Zachowano własną listę wydarzeń, idempotencję i prywatność tożsamości; dodano blokady współbieżności oraz migrację V26 usuwającą relacje po usunięciu konta/wydarzenia. Backend 39 unit/architecture +24 IT, frontend 41 oraz web RSVP12 + Hub10 PASS; typecheck/lint i eksporty web/iOS/Android PASS. Test mapy wykazał brak podglądu po wyborze wydarzenia we wspólnej lokalizacji (4/4 FAIL, kod mapy bez zmian). Native/manual acceptance pozostaje otwarte; V26 zastosowano wyłącznie w izolowanej bazie testowej. Bez Circles, Discussions i pełnego My Activities.
+
+## 2026-11-12
+
+- Community Phase 1 (P5-I00A): authenticated Hub with four module cards, real Events API/tickets and details/catalog navigation; Circles, Discussions and My Activities clearly unavailable. Responsive EN/PL Ocean themes, retry/loading/empty states and implementation plan. Web fixture tests 10/10, EventCard 3/3, typecheck, changed-file lint, web build and native exports PASS; local Events API 200. Native runtime/manual accessibility pending; existing EventsScreen unit suite still fails. No RSVP, memberships or discussion backend added.
+
 ## 2026-11-11
 
 - Wydarzenia wielodniowe pozostają widoczne do podanej godziny zakończenia w katalogu, pobliskich wydarzeniach i prywatnej liście Going Sober. Filtry dat uwzględniają nakładanie się okresów, a Going Sober można zaznaczyć także podczas wydarzenia. Bez daty końca zachowano dotychczasową granicę rozpoczęcia. Testy API: 20/20 PASS na izolowanym PostgreSQL, w tym trwające/zakończone wydarzenia, zakresy dat, paginacja i prywatność.

@@ -99,6 +99,148 @@ class CuratedEventsApiIT extends AbstractIntegrationTest {
         mvc.perform(put("/api/v1/me/event-interests/"+draft).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
         mvc.perform(put("/api/v1/me/event-interests/"+UUID.randomUUID()).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
     }
+    @Test void participationCountsAreAccurateAndIdentitiesStayPrivate() throws Exception {
+        String id=published(input("Participation counts")),a=user(false),b=user(false);
+        String own="/api/v1/me/event-interests/"+id,summary="/api/v1/events/"+id+"/participation";
+        mvc.perform(get(summary)).andExpect(status().isOk()).andExpect(jsonPath("$.participant_count").value(0))
+            .andExpect(jsonPath("$.can_join").value(true)).andExpect(jsonPath("$.declared").doesNotExist())
+            .andExpect(header().string("Cache-Control","no-store"));
+        for(String token:List.of(a,a,b)) mvc.perform(put(own).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        mvc.perform(get(own).header("Authorization","Bearer "+a)).andExpect(jsonPath("$.declared").value(true))
+            .andExpect(jsonPath("$.participant_count").value(2));
+        // A body/query cannot change whose registration is removed.
+        mvc.perform(delete(own).param("userId",a).header("Authorization","Bearer "+b)).andExpect(status().isNoContent());
+        mvc.perform(get(own).header("Authorization","Bearer "+a)).andExpect(jsonPath("$.declared").value(true));
+        mvc.perform(get(summary)).andExpect(jsonPath("$.participant_count").value(1));
+        mvc.perform(delete(own).header("Authorization","Bearer "+b)).andExpect(status().isNoContent());
+        mvc.perform(delete(own).header("Authorization","Bearer "+a)).andExpect(status().isNoContent());
+        mvc.perform(get(own).header("Authorization","Bearer "+a)).andExpect(jsonPath("$.declared").value(false)).andExpect(jsonPath("$.participant_count").value(0));
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+a)).andExpect(jsonPath("$.total").value(0));
+    }
+
+    @Test void concurrentParticipationIsUniqueAndKeepsOriginalTimestamp() throws Exception {
+        String id=published(input("Concurrent participation")),a=user(false),b=user(false);
+        String path="/api/v1/me/event-interests/"+id;
+        var start=new java.util.concurrent.CountDownLatch(1);
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(8)) {
+            var futures=new ArrayList<java.util.concurrent.Future<Integer>>();
+            for(int i=0;i<8;i++) {
+                String token=i<6?a:b;
+                futures.add(pool.submit(()->{start.await();return mvc.perform(put(path).header("Authorization","Bearer "+token)).andReturn().getResponse().getStatus();}));
+            }
+            start.countDown();
+            for(var future:futures) assertThat(future.get(15,java.util.concurrent.TimeUnit.SECONDS)).isEqualTo(204);
+        }
+        var times=jdbc.queryForList("SELECT user_ref,declared_at FROM events_interest WHERE event_id=? ORDER BY user_ref",UUID.fromString(id));
+        assertThat(times).hasSize(2);
+        mvc.perform(put(path).header("Authorization","Bearer "+a)).andExpect(status().isNoContent());
+        assertThat(jdbc.queryForList("SELECT user_ref,declared_at FROM events_interest WHERE event_id=? ORDER BY user_ref",UUID.fromString(id))).isEqualTo(times);
+        mvc.perform(get("/api/v1/events/"+id+"/participation")).andExpect(jsonPath("$.participant_count").value(2));
+    }
+
+    @Test void participationRequiresVerifiedOwnerAndValidIdentifiers() throws Exception {
+        String id=published(input("Protected participation")),me=user(false),unverified="unverified-"+UUID.randomUUID();
+        when(tokenVerifier.verify(unverified)).thenReturn(new VerifiedToken(unverified,false));
+        String path="/api/v1/me/event-interests/"+id;
+        for(var request:List.of(get(path),put(path),delete(path),get("/api/v1/me/event-interests")))
+            mvc.perform(request).andExpect(status().isUnauthorized());
+        for(var request:List.of(get(path),put(path),delete(path),get("/api/v1/me/event-interests")))
+            mvc.perform(request.header("Authorization","Bearer "+unverified)).andExpect(status().isForbidden());
+        mvc.perform(put("/api/v1/me/event-interests/invalid").header("Authorization","Bearer "+me)).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/events/invalid/participation")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/events/"+UUID.randomUUID()+"/participation")).andExpect(status().isNotFound());
+        String draft=create(input("Private draft")).path("id").asText();
+        mvc.perform(get("/api/v1/events/"+draft+"/participation")).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/me/event-interests").param("size","0").header("Authorization","Bearer "+me)).andExpect(status().isBadRequest());
+    }
+
+    @Test void accountAndEventErasureRemoveParticipationAndPreventRejoining() throws Exception {
+        String id=published(input("Erasure participation")),a=user(false),b=user(false);
+        String path="/api/v1/me/event-interests/"+id;
+        for(String token:List.of(a,b)) mvc.perform(put(path).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/v1/me").header("Authorization","Bearer "+a)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/events/"+id+"/participation")).andExpect(jsonPath("$.participant_count").value(1));
+        mvc.perform(put(path).header("Authorization","Bearer "+a)).andExpect(status().isForbidden());
+        mvc.perform(delete("/api/v1/admin/events/"+id).param("expectedVersion","2").header("Authorization","Bearer "+admin)).andExpect(status().isNoContent());
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM events_interest WHERE event_id=?",Long.class,UUID.fromString(id))).isZero();
+        mvc.perform(get("/api/v1/me/event-interests").header("Authorization","Bearer "+b)).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(put(path).header("Authorization","Bearer "+b)).andExpect(status().isNotFound());
+        mvc.perform(delete(path).header("Authorization","Bearer "+b)).andExpect(status().isNoContent());
+    }
+
+    private Map<String,Object> circleBody(boolean active,List<String> eventIds) {
+        var b=new LinkedHashMap<String,Object>();b.put("name","Circle "+UUID.randomUUID());b.put("slug","circle-"+UUID.randomUUID());
+        b.put("description","Activities together");b.put("category","FITNESS");b.put("guidelines","Respect others");b.put("active",active);b.put("eventIds",eventIds);return b;
+    }
+    private String circle(Map<String,Object> b)throws Exception {
+        return json.readTree(mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(b)))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).path("id").asText();
+    }
+    @Test void circlesMembershipIsUniquePrivateAndErased()throws Exception {
+        String id=circle(circleBody(true,List.of())),a=user(false),b=user(false),path="/api/v1/me/circles/"+id;
+        for(String token:List.of(a,a,b))mvc.perform(put(path).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/circles/"+id)).andExpect(jsonPath("$.member_count").value(2)).andExpect(jsonPath("$.joined").value(false)).andExpect(jsonPath("$.user_ref").doesNotExist());
+        mvc.perform(get("/api/v1/me/circles").header("Authorization","Bearer "+a)).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(delete(path).param("userId",a).header("Authorization","Bearer "+b)).andExpect(status().isNoContent());
+        mvc.perform(delete(path).header("Authorization","Bearer "+b)).andExpect(status().isNoContent());
+        mvc.perform(get(path).header("Authorization","Bearer "+a)).andExpect(jsonPath("$.joined").value(true)).andExpect(jsonPath("$.member_count").value(1));
+        mvc.perform(delete("/api/v1/me").header("Authorization","Bearer "+a)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/circles/"+id)).andExpect(jsonPath("$.member_count").value(0));
+        mvc.perform(put(path).header("Authorization","Bearer "+a)).andExpect(status().isForbidden());
+    }
+    @Test void circleConcurrentJoinDoesNotDuplicate()throws Exception {
+        String id=circle(circleBody(true,List.of())),me=user(false);
+        var start=new java.util.concurrent.CountDownLatch(1);
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(6)) {
+            var futures=new ArrayList<java.util.concurrent.Future<Integer>>();
+            for(int i=0;i<6;i++)futures.add(pool.submit(()->{start.await();return mvc.perform(put("/api/v1/me/circles/"+id).header("Authorization","Bearer "+me)).andReturn().getResponse().getStatus();}));
+            start.countDown();for(var f:futures)assertThat(f.get(15,java.util.concurrent.TimeUnit.SECONDS)).isEqualTo(204);
+        }
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM community_circle_member WHERE circle_id=?",Long.class,UUID.fromString(id))).isEqualTo(1);
+    }
+    @Test void circlesFiltersAdminVersionAndDeactivation()throws Exception {
+        var body=circleBody(true,List.of());String id=circle(body),me=user(false),name=body.get("name").toString();
+        mvc.perform(get("/api/v1/circles").param("q",name.toLowerCase()).param("category","FITNESS")).andExpect(jsonPath("$.total").value(1));
+        mvc.perform(get("/api/v1/circles").param("q",name).param("category","ART")).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(get("/api/v1/circles").param("size","0")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/v1/circles").param("category","INVALID")).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body))).andExpect(status().isConflict());
+        mvc.perform(put("/api/v1/me/circles/"+id).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        body.put("expectedVersion",1);body.put("active",false);
+        mvc.perform(put("/api/v1/admin/circles/"+id).header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body))).andExpect(status().isOk()).andExpect(jsonPath("$.version").value(2));
+        mvc.perform(put("/api/v1/admin/circles/"+id).header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body))).andExpect(status().isConflict());
+        mvc.perform(get("/api/v1/circles/"+id)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/circles").param("q",name)).andExpect(jsonPath("$.total").value(0));
+        mvc.perform(put("/api/v1/me/circles/"+id).header("Authorization","Bearer "+me)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/me/circles").header("Authorization","Bearer "+me)).andExpect(jsonPath("$.items[0].active").value(false));
+        mvc.perform(delete("/api/v1/me/circles/"+id).header("Authorization","Bearer "+me)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/me/circles").header("Authorization","Bearer "+me)).andExpect(jsonPath("$.total").value(0));
+    }
+    @Test void circlesAuthorizationAndValidation()throws Exception {
+        String id=circle(circleBody(true,List.of())),me=user(false),unverified="unverified-"+UUID.randomUUID();
+        when(tokenVerifier.verify(unverified)).thenReturn(new VerifiedToken(unverified,false));
+        for(var r:List.of(get("/api/v1/me/circles"),get("/api/v1/me/circles/"+id),put("/api/v1/me/circles/"+id),delete("/api/v1/me/circles/"+id),get("/api/v1/admin/circles")))mvc.perform(r).andExpect(status().isUnauthorized());
+        mvc.perform(put("/api/v1/me/circles/"+id).header("Authorization","Bearer "+unverified)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/admin/circles").header("Authorization","Bearer "+me)).andExpect(status().isForbidden());
+        mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+me).contentType("application/json").content(json.writeValueAsString(circleBody(true,List.of())))).andExpect(status().isForbidden());
+        var bad=circleBody(true,List.of());bad.put("slug","Bad Slug");
+        mvc.perform(post("/api/v1/admin/circles").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(bad))).andExpect(status().isBadRequest());
+        mvc.perform(put("/api/v1/me/circles/invalid").header("Authorization","Bearer "+me)).andExpect(status().isBadRequest());
+    }
+    @Test void circleRelatedEventsAndCoverVisibility()throws Exception {
+        String published=published(input("Circle event")),draft=create(input("Hidden event")).path("id").asText(),cover=cover();
+        var b=circleBody(true,List.of(published,draft));b.put("coverId",cover);String id=circle(b);
+        mvc.perform(get("/api/v1/circles/"+id+"/events")).andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.items[0].id").value(published));
+        mvc.perform(get("/api/v1/circles/media/"+cover)).andExpect(status().isOk());
+        mvc.perform(delete("/api/v1/admin/events/"+published).param("expectedVersion","2").header("Authorization","Bearer "+admin)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/circles/"+id+"/events")).andExpect(jsonPath("$.total").value(0));
+        b.put("eventIds",List.of(draft));b.put("active",false);b.put("expectedVersion",1);
+        mvc.perform(put("/api/v1/admin/circles/"+id).header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(b))).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/circles/media/"+cover)).andExpect(status().isNotFound());
+        b.put("eventIds",List.of(UUID.randomUUID().toString()));b.put("expectedVersion",2);
+        mvc.perform(put("/api/v1/admin/circles/"+id).header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(b))).andExpect(status().isBadRequest());
+    }
+
     private JsonNode create(Map<String,Object> body)throws Exception {
         return json.readTree(mvc.perform(post("/api/v1/admin/events").header("Authorization","Bearer "+admin).contentType("application/json").content(json.writeValueAsString(body)))
             .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());

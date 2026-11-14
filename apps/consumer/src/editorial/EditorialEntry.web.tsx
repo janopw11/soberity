@@ -10,11 +10,13 @@ export default function EditorialEntry() {
   const { getIdToken, user } = useAuthStatus();
   const { t } = useTranslation();
   const [allowed, setAllowed] = useState(false);
+  const [discussionsAllowed, setDiscussionsAllowed] = useState(false);
   const [eventsAllowed, setEventsAllowed] = useState(false);
   useEffect(() => {
     let current = true;
     setAllowed(false);
     setEventsAllowed(false);
+    setDiscussionsAllowed(false);
     void (async () => {
       try {
         const token = await getIdToken();
@@ -27,6 +29,10 @@ export default function EditorialEntry() {
           setAllowed(
             editorial.status === 'fulfilled' &&
               editorial.value.roles.length > 0,
+          );
+          setDiscussionsAllowed(
+            editorial.status === 'fulfilled' &&
+              editorial.value.roles.includes('REVIEWER'),
           );
           setEventsAllowed(events.status === 'fulfilled');
         }
@@ -58,6 +64,13 @@ export default function EditorialEntry() {
             onPress={() => router.push('/editorial-quizzes')}
           />
         </>
+      ) : null}
+      {discussionsAllowed ? (
+        <SettingsRow
+          label={t('discussions.admin')}
+          showChevron
+          onPress={() => router.push('/editorial-discussions')}
+        />
       ) : null}
       {eventsAllowed ? (
         <SettingsRow

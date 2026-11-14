@@ -10,13 +10,15 @@ import {
 } from 'react-native';
 
 import { radii, spacing, typography } from '@soberity/design-tokens';
+import { SettingsIcon, type SettingsIconName } from './SettingsIcon';
 import { useThemePreferences } from '../preferences/ThemePreferencesContext';
 
 export type ButtonVariant =
-  'primary' | 'secondary' | 'tertiary' | 'destructive';
+  'primary' | 'secondary' | 'tertiary' | 'destructive' | 'success';
 
 type ButtonProps = {
   label: string;
+  icon?: SettingsIconName;
   onPress?: (event: GestureResponderEvent) => void;
   variant?: ButtonVariant;
   disabled?: boolean;
@@ -29,6 +31,7 @@ type ButtonProps = {
 /** Primary interactive control. Min height 48, visible focus ring, loading/disabled states. */
 export function Button({
   label,
+  icon,
   onPress,
   variant = 'primary',
   disabled = false,
@@ -66,7 +69,16 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={variantStyle.indicatorColor} />
       ) : (
-        <Text style={[styles.label, variantStyle.label]}>{label}</Text>
+        <>
+          {icon ? (
+            <SettingsIcon
+              name={icon}
+              size={20}
+              color={variantStyle.label.color}
+            />
+          ) : null}
+          <Text style={[styles.label, variantStyle.label]}>{label}</Text>
+        </>
       )}
     </Pressable>
   );
@@ -83,6 +95,7 @@ function createStyles(
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row',
+      gap: spacing.space8,
     },
     disabled: { opacity: 0.5 },
     focused: {
@@ -130,6 +143,14 @@ function createVariantStyles(
       pressed: { backgroundColor: colors.surfaceAlt },
       label: { color: colors.primary, textDecorationLine: 'underline' },
       indicatorColor: colors.primary,
+    },
+    success: {
+      container: {
+        backgroundColor: colors.success,
+      },
+      pressed: { opacity: 0.85 },
+      label: { color: colors.onPrimary },
+      indicatorColor: colors.onPrimary,
     },
     destructive: {
       container: { backgroundColor: colors.danger },

@@ -32,7 +32,7 @@ import {
   type DropdownOutsideTouch,
 } from '../ui/DialogDropdown';
 
-/** Events-only sheet: the form and its applied/draft state stay owned by EventsScreen. */
+/** Filter sheet shared by Events and Circles; callers own form and applied/draft state. */
 export function EventFiltersSheet({
   visible,
   title,

@@ -3,6 +3,7 @@ package com.soberity.evidence.editorial;
 import com.soberity.evidence.domain.*;
 import com.soberity.evidence.domain.EvidenceTypes.*;
 import com.soberity.identity.token.VerifiedToken;
+import com.soberity.identity.security.ApplicationRoles;
 import java.time.Instant;
 import java.util.*;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class EditorialService {
     private final JdbcTemplate jdbc;
-    public EditorialService(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+    private final ApplicationRoles applicationRoles;
+    public EditorialService(JdbcTemplate jdbc, ApplicationRoles applicationRoles) {
+        this.jdbc = jdbc;
+        this.applicationRoles = applicationRoles;
+    }
 
     public record ClaimDraft(String locale, String category, ClaimContent content,
             String changeSummary, Instant nextReviewAt) { }
@@ -31,6 +36,7 @@ public class EditorialService {
         if (actor == null || !actor.emailVerified()) throw error(HttpStatus.FORBIDDEN, "Verified identity required.");
         if (Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM deleted_account WHERE firebase_uid=?)",Boolean.class,actor.uid())))
             throw error(HttpStatus.FORBIDDEN,"Account is unavailable.");
+        if (applicationRoles.isSuperAdmin(actor)) return Set.of("SUPER_ADMIN", "AUTHOR", "REVIEWER");
         return new LinkedHashSet<>(jdbc.queryForList("SELECT role FROM editorial_role WHERE firebase_uid=? ORDER BY role",String.class,actor.uid()));
     }
 

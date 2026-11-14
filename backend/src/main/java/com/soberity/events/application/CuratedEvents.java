@@ -103,7 +103,7 @@ public class CuratedEvents {
         if("DELETED".equals(event.get("status")))throw missing();
         jdbc.update("UPDATE sober_event SET status='DELETED',version=version+1,updated_at=clock_timestamp() WHERE id=?",id);
         audit(actor,id,"EVENT_DELETED");
-        // Joined does not exist before P2-I05; its FK/erasure hook must attach to this transaction then.
+        // V26 removes participation in the same transaction when status becomes DELETED.
     }
     private record ResolvedLocation(UUID countryId,UUID cityId) { }
     /** Explicit catalog IDs stay supported; otherwise the country and city come from the confirmed address point. */

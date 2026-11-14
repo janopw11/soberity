@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export type SettingsIconName =
+  | 'ticket'
   | 'search'
   | 'location'
   | 'refresh'
@@ -35,6 +36,10 @@ export type SettingsIconName =
   | 'alert';
 
 const ICON_PATHS: Record<SettingsIconName, string[]> = {
+  ticket: [
+    'M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V6z',
+    'M15 6v2 M15 11v2 M15 16v2',
+  ],
   search: ['M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 1 0 0-15z', 'M16 16l5 5'],
   location: [
     'M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 0 1 16 0z',

@@ -333,6 +333,18 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 
 **Definition of Done:** Backend nie ufa UID ani roli dostarczonej z klienta; brak sekretów w repo. Każdy obowiązkowy punkt powyżej ma dowód, a wyniki testów są zapisane.
 
+### Rozszerzenie P0-I05 — SUPER_ADMIN (polecenie właściciela)
+
+**Status rozszerzenia:** DONE (backend); **Started / Finished:** 2026-11-14. Historyczne zamknięcie P0-I05 pozostaje bez zmian.
+**Zależności:** istniejące zaufane granty EditorialService/EventAccess i migracje do V28.
+
+- [x] `P0-I05-T06` Globalny grant SUPER_ADMIN w PostgreSQL, efektywne AUTHOR/REVIEWER i dostęp Events/Circles/moderacja; brak nadawania przez klienta, natychmiastowa kontrola odwołania, usuwanie przy erasure.
+- [x] `P0-I05-V03` Testy dostępu między modułami, cofnięcia grantu, podszytych nagłówków, nieweryfikowanego/usuniętego konta oraz zachowania niezależnej recenzji.
+- [x] `P0-I05-T07` Aktywacja lokalna V29 i nadanie wskazanemu kontu po odczycie UID z Firebase dev; bez operacji produkcyjnych.
+
+**Dowód:** ApplicationRoles, V29, EditorialService/EventAccess, SuperAdminApiIT i EditorialApiIT, `backend/SUPER_ADMIN.md`. Maven verify exit 0: 39 unit/architecture + 61 IT (SuperAdmin 4, Editorial 10, Blog 8, CuratedEvents 29, Discussions 10), izolowany PostgreSQL na porcie 55439. Log `/tmp/soberity-super-admin-tests.log`. Backend lokalny odbudowany i uruchomiony; V28→V29, grant active=true, readiness UP, anonimowy admin HTTP 401. Firebase dev potwierdził konto wskazane przez właściciela jako enabled/email verified.
+**Ograniczenia:** rola agreguje dostęp do obecnych funkcji; reguły własności treści, prywatności, walidacji, niezależnej recenzji i wyłączone endpointy pozostają obowiązujące. Nowe moduły muszą integrować politykę roli. UI bez zmian; ręczny odbiór sesji właściciela web/iOS/Android NOT VERIFIED — odświeżyć panel i sprawdzić dostęp. Nie rozpoczynano następnej iteracji.
+
 ## P0-I06 — Cross-platform Auth adapter, signup & login
 
 **Status:** DONE  
@@ -1409,6 +1421,84 @@ Build TS kompiluje jawnie puste moduły narzędziowe. Maven sprawdza POM/JDK/wra
 **Raport główny:** §3.6, §10, §25  
 **Iteracje:** 7
 
+## P5-I00A — Community foundation (Community Phase 1)
+
+**Status:** IN_PROGRESS — implementation and web checks complete; native/manual accessibility acceptance NOT VERIFIED.
+**Started:** 2026-11-12
+**Finished:** —
+**Scope:** one explicitly requested iteration, independent of education Phase 1. Read-only hub; no RSVP, membership or discussion backend. Existing P5-I00 policy gate remains required before user-generated content.
+
+- [x] `P5-I00A-T01` Architecture/API/auth/admin audit and five-phase plan in COMMUNITY_IMPLEMENTATION_PLAN.md.
+- [x] `P5-I00A-T02` Authenticated Community route, menu entry, four module cards; existing Events navigation and clear disabled Coming soon modules.
+- [x] `P5-I00A-T03` Existing Events API/cards, loading/error/retry/empty handling; reusable Circle/Discussion unavailable cards; no production fake data.
+- [x] `P5-I00A-V01` Web desktop/mobile, EN/PL and light/dark: Playwright Community 10/10 PASS; typecheck and changed-file ESLint PASS; web build and iOS/Android exports PASS. Local API GET 200, two events with expected fields.
+- [ ] `P5-I00A-V02` Native runtime, VoiceOver/TalkBack and full manual keyboard/large-font acceptance. Simulator service inaccessible in sandbox; Android runtime not run. Owner: open `/community` with a verified account on both native platforms; check scroll, four cards, event details, theme/language, larger text and screen readers.
+
+**Regression limits:** EventCard unit 3/3 and theme contrast 2/2 PASS. Existing EventsScreen unit suite 6/6 FAIL: existing safe-area mock exports wrong module shape; diagnostic correction exposes stale Show Events/error-copy expectations. Diagnostic test edit reverted; event code/business logic untouched. No claim of a fully green repository suite. Browser fixtures exist only in tests; local real API smoke was read-only.
+
+**Next:** finish P5-I00A manual acceptance; Community Phase 2 only after explicit instruction. Existing P5-I00–P5-I06 status/checklists remain unchanged.
+
+## P5-I00B — Community Phase 2: Event Participation & RSVP
+
+**Status:** IN_PROGRESS — RSVP implemented and verified; map regression/manual native acceptance remain open.
+**Started:** 2026-11-12
+**Finished:** —
+**Last session:** 2026-11-13
+**Scope:** explicitly authorized Community Phase 2 only. Reuse existing Going Sober; no Circles, Discussions or complete My Activities dashboard. Dependency: existing EventInterests/V25 and Event Details; P5-I00A Hub routing retained. This does not close the original P2-I05 checklist or start another iteration.
+
+- [x] `P5-I00B-T01` Extend existing participation state/count and retain idempotent PUT/DELETE and paginated own-events API. Token-derived ownership, account-erasure lock, event-row lock and existing composite PK prevent duplicate/unauthorized writes. Evidence: CuratedEventsApiIT.
+- [x] `P5-I00B-T02` V26 erasure triggers and cleanup for deleted accounts and deleted/cancelled events; preserve active V25 registrations. No duplicate table/entity. Migration applied successfully only to isolated test PostgreSQL.
+- [x] `P5-I00B-T03` Existing EventGoingButton: Join Event, joined confirmation, Cancel RSVP, real count, focus refresh, bounded requests, busy/error/retry states and EN/PL. Unknown write outcome requires reconciliation; stale account/event responses ignored. Existing layout, Tickets, Hub links and Event business logic retained.
+- [x] `P5-I00B-V01` Backend `./mvnw --batch-mode verify -Dit.test=CuratedEventsApiIT`: 39 unit/architecture +24 integration PASS. Includes join/cancel, repeated/concurrent registrations, count accuracy, state, private list, authentication/authorization, invalid UUID/pagination, unavailable events and account/event erasure. Existing discovery/location integration scenarios also PASS. Initial sandbox run could not access Docker; approved rerun used isolated PostgreSQL.
+- [x] `P5-I00B-V02` Frontend: 36 distinct RSVP/card/filter/map-model/presentation tests plus 5 Button/contrast tests PASS (41 total). RSVP tests include unknown write outcome, account change and late read/write completion. Typecheck, changed-file ESLint/Prettier, web export and native iOS/Android exports PASS.
+- [x] `P5-I00B-V03` Browser fixture coverage: RSVP 12/12 and Hub 10/10 desktop/mobile-web EN/PL Ocean light/dark. Join → reload → cancel → reload, guest sign-in and recovery after uncertain write verified. One Hub test initially failed on shared Playwright artifact collision; isolated rerun PASS. Screenshots reviewed. Public/private API integration and browser fixtures are separate evidence, not a live end-to-end Firebase deployment test.
+- [ ] `P5-I00B-V04` Full map regression: 4/4 existing cluster browser scenarios FAIL after selecting a colocated event; expected detail preview dialog absent. Corrected obsolete Map selector from button to tab in the test. Cluster split and colocated selection steps execute, but preview assertion fails. EventMap/preview production code unchanged by this iteration. No claim that all existing functionality passed regression.
+- [ ] `P5-I00B-V05` Native runtime, VoiceOver/TalkBack and manual accessibility acceptance NOT VERIFIED. iOS simulator was available; native authenticated RSVP flow not run. Android `adb devices` returned no devices. Owner: apply V26/start updated local backend, open an event on iOS/Android, join/cancel/reopen, check counts, large text, screen reader and EN/PL/themes. Exports alone do not verify runtime.
+
+**Activation:** no application/production DB migration or backend restart performed. Restart local backend via `node scripts/start-local-backend.mjs` per RUN.md to apply V26 and serve new count/state endpoints. V26 removes obsolete declarations only for deleted accounts/events; review before application DB rollout.
+**Documentation:** backend/EVENT_PARTICIPATION_API.md, COMMUNITY_IMPLEMENTATION_PLAN.md, local ignored docs/BRANDING.md and CHANGELOG.md updated.
+**Next:** acceptance of P5-I00B and follow-up on map preview regression; do not start Community Phase 3 without explicit instruction.
+
+
+## P5-I00C — Community Phase 3: Sober Circles
+
+**Follow-up 2026-11-14:** owner-requested directory refactor: Ocean header with people icon; Events filter sheet for circle-name search, category and My/All, draft/apply/reset state and page reset. Existing API reused. IN_PROGRESS pending browser verification; native runtime NOT VERIFIED. No new iteration started.
+
+**Status:** IN_PROGRESS — implementation and automated acceptance complete; native/manual acceptance NOT VERIFIED.
+**Started:** 2026-11-13. **Finished:** —.
+**Scope:** explicit owner request for Community Phase 3 only. Reuses Phase 1 Hub and Phase 2 Events; does not close their outstanding checks or broader P5 policy/UGC gates.
+
+- [x] `P5-I00C-T01` V27 Circle/membership/Event association/audit tables; slug and membership uniqueness, constraints/indexes, concurrent idempotent join and account erasure. JDBC conventions and existing identity reused.
+- [x] `P5-I00C-T02` Active public directory/detail/counts, private membership and My Circles, ownership, inactive behavior, validated versioned admin management under existing Events admin grant. Existing normalized media upload/selection and audit reused.
+- [x] `P5-I00C-T03` Directory search/category/pagination, detail/guidelines/related Events, join/leave/loading/recovery, real Hub preview and existing web admin integration. EN/PL and Ocean tokens; no social feeds, member identity disclosure or fake records.
+- [x] `P5-I00C-V01` Maven verify:39 unit/architecture +29 CuratedEventsApiIT integration PASS on isolated PostgreSQL. Includes concurrent/duplicate join, ownership, account erasure, counts, filters, admin ACL/conflicts, inactive behavior, covers and existing Event discovery/RSVP relationships. V27 applied only to test database.
+- [x] `P5-I00C-V02` Client35 selected unit tests PASS (membership, RSVP, EventCard, event filters/map models/clusters, theme contrast). Typecheck, changed-file ESLint, web export and iOS/Android exports PASS. Native exports do not prove runtime.
+- [x] `P5-I00C-V03` Browser fixtures:34 distinct scenarios verified (Circles12, Hub10, RSVP12), desktop/mobile-web, EN/PL, Ocean light/dark; includes admin create/edit/activate/deactivate, upload cover and Event association. Final batch30/34 PASS with4 navigation/session timeouts; focused desktop rerun5/5 PASS without code changes (four failed scenarios plus PL dark). Earlier Circles12/12 PASS. Screenshots desktop/light and mobile/PL/dark reviewed. API integration and browser fixtures remain separate evidence. Prettier and git diff --check PASS.
+- [ ] `P5-I00C-V04` Native runtime, VoiceOver/TalkBack and manual accessibility acceptance NOT VERIFIED. After applying pending V26/V27 to development and starting updated backend, verify search/join/reopen/leave and related Event navigation in EN/PL/Ocean themes with large text/screen reader on iOS and Android. No application database migration/restart performed this session.
+
+**Known external regression:** prior P5-I00B colocated-event map preview browser4/4 FAIL remains unresolved; map production code unchanged. Existing backend discovery/RSVP and client map-model tests pass, but full map acceptance cannot be claimed.
+**Docs:** backend/CIRCLES_API.md, COMMUNITY_IMPLEMENTATION_PLAN.md, CHANGELOG.md and local docs/BRANDING.md updated. No Phase4 started.
+**Next:** P5-I00C native/manual acceptance and development activation; separate follow-up for existing map preview failure. Stop after Phase3.
+
+
+## P5-I00D — Community Phase 4: Science Discussions
+
+**Status:** IN_PROGRESS — implementation and automated checks complete; native/manual acceptance NOT VERIFIED.
+**Started:** 2026-11-13. **Finished:** —.
+**Scope:** explicitly requested Phase4 only, following P5-I00A/B/C. Preserve Community without Events. No Phase5 dashboard, generic feed, unrestricted topics or chat. Broader P5 policy/reporting/blocking/legal launch gates remain open.
+
+- [x] `P5-I00D-T01` V28 topic/comment/audit persistence; references to existing science_article revision/editorial_post, indexed aggregates and pagination, same-topic one-level reply FK/trigger, own-comment deletion and account-erasure scrubbing. No content duplication or production fixture seeds.
+- [x] `P5-I00D-T02` Public directory/detail/comments with search/category/recent/popularity; authenticated add/reply/own-delete and private participated topics. Existing Firebase/profile identity; reviewer-only creation/status/moderation, optimistic edit versions, closed/hidden/archived visibility, length/control validation and per-account rate limit.
+- [x] `P5-I00D-T03` Responsive EN/PL Ocean directory/detail/comments, classified opinion/experience notice, real Hub discussions, ArticleScreen action with real count and original article navigation. Existing reviewer administration in same app, article selection and hide/restore/remove actions. Safe plain-text rendering, busy/error/retry/empty and uncertain-write/account-change protection. Community retains no Events card/list; My Activities remains unavailable.
+- [x] `P5-I00D-V01` Maven verify:39 unit/architecture +62 integration PASS (DiscussionsApiIT10, BlogApiIT8, SciencePublicApiIT15, CuratedEventsApiIT29). Tests real Spring Security/Flyway/PostgreSQL: retrieval/search/filters/pagination, comment/reply/delete, ownership, reviewer ACL, hidden/restored/removed text, version conflicts, private participation, rate/invalid inputs, article references and erasure. Existing article/event/Circle/RSVP API regression green. Initial test fixture referenced an incorrect account-erasure timestamp column; corrected to requested_at and rerun PASS.
+- [x] `P5-I00D-V02` Client10 unit tests PASS (CommentForm4, CircleMembership4, theme contrast2): real request shape, root/reply, empty guard, uncertain-write reconciliation and late account-switch completion. Typecheck, changed-file ESLint, Prettier, git diff --check, web export and iOS/Android exports PASS.
+- [x] `P5-I00D-V03` Browser22/22 PASS desktop/mobile-web, EN/PL/light/dark: Hub8; discussion article→comment/reply/delete→article navigation8; directory search/category/sort/retry2; guest read/sign-in2; reviewer create/edit/hide/restore/remove2. Plain script-like text does not execute. Screenshots reviewed on desktop and mobile PL dark. Initial sandbox server startup was interrupted and rerun with local-server permission; intermediate test run interrupted to correct selectors to existing native HTML select; final22/22 PASS. Browser fixtures and real API integration are separate evidence, not live Firebase end-to-end acceptance.
+- [ ] `P5-I00D-V04` Native authenticated runtime, VoiceOver/TalkBack and manual accessibility/live API acceptance NOT VERIFIED. After sandbox device probe failed, approved probe found booted iPhone17 Pro iOS26.5; adb had no devices. Native exports passed but no native discussion flow was run. Owner: start updated development backend to apply pending V26–V28, create a topic as REVIEWER, then check reading/add/reply/delete/reload/counts/article navigation on iOS and Android, EN/PL/themes, large text and screen readers.
+
+**Activation:** no application/production database migration, backend restart, deployment or permission grant. V28 applied only to isolated test PostgreSQL. Existing map colocated-preview regression remains open and outside this change; no claim of full repository regression acceptance.
+**Documentation:** backend/SCIENCE_DISCUSSIONS_API.md (contracts, moderation/privacy rules, activation and limits), COMMUNITY_IMPLEMENTATION_PLAN.md, local docs/BRANDING.md and CHANGELOG.md updated.
+**Next:** P5-I00D native/manual acceptance and local activation. Stop after Phase4; Phase5 requires explicit instruction.
+
 ## P5-I00 — Community policy, privacy & threat model
 
 **Status:** TODO  
@@ -2267,6 +2357,12 @@ Wartości: `PASS`, `FAIL`, `BLOCKED`, `N/A` (z uzasadnieniem), `NOT VERIFIED`. P
 
 # 5. Aktualny punkt pracy
 
+**2026-11-14 — rozszerzenie P0-I05 / SUPER_ADMIN:** backend DONE; T06/T07/V03 zweryfikowane (39 unit + 61 IT), lokalna V29 i grant dla wskazanego konta aktywne, readiness UP / anonymous admin 401. Następny krok: odbiór panelu w sesji właściciela (web/iOS/Android NOT VERIFIED); bez startu kolejnej iteracji.
+
+**2026-11-13 — P5-I00D / Community Phase4:** Science Discussions implemented; backend39+62, client10 and browser22 PASS; static checks/web/native exports PASS. V28 only in isolated test database. Native/manual and live application activation pending. Community remains without Events. Stop after Phase4; no My Activities dashboard.
+
+**2026-11-12 — P5-I00A / Community Phase 1:** Hub implemented; web 10/10, builds and typecheck PASS. Native/manual accessibility NOT VERIFIED; existing EventsScreen tests remain failing. Next: acceptance of P5-I00A; do not start Community Phase 2 without instruction.
+
 **2026-11-07 — dokumentacja uruchomienia:** dodano `RUN.md` z komendami web/iOS/Android, lokalnego helpera backendu z PostgreSQL i alternatywnego pełnego Compose z Auth emulator. Zadanie dokumentacyjne poza iteracją; statusy i checkboxy P2-I03/P2-I04 bez zmian. Komendy porównano ze skryptami i konfiguracją repozytorium; bez uruchamiania usług i testów runtime. CHANGELOG bez wpisu: drobna dokumentacja. Następny krok: odbiór P2-I03/P2-I04 zgodnie z poleceniem właściciela.
 
 **P2-I03 — wyśrodkowany CTA (2026-11-06):** EventDetailParts bez Continue the experience, przycisk Tickets/Bilety wyśrodkowany i poszerzony do360px (maksymalnie dostępna szerokość). Bez testów/skryptów na polecenie właściciela; NOT VERIFIED. CHANGELOG odroczony do odbioru. Następny krok: ręczny odbiór P2-I03.
@@ -2944,3 +3040,26 @@ NEXT: [kolejny ID, tylko do zaakceptowania przez właściciela]
 | 2026-11-11 | Korekta Home i P2-I03 — Community preview / rozmiar Going Sober | Implementacja / runtime NOT VERIFIED | WelcomeScreen + nowy WeeklyCommunityHighlight: statyczny mock zastępuje rotację funkcji, nagłówek EN/PL i ikona people, istniejące assety community obu motywów. EventGoingButton: maks. 360 px i min. 52 px jak Tickets; komentarz EventDetailParts dostosowany do scrolla. EN/PL i BRANDING uzupełnione. | Prettier zmienionych komponentów/tłumaczeń, ESLint czterech komponentów oraz git diff --check PASS. Web/iOS/Android nie uruchamiano; ręcznie sprawdzić Home i szczegóły wydarzenia w EN/PL oraz obu motywach. Brak rozpoczęcia modułu Community lub zamknięcia iteracji. CHANGELOG bez wpisu: mock i drobna korekta UI przed odbiorem. Następny krok: odbiór Home oraz korekty P2-I03. |
 
 | 2026-11-11 | P2-I03 — szczegóły bez pastylki kategorii | IN_PROGRESS / runtime NOT VERIFIED | EventDetailScreen: usunięto kategorię pod tytułem i nieużywane style; BRANDING uzupełniony. | Bez testów runtime; CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I03. |
+
+| 2026-11-12 | P2-I03 — kolor Going Sober i ikona Tickets | IN_PROGRESS / runtime NOT VERIFIED | EventGoingButton: zielony wariant success; Button: opcjonalna ikona i wariant success; SettingsIcon: bilet; EventDetailParts: ikona przed Tickets/Bilety. BRANDING uzupełniony. | Prettier, ESLint i git diff --check PASS; istniejące testy Button 3/3 PASS (--watchman=false po blokadzie uprawnień Watchmana). Odbiór wizualny web/iOS/Android nieuruchomiony: sprawdzić szczegóły w EN/PL, obu motywach i stanach Going Sober. Bez zaliczania checkboxów. CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I03. |
+
+| 2026-11-12 | P2-I03 — wypełnienie Going Sober | IN_PROGRESS / runtime NOT VERIFIED | Na korektę właściciela Button success ma pełne zielone tło i kontrastowy tekst onPrimary obu motywów; BRANDING uaktualniony. | Odbiór wizualny web/iOS/Android nieuruchomiony. CHANGELOG bez wpisu: drobna korekta UI. Następny krok: odbiór P2-I03. |
+
+| 2026-11-12 | P2-I03 — tekst przycisku po deklaracji | IN_PROGRESS / runtime NOT VERIFIED | EventGoingButton i EN/PL: osobne etykiety przed/po zapisie Going Sober; cofnięcie przywraca etykietę początkową. BRANDING uzupełniony. | JSON parse, ESLint i git diff --check PASS. Web/iOS/Android nieuruchomione. CHANGELOG bez wpisu: drobna korekta tekstów UI. Następny krok: odbiór P2-I03. |
+
+| 2026-11-12 | P2-I03 — potwierdzenie w drugiej osobie | IN_PROGRESS / runtime NOT VERIFIED | EN/PL buttonActive: You’re going sober ✓ / Idziesz na trzeźwo ✓. BRANDING uaktualniony. | JSON parse i git diff --check PASS; runtime nieuruchomiony. CHANGELOG bez wpisu: drobna korekta tekstu. Następny krok: odbiór P2-I03. |
+
+| 2026-11-12 | P5-I00A — Community Phase 1 | IN_PROGRESS / native NOT VERIFIED | Hub, authenticated route/menu, reusable cards, real Events API, EN/PL and plan. Existing Event logic/auth untouched. | Playwright 10/10; EventCard 3/3; typecheck/changed-file lint/web build/native exports PASS; local API 200. Existing EventsScreen 6 failures documented above. Native/manual a11y pending. CHANGELOG updated; Phase 2 not started. |
+
+| 2026-11-13 | P5-I00B — Community RSVP, continuation and verification | IN_PROGRESS / map + native acceptance open | Existing participation API/table extended, real aggregate and Join/Cancel UI, V26 account/event erasure, API docs and plan. | Backend39 unit+24 IT, frontend41, browser RSVP12/12 and Hub10/10 PASS; typecheck/lint/format/builds PASS. Map4/4 preview failures documented, production map unchanged. No application DB migration/restart. CHANGELOG updated; no Phase3. |
+
+
+| 2026-11-13 | P5-I00C — Community Phase3: Sober Circles | IN_PROGRESS / native manual acceptance pending | V27 Circle/member/Event association/audit, authorized API, directory/detail/membership, real Hub preview, existing Events web admin/media integration. T01–T03 and V01–V03 checked; V04 pending. | Backend39+29, client35, browser34 distinct scenarios PASS after focused5/5 rerun of navigation/session timeouts; typecheck/changed-file lint/format/web/native exports/diff PASS. No app DB migration/restart; native runtime/manual a11y NOT VERIFIED. Prior map preview failure retained. CHANGELOG/API/plan/branding updated. Next: P5-I00C activation/native acceptance; no Phase4. |
+
+
+| 2026-11-13 | P5-I00C — korekta Community bez wydarzeń | Korekta web zweryfikowana; status iteracji bez zmian | CommunityScreen: usunięto kafel Events, sekcję wydarzeń i pobieranie Events API; układ trzech kafli. Zaktualizowano istniejący test Community, plan i branding. | Typecheck, ESLint, Prettier, git diff --check PASS; Playwright8/8 desktop/mobile-web EN/PL light/dark PASS. Native runtime tej korekty nieuruchomiony. CHANGELOG uzupełniony. Następny krok: pozostały odbiór P5-I00C, bez następnej fazy. |
+
+
+| 2026-11-13 | P5-I00D — Community Phase4: Science Discussions | IN_PROGRESS / native manual acceptance pending | V28 topic/comment/audit; public directory, private commenting/participated API, existing reviewer moderation, ArticleScreen links and real Hub data. T01–T03 and V01–V03 checked; V04 pending. | Backend39+62, client10, browser22/22, typecheck/lint/format/diff and web/native exports PASS. Device probe: booted iOS, no Android device; native flow NOT VERIFIED. Application DB unchanged; prior map failure remains open. CHANGELOG/API/plan/branding updated. Next: P5-I00D activation/manual native acceptance; no Phase5. |
+
+| 2026-11-14 | P0-I05 — rozszerzenie SUPER_ADMIN | DONE backend; T06/T07/V03 | ApplicationRoles, V29, EditorialService/EventAccess, testy SuperAdmin/Editorial i SUPER_ADMIN.md. Maven 39 unit +61 IT PASS, diff check PASS. Lokalna migracja V29 i grant konta wskazanego przez właściciela po odczycie Firebase UID; readiness UP, anonymous admin401. CHANGELOG uzupełniony. | Ręczny odbiór sesji web/iOS/Android NOT VERIFIED; odświeżyć panel. Bez produkcji i bez kolejnej iteracji. |

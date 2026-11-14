@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Private "going" intent per account. It is only an informational note for the user: no booking,
+ * Going / Not Going RSVP per account. Aggregate counts are public, identities remain private: no booking,
  * ticket or organizer notification. Only the hashed account reference is stored.
  */
 @Service
@@ -27,6 +27,9 @@ public class EventInterests {
 
     /** Idempotent: repeating the declaration keeps the original declaration time. */
     public void declare(VerifiedToken actor, UUID eventId) {
+        access.verified(actor);
+        // Use the same event-row lock as admin publication/deletion. Recheck eligibility after locking.
+        jdbc.queryForList("SELECT id FROM sober_event WHERE id=? FOR UPDATE", eventId);
         Boolean upcoming = jdbc.queryForObject(
                 "SELECT EXISTS(SELECT 1 " + EventCatalog.JOIN + " WHERE e.id=? AND " + EventCatalog.ELIGIBLE
                         + " AND coalesce(r.ends_at,r.starts_at)>clock_timestamp())",
@@ -41,10 +44,12 @@ public class EventInterests {
 
     /** Idempotent: withdrawing a declaration that does not exist changes nothing. */
     public void withdraw(VerifiedToken actor, UUID eventId) {
+        access.verified(actor);
         jdbc.update("DELETE FROM events_interest WHERE event_id=? AND user_ref=?", eventId, access.ref(actor));
     }
 
     public boolean declared(VerifiedToken actor, UUID eventId) {
+        access.verified(actor);
         return Boolean.TRUE.equals(jdbc.queryForObject(
                 "SELECT EXISTS(SELECT 1 FROM events_interest WHERE event_id=? AND user_ref=?)",
                 Boolean.class,
@@ -52,8 +57,31 @@ public class EventInterests {
                 access.ref(actor)));
     }
 
+    /** One SQL snapshot for the count, availability and caller's state. No participant identities. */
+    public Map<String, Object> state(VerifiedToken actor, UUID eventId) {
+        access.verified(actor);
+        return summary(eventId, access.ref(actor));
+    }
+
+    public Map<String, Object> summary(UUID eventId) {
+        var result = new java.util.LinkedHashMap<>(summary(eventId, ""));
+        result.remove("declared");
+        return result;
+    }
+
+    private Map<String, Object> summary(UUID eventId, String userRef) {
+        var rows = jdbc.queryForList("""
+                SELECT (SELECT count(*) FROM events_interest i WHERE i.event_id=e.id) AS participant_count,
+                  EXISTS(SELECT 1 FROM events_interest i WHERE i.event_id=e.id AND i.user_ref=?) AS declared,
+                  coalesce(r.ends_at,r.starts_at)>clock_timestamp() AS can_join
+                """ + EventCatalog.JOIN + " WHERE e.id=? AND " + EventCatalog.ELIGIBLE, userRef, eventId);
+        if (rows.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event is not available.");
+        return rows.getFirst();
+    }
+
     /** The caller's own upcoming or ongoing, still-eligible declarations, soonest first. */
     public Map<String, Object> mine(VerifiedToken actor, int page, int size) {
+        access.verified(actor);
         if (page < 0 || page > 100000 || size < 1 || size > 100) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid pagination.");
         }

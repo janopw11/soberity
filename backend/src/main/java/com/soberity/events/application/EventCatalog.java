@@ -97,6 +97,14 @@ public class EventCatalog {
         result.put("radiusKm",properties.nearbyRadiusKm());
         result.put("location",locations.nearbyPlace(input.latitude(),input.longitude()));return result;
     }
+    /** Published upcoming/ongoing projections for explicit circle associations; no event copies. */
+    public Map<String,Object> related(List<UUID> ids,int page,int size) {
+        pagination(page,size);
+        if(ids.isEmpty())return Map.of("items",List.of(),"page",page,"size",size,"total",0);
+        var args=new ArrayList<Object>(ids);
+        return page("SELECT "+FIELDS+JOIN+" WHERE "+ELIGIBLE+" AND coalesce(r.ends_at,r.starts_at)>clock_timestamp() AND e.id IN ("+
+            String.join(",",Collections.nCopies(ids.size(),"?"))+")",args,"r.starts_at,e.id",page,size);
+    }
     public Map<String,Object> detail(UUID id) {
         var rows=jdbc.queryForList("SELECT "+FIELDS+JOIN+" WHERE e.id=? AND "+ELIGIBLE,id);
         if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event unavailable.");

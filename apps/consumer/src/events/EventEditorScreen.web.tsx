@@ -490,6 +490,9 @@ export default function EventEditorScreen() {
         <style>{css}</style>
         <header>
           <h1>{t('eventEditor.title')}</h1>
+          {allowed ? (
+            <Link href="/editorial-circles">{t('circles.admin')}</Link>
+          ) : null}
           <Link href="/events">{t('events.detail.browse')}</Link>
         </header>
         {error ? (

@@ -281,6 +281,7 @@ export function EventActionBar({
         {label ? (
           <Button
             label={label}
+            icon="ticket"
             variant={variant}
             disabled={busy}
             onPress={onPress}

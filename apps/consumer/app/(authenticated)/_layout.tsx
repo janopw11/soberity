@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { AppLogo } from '../../src/ui';
+import { AppLogo, SettingsIcon } from '../../src/ui';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { spacing, typography } from '@soberity/design-tokens';
 import { useThemePreferences } from '../../src/preferences/ThemePreferencesContext';
@@ -13,6 +13,32 @@ export default function AuthenticatedLayout() {
 
   return (
     <Stack screenOptions={headerOptions}>
+      <Stack.Screen
+        name="circles/index"
+        options={{
+          title: t('circles.title'),
+          headerTitle: () => <CirclesTitle />,
+        }}
+      />
+      <Stack.Screen
+        name="circles/[id]"
+        options={{ title: t('circles.title') }}
+      />
+      <Stack.Screen
+        name="editorial-circles"
+        options={{ title: t('circles.admin') }}
+      />
+      <Stack.Screen
+        name="editorial-discussions"
+        options={{ title: t('discussions.admin') }}
+      />
+      <Stack.Screen
+        name="community"
+        options={{
+          title: t('community.title'),
+          headerTitle: () => <SectionTitle section="community" />,
+        }}
+      />
       <Stack.Screen
         name="index"
         options={{
@@ -42,7 +68,10 @@ export default function AuthenticatedLayout() {
       />
       <Stack.Screen
         name="about"
-        options={{ title: t('about.title'), headerTitle: () => <AboutTitle /> }}
+        options={{
+          title: t('about.title'),
+          headerTitle: () => <SectionTitle section="about" />,
+        }}
       />
       <Stack.Screen name="account" options={{ title: t('account.title') }} />
       <Stack.Screen
@@ -65,10 +94,29 @@ export default function AuthenticatedLayout() {
   );
 }
 
-function AboutTitle() {
+function CirclesTitle() {
+  const { t } = useTranslation();
+  const { colors } = useThemePreferences();
+  return (
+    <View style={styles.aboutTitle}>
+      <SettingsIcon name="people" color={colors.primary} size={28} />
+      <Text
+        accessibilityRole="header"
+        style={[styles.aboutLabel, { color: colors.primary }]}
+      >
+        {t('circles.title')}
+      </Text>
+    </View>
+  );
+}
+
+function SectionTitle({ section }: { section: 'about' | 'community' }) {
   const { t } = useTranslation();
   const { colors, theme } = useThemePreferences();
-  const aboutItem = navigationItems.find((item) => item.id === 'about')!;
+  const aboutItem =
+    section === 'community'
+      ? navigationItems.find((item) => item.id === 'community')!
+      : navigationItems.find((item) => item.id === 'about')!;
   return (
     <View style={styles.aboutTitle}>
       <Image
@@ -83,7 +131,7 @@ function AboutTitle() {
         accessibilityRole="header"
         style={[styles.aboutLabel, { color: colors.primary }]}
       >
-        {t('about.title')}
+        {t(`${section}.title`)}
       </Text>
     </View>
   );
